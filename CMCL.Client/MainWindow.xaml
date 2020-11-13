@@ -1,0 +1,29 @@
+﻿<hc:Window x:Class="CMCL.Client.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:hc="https://handyorg.github.io/handycontrol"
+        xmlns:local="clr-namespace:CMCL.Client"
+        xmlns:userControl="clr-namespace:CMCL.Client.UserControl"
+        mc:Ignorable="d" WindowStyle="None" Title="Component" Height="450" Width="800" ShowTitle="False"
+        OtherButtonForeground="Black" CloseButtonForeground="Black" ResizeMode="CanMinimize"
+        WindowStartupLocation="CenterScreen" ShowNonClientArea="True" NonClientAreaHeight="30" x:Name="MainWin"
+        Loaded="MainWindow_OnLoaded" Icon="Resources/Images/Component_128.png">
+    <hc:Window.NonClientAreaContent>
+        <StackPanel Orientation="Horizontal" Height="0">
+        </StackPanel>
+    </hc:Window.NonClientAreaContent>
+    <Grid>
+        <TabControl x:Name="TabMain" SelectionChanged="TabControl_OnSelectionChanged">
+            <TabItem Header="开始游戏" x:Name="MainTabItem">
+                <userControl:MainTabUc></userControl:MainTabUc>
+            </TabItem>
+            <TabItem Header="版本" x:Name="VersionTabItem">
+                <!--<hc:LoadingCircle x:Name="VersionListLoading" Visibility="Visible" Grid.Row="0"></hc:LoadingCircle>-->
+                <userControl:GameVersionUc></userControl:GameVersionUc>
+            </TabItem>
+        </TabControl>
+        <hc:NotifyIcon Token="AppNotifyIcon" Text="CMCL" Visibility="Visible" Icon="Resources/Images/Component_32.png"></hc:NotifyIcon>
+    </Grid>
+</hc:Window>

@@ -1,0 +1,30 @@
+﻿<hc:BlurWindow x:Class="CMCL.Client.Window.DownloadInfoFrm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CMCL.Client.Window"
+        xmlns:hc="https://handyorg.github.io/handycontrol"
+        mc:Ignorable="d" Closing="DownloadInfoFrm_OnClosing"
+        Title="DownloadInfoFrm" Height="280" Width="220">
+    <Grid>
+        <TextBlock x:Name="BtnStopDownload" Text="关闭" TextAlignment="Center" Cursor="Hand" Margin="88,229,88,0" FontSize="7" Height="10" VerticalAlignment="Top" MouseLeftButtonUp="BtnStopDownload_OnMouseLeftButtonUp" MouseEnter="BtnStopDownload_OnMouseEnter" MouseLeave="BtnStopDownload_OnMouseLeave"/>
+        <hc:CircleProgressBar Margin="50,37,50,108" Style="{DynamicResource ProgressBarInfoCircle}" x:Name="DownloadProgressBar">
+            <hc:CircleProgressBar.Value>
+                <Binding Path="CurrentDownloadProgress"></Binding>
+            </hc:CircleProgressBar.Value>
+        </hc:CircleProgressBar>
+        <!--<Label x:Name="InfoLabel" Content="暂无信息" Margin="30,182,30,36" VerticalAlignment="Stretch"  Style="{DynamicResource LabelInfo}" HorizontalAlignment="Stretch"></Label>-->
+
+        <TextBlock x:Name="TbDownloadGroup" Height="20" TextAlignment="Center" Margin="0,160,0,65">
+            <TextBlock.Text>
+                <Binding Path="CurrentDownloadGroup"></Binding>
+            </TextBlock.Text>
+        </TextBlock>
+        <TextBlock x:Name="TbDownloadFile" Height="20" TextAlignment="Center" Margin="0,185,0,40">
+            <TextBlock.Text>
+                <Binding Path="CurrentDownloadFile"></Binding>
+            </TextBlock.Text>
+        </TextBlock>
+    </Grid>
+</hc:BlurWindow>
