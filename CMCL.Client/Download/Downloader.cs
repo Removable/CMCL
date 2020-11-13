@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using CMCL.Client.Util;
-using RestSharp;
+using Flurl.Http;
 
 namespace CMCL.Client.Download
 {
@@ -22,31 +22,29 @@ namespace CMCL.Client.Download
         public static async Task<string> GetStringAsync(string url)
         {
             var uri = new Uri(url);
-
-            var client = new RestClient(url)
+            FlurlHttp.Configure(settings =>
             {
-                FollowRedirects = true,
-                Timeout = 15
-            };
-            var request = new RestRequest("", Method.GET);
-            var response = await client.ExecuteGetAsync<string>(request);
-            if (response.StatusCode == HttpStatusCode.Found)
+                settings.Redirects.AllowSecureToInsecure = true;
+                settings.Redirects.Enabled = true;
+                settings.Redirects.MaxAutoRedirects = 5;
+            });
+            var response = await url.GetAsync();
+            if (response.StatusCode == (int)HttpStatusCode.Found)
             {
-                var location = response.Headers.FirstOrDefault(i => i.Name == "Location");
-                if (location != null)
+                if (response.ResponseMessage.Headers.Location != null)
                 {
-                    url = location.Value?.ToString() ?? string.Empty;
-                    if (!string.IsNullOrWhiteSpace(url))
+                    url = response.ResponseMessage.Headers.Location.ToString();
+                    if (!url.Contains("http:"))
                     {
-                        if (!url.StartsWith("http:")) url = $"{uri.Host}{uri.Scheme}{url}";
-                        return await GetStringAsync(url);
+                        url = $"{uri.Scheme}{uri.Host}{url}";
                     }
+                    return await GetStringAsync(url);
                 }
             }
 
-            if (response.StatusCode == HttpStatusCode.OK)
-                return response.Content;
-            throw new Exception($"获取地址出错，状态码：{(int) response.StatusCode}");
+            if (response.StatusCode == (int) HttpStatusCode.OK)
+                return await response.ResponseMessage.Content.ReadAsStringAsync();
+            throw new Exception($"获取地址出错，状态码：{(int)response.StatusCode}");
         }
 
         /// <summary>
@@ -70,7 +68,7 @@ namespace CMCL.Client.Download
             var uri = new Uri(url);
 
             //实例化一个HttpClient并将允许自动重定向设为false
-            var client = new HttpClient(new HttpClientHandler {AllowAutoRedirect = false});
+            var client = new HttpClient(new HttpClientHandler { AllowAutoRedirect = false });
             using var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, token);
             //若返回的状态码为302
             if (response.StatusCode == HttpStatusCode.Found)
