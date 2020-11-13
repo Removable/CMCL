@@ -21,7 +21,6 @@ namespace CMCL.Client.Download
         /// <returns></returns>
         public static async Task<string> GetStringAsync(string url)
         {
-            var uri = new Uri(url);
             FlurlHttp.Configure(settings =>
             {
                 settings.Redirects.AllowSecureToInsecure = true;
@@ -29,22 +28,10 @@ namespace CMCL.Client.Download
                 settings.Redirects.MaxAutoRedirects = 5;
             });
             var response = await url.GetAsync();
-            if (response.StatusCode == (int)HttpStatusCode.Found)
-            {
-                if (response.ResponseMessage.Headers.Location != null)
-                {
-                    url = response.ResponseMessage.Headers.Location.ToString();
-                    if (!url.Contains("http:"))
-                    {
-                        url = $"{uri.Scheme}{uri.Host}{url}";
-                    }
-                    return await GetStringAsync(url);
-                }
-            }
 
             if (response.StatusCode == (int) HttpStatusCode.OK)
                 return await response.ResponseMessage.Content.ReadAsStringAsync();
-            throw new Exception($"获取地址出错，状态码：{(int)response.StatusCode}");
+            throw new Exception($"获取地址出错，状态码：{response.StatusCode}");
         }
 
         /// <summary>
