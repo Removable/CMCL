@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:CMCL.Client.UserControl"
              xmlns:hc="https://handyorg.github.io/handycontrol"
              mc:Ignorable="d" Loaded="GameVersionUc_OnLoaded"
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="390" d:DesignWidth="800">
     <Grid Background="White" x:Name="TopGrid">
         <Grid.RowDefinitions>
             <RowDefinition/>

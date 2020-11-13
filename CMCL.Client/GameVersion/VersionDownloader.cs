@@ -52,7 +52,7 @@ namespace CMCL.Client.GameVersion
             var cancellationToken = new CancellationTokenSource();
             await Downloader.GetFileAsync(
                 _gameDownloadUrl.Replace(":version", versionId).Replace(":category", "client"),
-                progress, cancellationToken.Token, fullPath,
+                progress, fullPath,
                 new DownloadInfo
                 {
                     TotalFilesCount = 1,
@@ -60,10 +60,10 @@ namespace CMCL.Client.GameVersion
                     CurrentFileName = $"{versionId}.jar",
                     CurrentCategory = "游戏本体",
                     ReportFinish = false
-                });
+                }, cancellationToken.Token);
             await Downloader.GetFileAsync(
                 _gameDownloadUrl.Replace(":version", versionId).Replace(":category", "json"),
-                progress, cancellationToken.Token, fullPath,
+                progress, fullPath,
                 new DownloadInfo
                 {
                     TotalFilesCount = 1,
@@ -71,7 +71,7 @@ namespace CMCL.Client.GameVersion
                     CurrentFileName = $"{versionId}.json",
                     CurrentCategory = "JSON文件",
                     ReportFinish = true
-                });
+                }, cancellationToken.Token);
             return (true, "");
         }
     }

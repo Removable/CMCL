@@ -5,8 +5,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CMCL.Client.UserControl"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="390" d:DesignWidth="800">
     <Grid Background="White">
-        <Label Content="敬请期待..." Style="{DynamicResource LabelPrimary}"></Label>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="6*"/>
+            <RowDefinition Height="4*"/>
+        </Grid.RowDefinitions>
+        <TextBlock Margin="0,80,0,0" Text="Component Launcher" FontSize="40" Foreground="#326CF3" Style="{StaticResource TextBlockLargeBold}" Grid.Row="0" VerticalAlignment="Top"/>
+        <TextBlock Margin="0,158,0,0" TextAlignment="Center" Text="Minecraft版本：1.16.4" FontSize="16" Style="{StaticResource TextBlockDefaultPrimary}" VerticalAlignment="Top" Width="780" Grid.Row="0"/>
+        <Label Content="开始" Style="{DynamicResource LabelPrimary}" Margin="0,40,0,0" VerticalAlignment="Top" Grid.Row="1" Width="150" Height="50"></Label>
     </Grid>
 </UserControl>
