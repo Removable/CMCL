@@ -1,4 +1,4 @@
-﻿<hc:BlurWindow x:Class="CMCL.Client.Window.DownloadInfoFrm"
+﻿<hc:Window x:Class="CMCL.Client.Window.DownloadInfoFrm"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,9 +6,10 @@
         xmlns:local="clr-namespace:CMCL.Client.Window"
         xmlns:hc="https://handyorg.github.io/handycontrol"
         mc:Ignorable="d" Closing="DownloadInfoFrm_OnClosing"
-        Title="DownloadInfoFrm" Height="280" Width="220">
+        WindowStyle="None" AllowsTransparency="True" Background="White" ShowNonClientArea="True"
+        Title="DownloadInfoFrm" Height="280" Width="220" ResizeMode="NoResize">
     <Grid>
-        <TextBlock x:Name="BtnStopDownload" Text="关闭" TextAlignment="Center" Cursor="Hand" Margin="88,229,88,0" FontSize="7" Height="10" VerticalAlignment="Top" MouseLeftButtonUp="BtnStopDownload_OnMouseLeftButtonUp" MouseEnter="BtnStopDownload_OnMouseEnter" MouseLeave="BtnStopDownload_OnMouseLeave"/>
+        <TextBlock x:Name="BtnStopDownload" Text="0B/s" TextAlignment="Center" Cursor="Hand" Margin="88,229,88,0" FontSize="10" Height="15" VerticalAlignment="Top" MouseLeftButtonUp="BtnStopDownload_OnMouseLeftButtonUp" MouseEnter="BtnStopDownload_OnMouseEnter" MouseLeave="BtnStopDownload_OnMouseLeave"/>
         <hc:CircleProgressBar Margin="50,37,50,108" Style="{DynamicResource ProgressBarInfoCircle}" x:Name="DownloadProgressBar">
             <hc:CircleProgressBar.Value>
                 <Binding Path="CurrentDownloadProgress"></Binding>
@@ -27,4 +28,4 @@
             </TextBlock.Text>
         </TextBlock>
     </Grid>
-</hc:BlurWindow>
+</hc:Window>

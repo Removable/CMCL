@@ -7,7 +7,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using CMCL.Client.Download;
 using CMCL.Client.Game;
+using CMCL.Client.GameVersion.JsonClasses;
 using CMCL.Client.Util;
+using Newtonsoft.Json;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace CMCL.Client.GameVersion
 {
@@ -59,7 +62,7 @@ namespace CMCL.Client.GameVersion
                     CurrentFileIndex = 1,
                     CurrentFileName = $"{versionId}.jar",
                     CurrentCategory = "游戏本体",
-                    ReportFinish = false
+                    ReportFinish = false,
                 }, cancellationToken.Token);
             await Downloader.GetFileAsync(
                 _gameDownloadUrl.Replace(":version", versionId).Replace(":category", "json"),
@@ -72,6 +75,9 @@ namespace CMCL.Client.GameVersion
                     CurrentCategory = "JSON文件",
                     ReportFinish = true
                 }, cancellationToken.Token);
+            var versionInfo =
+                JsonConvert.DeserializeObject<VersionInfo>(
+                    await File.ReadAllTextAsync(Path.Combine(fullPath, $"{versionId}.json"), cancellationToken.Token));
             return (true, "");
         }
     }

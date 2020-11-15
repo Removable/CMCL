@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using CMCL.Client.Util;
@@ -21,13 +22,7 @@ namespace CMCL.Client.Download
         /// <returns></returns>
         public static async Task<string> GetStringAsync(string url)
         {
-            FlurlHttp.Configure(settings =>
-            {
-                settings.Redirects.AllowSecureToInsecure = true;
-                settings.Redirects.Enabled = true;
-                settings.Redirects.MaxAutoRedirects = 5;
-            });
-            var response = await url.GetAsync();
+            using var response = await url.GetAsync();
 
             if (response.StatusCode == (int) HttpStatusCode.OK)
                 return await response.ResponseMessage.Content.ReadAsStringAsync();
@@ -52,65 +47,111 @@ namespace CMCL.Client.Download
                 $"正在下载 {downloadInfo.CurrentCategory}({downloadInfo.CurrentFileIndex}/{downloadInfo.TotalFilesCount})";
 
             FileHelper.CreateDirectoryIfNotExist(directory);
+            var filePath = Path.Combine(directory, downloadInfo.CurrentFileName);
+
             var uri = new Uri(url);
 
-            //实例化一个HttpClient并将允许自动重定向设为false
-            var client = new HttpClient(new HttpClientHandler { AllowAutoRedirect = false });
-            using var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, token);
-            //若返回的状态码为302
-            if (response.StatusCode == HttpStatusCode.Found)
-            {
-                //若重定向的新地址为相对地址，则将其重新拼接
-                url = response.Headers.Location.ToString();
-                if (!response.Headers.Location.IsAbsoluteUri) url = $"{uri.Scheme}://{uri.Host}{url}";
-                //递归
-                await GetFileAsync(url, progress, directory, downloadInfo, token);
-                return;
-            }
-
-            //若返回了其他表示错误的状态码
-            if (!response.IsSuccessStatusCode) throw new Exception($"出错啦，状态码：{response.StatusCode}");
+            //获取重定向后的响应
+            var response = await GetFinalResponse(uri);
 
             var total = response.Content.Headers.ContentLength ?? -1L;
             var canReportProgress = total != -1 && progress != null;
 
-            //读取流并写到文件
-            await using Stream stream = await response.Content.ReadAsStreamAsync(token),
-                fileStream = new FileStream(Path.Combine(directory, downloadInfo.CurrentFileName), FileMode.Create,
-                    FileAccess.Write, FileShare.None, 8192, true);
-            var totalRead = 0L;
-            var buffer = new byte[4096];
-            var isMoreToRead = true;
-
-            do
+            try
             {
-                token.ThrowIfCancellationRequested();
+                //读取流并写到文件
+                await using Stream stream = await response.Content.ReadAsStreamAsync(token),
+                    fileStream = new FileStream(filePath, FileMode.Create,
+                        FileAccess.Write, FileShare.None, 4096, true);
+                var totalRead = 0L;
+                var buffer = new byte[4096];
+                var isMoreToRead = true;
 
-                var read = await stream.ReadAsync(buffer, 0, buffer.Length, token);
-
-                if (read == 0)
+                do
                 {
-                    isMoreToRead = false;
+                    token.ThrowIfCancellationRequested();
+
+                    var read = await stream.ReadAsync(buffer.AsMemory(0, buffer.Length), token);
+
+                    if (read == 0)
+                    {
+                        isMoreToRead = false;
+                    }
+                    else
+                    {
+                        var data = new byte[read];
+                        buffer.ToList().CopyTo(0, data, 0, read);
+
+                        await fileStream.WriteAsync(buffer.AsMemory(0, read), token);
+
+                        totalRead += read;
+
+                        //进度报告
+                        if (canReportProgress)
+                        {
+                            //TODO 通过这里比上次多的数据差，统计下载速度
+                            var progressValue = totalRead * 1d / (total * 1d) * 100;
+                            if (progressValue >= 100 && downloadInfo.ReportFinish)
+                                DownloadInfoHandler.DownloadFinished = true;
+                            progress.Report(progressValue);
+                        }
+                    }
+                } while (isMoreToRead);
+
+                response.Dispose();
+            }
+            catch (Exception ex)
+            {
+                response.Dispose();
+                //若以bangbang93.com源下载失败，切换mcbbs源尝试
+                if (url.Contains("bangbang93.com"))
+                {
+                    url = url.Replace("bangbang93.com", "download.mcbbs.net");
+                    if (!url.StartsWith("https"))
+                    {
+                        url.Replace("http", "https");
+                    }
+
+                    await GetFileAsync(url, progress, directory, downloadInfo, token);
                 }
                 else
+                    throw new Exception("下载失败");
+            }
+
+            //获取经过重定向后的最终响应
+            async Task<HttpResponseMessage> GetFinalResponse(Uri thisUri)
+            {
+                //实例化一个HttpClient并将允许自动重定向设为false
+                var client = new HttpClient(new HttpClientHandler {AllowAutoRedirect = false});
+                try
                 {
-                    var data = new byte[read];
-                    buffer.ToList().CopyTo(0, data, 0, read);
-
-                    await fileStream.WriteAsync(buffer, 0, read, token);
-
-                    totalRead += read;
-
-                    //进度报告
-                    if (canReportProgress)
-                    {
-                        var progressValue = totalRead * 1d / (total * 1d) * 100;
-                        if (progressValue >= 100 && downloadInfo.ReportFinish)
-                            DownloadInfoHandler.DownloadFinished = true;
-                        progress.Report(progressValue);
-                    }
+                    response =
+                        await client.GetAsync(thisUri.ToString(), HttpCompletionOption.ResponseHeadersRead, token);
                 }
-            } while (isMoreToRead);
+                catch
+                {
+                    return await GetFinalResponse(thisUri);
+                }
+
+                //若返回的状态码为302
+                switch (response.StatusCode)
+                {
+                    case HttpStatusCode.Found:
+                        if (response.Headers.Location == null)
+                            throw new Exception("未找到重定向地址");
+                        //若重定向的新地址为相对地址，则将其重新拼接
+                        if (!response.Headers.Location.IsAbsoluteUri)
+                            thisUri = new Uri($"{thisUri.Scheme}://{thisUri.Host}{response.Headers.Location}");
+                        else
+                            thisUri = response.Headers.Location;
+                        //递归
+                        return await GetFinalResponse(thisUri);
+                    case HttpStatusCode.OK:
+                        return response;
+                    default:
+                        throw new Exception($"出错啦，状态码：{response.StatusCode}");
+                }
+            }
         }
     }
 }

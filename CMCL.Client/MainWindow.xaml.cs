@@ -35,7 +35,7 @@ namespace CMCL.Client
             //var cancellationToken = new CancellationTokenSource();
             //await Downloader.GetFileAsync("https://bmclapi2.bangbang93.com/version/1.15.2/client", progress, cancellationToken.Token, @"D:\", "b.jar");
 
-            FlurlHttp.GlobalSettings. (settings =>
+            FlurlHttp.Configure(settings =>
             {
                 settings.Redirects.AllowSecureToInsecure = true;
                 settings.Redirects.Enabled = true;

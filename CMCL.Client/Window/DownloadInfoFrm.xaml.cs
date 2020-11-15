@@ -18,7 +18,7 @@ namespace CMCL.Client.Window
     /// <summary>
     /// DownloadInfoFrm.xaml 的交互逻辑
     /// </summary>
-    public partial class DownloadInfoFrm : HandyControl.Controls.BlurWindow
+    public partial class DownloadInfoFrm : HandyControl.Controls.Window
     {
         public DownloadInfoFrm()
         {

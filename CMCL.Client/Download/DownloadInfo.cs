@@ -29,5 +29,10 @@ namespace CMCL.Client.Download
         /// 下载完成后是否标记为下载已结束
         /// </summary>
         public bool ReportFinish { get; set; }
+        
+        /// <summary>
+        /// md5哈希值
+        /// </summary>
+        public string Hash { get; set; }
     }
 }

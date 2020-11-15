@@ -31,13 +31,14 @@ namespace CMCL.Client.UserControl
     public partial class GameVersionUc : System.Windows.Controls.UserControl
     {
         private GameVersionManifest _gameVersionManifest = null;
+
         public GameVersionUc()
         {
             InitializeComponent();
         }
+
         private void GameVersionUc_OnLoaded(object sender, RoutedEventArgs e)
         {
-
         }
 
         private async Task LoadGameVersionList()
@@ -57,7 +58,7 @@ namespace CMCL.Client.UserControl
                 var remark = string.Empty;
                 if (gameVersionInfo.Id == _gameVersionManifest.Latest.Release)
                 {
-                    remark = "(最新正式版)";
+                    remark = "(最新稳定版)";
                 }
                 else if (gameVersionInfo.Id == _gameVersionManifest.Latest.Snapshot)
                 {
@@ -66,10 +67,13 @@ namespace CMCL.Client.UserControl
 
                 var dr = dataTable.NewRow();
                 dr["版本"] = gameVersionInfo.Id;
-                dr["发布时间"] = DateTime.Parse(gameVersionInfo.Time).ToString("yyyy-MM-dd HH:mm:ss");
+                dr["发布时间"] = DateTime.Parse(gameVersionInfo.ReleaseTime).ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss");
                 dr["类型"] = $"{gameVersionInfo.Type}{remark}";
                 dataTable.Rows.Add(dr);
+                //从1.13开始支持，更早版本抛弃
+                if (gameVersionInfo.Id == "1.13") break;
             }
+
             VersionListView.ItemsSource = dataTable.DefaultView;
 
             BtnRefresh.IsEnabled = true;
@@ -94,6 +98,7 @@ namespace CMCL.Client.UserControl
                 await LoadGameVersionList();
             }
         }
+
         /// <summary>
         /// 下载按钮
         /// </summary>
@@ -107,6 +112,7 @@ namespace CMCL.Client.UserControl
                 NotifyIcon.ShowBalloonTip("提示", "请选择一个版本", NotifyIconInfoType.Warning, "AppNotifyIcon");
                 return;
             }
+
             BtnDownload.IsEnabled = false;
             BtnRefresh.IsEnabled = false;
 
@@ -125,10 +131,7 @@ namespace CMCL.Client.UserControl
                     Downloader.DownloadInfoHandler.CurrentDownloadProgress = value;
                     if (Downloader.DownloadInfoHandler.DownloadFinished)
                     {
-                        this.Dispatcher.BeginInvoke(new Action(() =>
-                        {
-                            downloadInfoFrm.Close();
-                        }));
+                        this.Dispatcher.BeginInvoke(new Action(() => { downloadInfoFrm.Close(); }));
                     }
                 };
                 await VersionDownloader.DownloadClient(progress, selectVer["版本"].ToString(), "");
