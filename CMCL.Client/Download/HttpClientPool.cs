@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 
@@ -10,29 +11,33 @@ namespace CMCL.Client.Download
     public static class HttpClientPool
     {
         private static List<HttpClientPack> Pool = new List<HttpClientPack>();
+        private static readonly object _poolLock = new object();
 
         public static HttpClientPack GetHttpClient()
         {
-            var clientPack = Pool.FirstOrDefault(i => !i.InUse);
-            if (clientPack == null)
+            lock (_poolLock)
             {
-                clientPack = new HttpClientPack
+                var clientPack = Pool.FirstOrDefault(i => !i.InUse);
+                if (clientPack == null)
                 {
-                    InUse = false,
-                    client = new HttpClient(new HttpClientHandler {AllowAutoRedirect = false})
-                };
-                Pool.Add(clientPack);
-            }
+                    clientPack = new HttpClientPack
+                    {
+                        InUse = false,
+                        client = new HttpClient(new HttpClientHandler {AllowAutoRedirect = false})
+                    };
+                    Pool.Add(clientPack);
+                }
 
-            clientPack.InUse = true;
-            return clientPack;
+                clientPack.InUse = true;
+                return clientPack;
+            }
         }
     }
 
     /// <summary>
     /// http client资源
     /// </summary>
-    public class HttpClientPack
+    public class HttpClientPack : IDisposable
     {
         /// <summary>
         /// HTTP客户端
@@ -43,5 +48,10 @@ namespace CMCL.Client.Download
         /// 是否使用中
         /// </summary>
         public bool InUse { get; set; }
+
+        public void Dispose()
+        {
+            this.InUse = false;
+        }
     }
 }

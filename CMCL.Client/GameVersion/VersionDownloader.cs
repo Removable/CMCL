@@ -16,7 +16,9 @@ namespace CMCL.Client.GameVersion
 {
     public class VersionDownloader
     {
-        private static readonly string _versionManifestUrl = @"https://bmclapi2.bangbang93.com/mc/game/version_manifest.json";
+        private static readonly string _versionManifestUrl =
+            @"https://bmclapi2.bangbang93.com/mc/game/version_manifest.json";
+
         private static readonly string _gameDownloadUrl = @"https://bmclapi2.bangbang93.com/version/:version/:category";
 
         /// <summary>
@@ -26,7 +28,11 @@ namespace CMCL.Client.GameVersion
         public static async Task<GameVersionManifest> LoadGameVersionList()
         {
             var jsonStr = await Downloader.GetStringAsync(_versionManifestUrl);
-            var gameVersionManifest = JsonConvert.DeserializeObject<GameVersionManifest>(jsonStr);
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+            };
+            var gameVersionManifest = JsonSerializer.Deserialize<GameVersionManifest>(jsonStr, options);
             return gameVersionManifest;
         }
 
@@ -37,12 +43,14 @@ namespace CMCL.Client.GameVersion
         /// <param name="versionId"></param>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static async Task<(bool success, string msg)> DownloadClient(IProgress<double> mainProgress, string versionId, string path = "")
+        public static async Task<(bool success, string msg)> DownloadClient(IProgress<double> mainProgress,
+            string versionId, string path = "")
         {
             if (string.IsNullOrWhiteSpace(path))
             {
                 path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             }
+
             var fullPath = Path.Combine(path, ".minecraft", "versions", versionId);
             Downloader.DownloadInfoHandler.DownloadFinished = false;
 
@@ -71,9 +79,6 @@ namespace CMCL.Client.GameVersion
                     CurrentCategory = "JSON文件",
                     ReportFinish = true
                 }, cancellationToken.Token);
-            var versionInfo =
-                JsonConvert.DeserializeObject<VersionInfo>(
-                    await File.ReadAllTextAsync(Path.Combine(fullPath, $"{versionId}.json"), cancellationToken.Token));
             return (true, "");
         }
     }

@@ -3,11 +3,9 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using CMCL.Client.Util;
-using Flurl.Http;
 
 namespace CMCL.Client.Download
 {
@@ -22,9 +20,9 @@ namespace CMCL.Client.Download
         /// <returns></returns>
         public static async Task<string> GetStringAsync(string url)
         {
-            using var response = await url.GetAsync();
+            using var response = await GetFinalResponse(new Uri(url), default(CancellationToken), 0);
 
-            if (response.StatusCode == (int) HttpStatusCode.OK)
+            if (response.StatusCode == HttpStatusCode.OK)
                 return await response.ResponseMessage.Content.ReadAsStringAsync();
             throw new Exception($"获取地址出错，状态码：{response.StatusCode}");
         }
@@ -53,7 +51,7 @@ namespace CMCL.Client.Download
             var uri = new Uri(url);
 
             //获取重定向后的响应
-            var response = await GetFinalResponse(uri);
+            var response = await GetFinalResponse(uri, token, 0);
 
             var total = response.Content.Headers.ContentLength ?? -1L;
             var canReportProgress = total != -1 && progress != null;
@@ -115,26 +113,22 @@ namespace CMCL.Client.Download
                 else
                     throw new Exception("下载失败");
             }
+        }
 
-            //获取经过重定向后的最终响应
-            async Task<HttpResponseMessage> GetFinalResponse(Uri thisUri)
+        /// <summary>
+        /// 获取经过重定向后的最终响应
+        /// </summary>
+        /// <param name="thisUri"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        private static async Task<HttpResponseMessage> GetFinalResponse(Uri thisUri, CancellationToken token,
+            int tryCount)
+        {
+            try
             {
-                //实例化一个HttpClient并将允许自动重定向设为false
-                var clientPack = HttpClientPool.GetHttpClient();
-                try
-                {
-                    response =
-                        await clientPack.client.GetAsync(thisUri.ToString(), HttpCompletionOption.ResponseHeadersRead,
-                            token);
-                }
-                catch
-                {
-                    return await GetFinalResponse(thisUri);
-                }
-                finally
-                {
-                    clientPack.InUse = false;
-                }
+                using var clientPack = HttpClientPool.GetHttpClient();
+                var response = await clientPack.client.GetAsync(thisUri.ToString(),
+                    HttpCompletionOption.ResponseHeadersRead, token);
 
                 //若返回的状态码为302
                 switch (response.StatusCode)
@@ -148,12 +142,18 @@ namespace CMCL.Client.Download
                         else
                             thisUri = response.Headers.Location;
                         //递归
-                        return await GetFinalResponse(thisUri);
+                        return await GetFinalResponse(thisUri, token, tryCount);
                     case HttpStatusCode.OK:
                         return response;
                     default:
                         throw new Exception($"出错啦，状态码：{response.StatusCode}");
                 }
+            }
+            catch (Exception ex)
+            {
+                if (tryCount <= 3)
+                    return await GetFinalResponse(thisUri, token, tryCount + 1); 
+                throw;
             }
         }
     }
