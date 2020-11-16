@@ -103,14 +103,11 @@ namespace CMCL.Client.Download
             catch (Exception ex)
             {
                 response.Dispose();
-                //若以bangbang93.com源下载失败，切换mcbbs源尝试
-                if (url.Contains("bangbang93.com"))
+                //若以bmcl源下载失败，切换mcbbs源尝试
+                var bmclMirror = new BMCLMirror();
+                if (bmclMirror.IsCurrentMirror(url))
                 {
-                    url = url.Replace("bangbang93.com", "download.mcbbs.net");
-                    if (!url.StartsWith("https"))
-                    {
-                        url.Replace("http", "https");
-                    }
+                    url = bmclMirror.TranslateToCurrentMirrorUrl(url);
 
                     await GetFileAsync(url, progress, directory, downloadInfo, token);
                 }

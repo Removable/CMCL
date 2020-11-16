@@ -26,11 +26,7 @@ namespace CMCL.Client.GameVersion
         public static async Task<GameVersionManifest> LoadGameVersionList()
         {
             var jsonStr = await Downloader.GetStringAsync(_versionManifestUrl);
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-            };
-            var gameVersionManifest = JsonSerializer.Deserialize<GameVersionManifest>(jsonStr, options);
+            var gameVersionManifest = JsonConvert.DeserializeObject<GameVersionManifest>(jsonStr);
             return gameVersionManifest;
         }
 
