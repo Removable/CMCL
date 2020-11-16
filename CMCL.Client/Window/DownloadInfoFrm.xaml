@@ -9,7 +9,11 @@
         WindowStyle="None" AllowsTransparency="True" Background="White" ShowNonClientArea="True"
         Title="DownloadInfoFrm" Height="280" Width="220" ResizeMode="NoResize">
     <Grid>
-        <TextBlock x:Name="BtnStopDownload" Text="0B/s" TextAlignment="Center" Cursor="Hand" Margin="88,229,88,0" FontSize="10" Height="15" VerticalAlignment="Top" MouseLeftButtonUp="BtnStopDownload_OnMouseLeftButtonUp" MouseEnter="BtnStopDownload_OnMouseEnter" MouseLeave="BtnStopDownload_OnMouseLeave"/>
+        <TextBlock x:Name="BtnStopDownload" TextAlignment="Center" Cursor="Hand" Margin="88,229,88,0" FontSize="10" Height="15" VerticalAlignment="Top" MouseLeftButtonUp="BtnStopDownload_OnMouseLeftButtonUp" MouseEnter="BtnStopDownload_OnMouseEnter" MouseLeave="BtnStopDownload_OnMouseLeave">
+            <TextBlock.Text>
+                <Binding Path="CurrentDownloadSpeed"/>
+            </TextBlock.Text>
+        </TextBlock>
         <hc:CircleProgressBar Margin="50,37,50,108" Style="{DynamicResource ProgressBarInfoCircle}" x:Name="DownloadProgressBar">
             <hc:CircleProgressBar.Value>
                 <Binding Path="CurrentDownloadProgress"></Binding>

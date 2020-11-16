@@ -42,6 +42,7 @@ namespace CMCL.Client.Download
             DownloadInfo downloadInfo, CancellationToken token)
         {
             DownloadInfoHandler.CurrentDownloadProgress = 0;
+            DownloadInfoHandler.CurrentDownloadSpeed = 0;
             DownloadInfoHandler.CurrentDownloadFile = downloadInfo.CurrentFileName;
             DownloadInfoHandler.CurrentDownloadGroup =
                 $"正在下载 {downloadInfo.CurrentCategory}({downloadInfo.CurrentFileIndex}/{downloadInfo.TotalFilesCount})";
@@ -119,15 +120,20 @@ namespace CMCL.Client.Download
             async Task<HttpResponseMessage> GetFinalResponse(Uri thisUri)
             {
                 //实例化一个HttpClient并将允许自动重定向设为false
-                var client = new HttpClient(new HttpClientHandler {AllowAutoRedirect = false});
+                var clientPack = HttpClientPool.GetHttpClient();
                 try
                 {
                     response =
-                        await client.GetAsync(thisUri.ToString(), HttpCompletionOption.ResponseHeadersRead, token);
+                        await clientPack.client.GetAsync(thisUri.ToString(), HttpCompletionOption.ResponseHeadersRead,
+                            token);
                 }
                 catch
                 {
                     return await GetFinalResponse(thisUri);
+                }
+                finally
+                {
+                    clientPack.InUse = false;
                 }
 
                 //若返回的状态码为302
