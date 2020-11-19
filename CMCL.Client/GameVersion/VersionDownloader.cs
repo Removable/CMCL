@@ -7,9 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using CMCL.Client.Download;
 using CMCL.Client.Game;
-using CMCL.Client.GameVersion.JsonClasses;
-using CMCL.Client.Util;
-using Newtonsoft.Json;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace CMCL.Client.GameVersion

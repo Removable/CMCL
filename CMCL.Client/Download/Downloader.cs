@@ -23,7 +23,7 @@ namespace CMCL.Client.Download
             using var response = await GetFinalResponse(new Uri(url), default(CancellationToken), 0);
 
             if (response.StatusCode == HttpStatusCode.OK)
-                return await response.ResponseMessage.Content.ReadAsStringAsync();
+                return await response.Content.ReadAsStringAsync();
             throw new Exception($"获取地址出错，状态码：{response.StatusCode}");
         }
 

@@ -1,14 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using Flurl.Http;
 
 namespace CMCL.Client
 {
@@ -34,13 +25,6 @@ namespace CMCL.Client
             //progress.ProgressChanged += (sender, value) => VersionTabItem.Header = ("\r%{0:N0}", value);
             //var cancellationToken = new CancellationTokenSource();
             //await Downloader.GetFileAsync("https://bmclapi2.bangbang93.com/version/1.15.2/client", progress, cancellationToken.Token, @"D:\", "b.jar");
-
-            FlurlHttp.Configure(settings =>
-            {
-                settings.Redirects.AllowSecureToInsecure = true;
-                settings.Redirects.Enabled = true;
-                settings.Redirects.MaxAutoRedirects = 5;
-            });
         }
 
         private void TabControl_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
