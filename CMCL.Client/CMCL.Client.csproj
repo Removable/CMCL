@@ -17,10 +17,18 @@
     <None Remove="Resources\Images\Component_128.png" />
     <None Remove="Resources\Images\Component_32.png" />
     <None Remove="Resources\Images\Component_64.png" />
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="HandyControl" Version="3.0.0-rc.2" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,6 +38,10 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Images\Component_64.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Services" />
   </ItemGroup>
 
 </Project>

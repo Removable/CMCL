@@ -1,5 +1,7 @@
-﻿using System.Windows;
+﻿using System.Net.Http;
+using System.Windows;
 using System.Windows.Controls;
+using CMCL.Client.UserControl;
 
 namespace CMCL.Client
 {
@@ -8,9 +10,12 @@ namespace CMCL.Client
     /// </summary>
     public partial class MainWindow : HandyControl.Controls.Window, System.Windows.Markup.IComponentConnector
     {
-        public MainWindow()
+        private readonly IHttpClientFactory _httpClientFactory;
+        
+        public MainWindow(IHttpClientFactory httpClientFactory)
         {
             InitializeComponent();
+            _httpClientFactory = httpClientFactory;
         }
         /// <summary>
         /// 窗体载入后
@@ -29,7 +34,15 @@ namespace CMCL.Client
 
         private void TabControl_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
+            if (sender is TabControl tabControl)
+            {
+                var selectedItem = (TabItem) tabControl.SelectedItem;
+                if (selectedItem.Name == "VersionTabItem" && selectedItem.Content == null)
+                {
+                    var gameVersionUc = new GameVersionUc(_httpClientFactory);
+                    selectedItem.Content = gameVersionUc;
+                }
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -22,9 +23,9 @@ namespace CMCL.Client.GameVersion
         /// 获取版本列表
         /// </summary>
         /// <returns></returns>
-        public static async Task<GameVersionManifest> LoadGameVersionList()
+        public static async ValueTask<GameVersionManifest> LoadGameVersionList(HttpClient httpClient)
         {
-            var jsonStr = await Downloader.GetStringAsync(_versionManifestUrl);
+            var jsonStr = await Downloader.GetStringAsync(httpClient, _versionManifestUrl);
             var options = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
@@ -40,8 +41,7 @@ namespace CMCL.Client.GameVersion
         /// <param name="versionId"></param>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static async Task<(bool success, string msg)> DownloadClient(IProgress<double> mainProgress,
-            string versionId, string path = "")
+        public static async ValueTask<(bool success, string msg)> DownloadClient(HttpClient httpClient, IProgress<double> mainProgress, string versionId, string path = "")
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -54,7 +54,7 @@ namespace CMCL.Client.GameVersion
             var progress = new Progress<double>();
             progress.ProgressChanged += (sender, value) => mainProgress.Report(value);
             var cancellationToken = new CancellationTokenSource();
-            await Downloader.GetFileAsync(
+            await Downloader.GetFileAsync(httpClient,
                 _gameDownloadUrl.Replace(":version", versionId).Replace(":category", "client"),
                 progress, fullPath,
                 new DownloadInfo
@@ -65,7 +65,7 @@ namespace CMCL.Client.GameVersion
                     CurrentCategory = "游戏本体",
                     ReportFinish = false,
                 }, cancellationToken.Token);
-            await Downloader.GetFileAsync(
+            await Downloader.GetFileAsync(httpClient,
                 _gameDownloadUrl.Replace(":version", versionId).Replace(":category", "json"),
                 progress, fullPath,
                 new DownloadInfo

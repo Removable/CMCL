@@ -20,7 +20,7 @@
             </TabItem>
             <TabItem Header="版本" x:Name="VersionTabItem">
                 <!--<hc:LoadingCircle x:Name="VersionListLoading" Visibility="Visible" Grid.Row="0"></hc:LoadingCircle>-->
-                <userControl:GameVersionUc></userControl:GameVersionUc>
+                <!-- <userControl:GameVersionUc></userControl:GameVersionUc> -->
             </TabItem>
         </TabControl>
         <hc:NotifyIcon Token="AppNotifyIcon" Text="CMCL" Visibility="Visible" Icon="Resources/Images/Component_32.png"></hc:NotifyIcon>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,24 +32,26 @@ namespace CMCL.Client.UserControl
     public partial class GameVersionUc : System.Windows.Controls.UserControl
     {
         private GameVersionManifest _gameVersionManifest = null;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public GameVersionUc()
+        public GameVersionUc(IHttpClientFactory httpClientFactory)
         {
             InitializeComponent();
+            _httpClientFactory = httpClientFactory;
         }
 
         private void GameVersionUc_OnLoaded(object sender, RoutedEventArgs e)
         {
         }
 
-        private async Task LoadGameVersionList()
+        private async ValueTask LoadGameVersionList()
         {
             BtnRefresh.IsEnabled = false;
             BtnDownload.IsEnabled = false;
             var loadingCircle = new LoadingCircle();
             TopGrid.Children.Add(loadingCircle);
 
-            _gameVersionManifest = await VersionDownloader.LoadGameVersionList();
+            _gameVersionManifest = await VersionDownloader.LoadGameVersionList(_httpClientFactory.CreateClient());
             var dataTable = new DataTable();
             dataTable.Columns.Add("版本");
             dataTable.Columns.Add("发布时间");
@@ -134,7 +137,7 @@ namespace CMCL.Client.UserControl
                         this.Dispatcher.BeginInvoke(new Action(() => { downloadInfoFrm.Close(); }));
                     }
                 };
-                await VersionDownloader.DownloadClient(progress, selectVer["版本"].ToString(), "");
+                await VersionDownloader.DownloadClient(_httpClientFactory.CreateClient(), progress, selectVer["版本"].ToString(), "");
             });
             thread.Start();
 
