@@ -36,12 +36,12 @@ namespace CMCL.Client.Window
 
         private void BtnStopDownload_OnMouseEnter(object sender, MouseEventArgs e)
         {
-            BtnStopDownload.TextDecorations = TextDecorations.Underline;
+            // BtnStopDownload.TextDecorations = TextDecorations.Underline;
         }
 
         private void BtnStopDownload_OnMouseLeave(object sender, MouseEventArgs e)
         {
-            BtnStopDownload.TextDecorations = null;
+            // BtnStopDownload.TextDecorations = null;
         }
 
         private void BtnStopDownload_OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
