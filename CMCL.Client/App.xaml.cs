@@ -23,16 +23,16 @@ namespace CMCL.Client
         protected override void OnStartup(StartupEventArgs e)
         {
             // 初始化配置建造器
-            var appSettingsPath = new Uri("AppData/appsettings.json", UriKind.Relative);
-            var sourceInfo = Application.GetResourceStream(appSettingsPath);
-            if (sourceInfo == null)
-                throw new Exception("找不到appsettings.json");
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonStream(sourceInfo.Stream);
+            // var appSettingsPath = new Uri("AppData/appsettings.json", UriKind.Relative);
+            // var sourceInfo = Application.GetResourceStream(appSettingsPath);
+            // if (sourceInfo == null)
+            //     throw new Exception("找不到appsettings.json");
+            // var builder = new ConfigurationBuilder()
+            //     .SetBasePath(Directory.GetCurrentDirectory())
+            //     .AddJsonStream(sourceInfo.Stream);
 
             // 获取配置建造器创建的对象
-            Configuration = builder.Build();
+            // Configuration = builder.Build();
 
             //配置全局服务容器
             var serviceCollection = new ServiceCollection();
@@ -55,7 +55,7 @@ namespace CMCL.Client
             services.AddTransient(typeof(MainWindow));
 
             // 在全局容器中配置 AppSettings
-            services.Configure<AppSettings>(Configuration.GetSection(nameof(AppSettings)));
+            // services.Configure<AppSettings>(Configuration.GetSection(nameof(AppSettings)));
 
             // 在全局容器中注册自定义服务
             // services.AddScoped<ISampleService, SampleService>();

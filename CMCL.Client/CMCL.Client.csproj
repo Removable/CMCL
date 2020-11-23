@@ -37,6 +37,8 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Images\Component_64.png" />
+    <None Remove="Resources\Images\splash.jpg" />
+    <SplashScreen Include="Resources\Images\splash.jpg" />
   </ItemGroup>
 
 </Project>

@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using CMCL.Client.UserControl;
+using CMCL.Client.Util;
 
 namespace CMCL.Client
 {
@@ -11,12 +12,14 @@ namespace CMCL.Client
     public partial class MainWindow : HandyControl.Controls.Window, System.Windows.Markup.IComponentConnector
     {
         private readonly IHttpClientFactory _httpClientFactory;
-        
+
         public MainWindow(IHttpClientFactory httpClientFactory)
         {
             InitializeComponent();
             _httpClientFactory = httpClientFactory;
+            AppConfig.InitConfigFile();
         }
+
         /// <summary>
         /// 窗体载入后
         /// </summary>
