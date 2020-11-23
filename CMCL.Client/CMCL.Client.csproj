@@ -13,13 +13,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="AppData\App.config" />
+    <None Remove="AppData\appsettings.json" />
     <None Remove="Resources\Images\Component_128.ico" />
     <None Remove="Resources\Images\Component_128.png" />
     <None Remove="Resources\Images\Component_32.png" />
     <None Remove="Resources\Images\Component_64.png" />
-    <None Update="AppData\appsettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <EmbeddedResource Include="AppData\App.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AppData\appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>

@@ -42,6 +42,11 @@ namespace CMCL.Client
                     var gameVersionUc = new GameVersionUc(_httpClientFactory);
                     selectedItem.Content = gameVersionUc;
                 }
+                else if (selectedItem.Name == "SettingsItem" && selectedItem.Content == null)
+                {
+                    var settingsUc = new SettingsUc();
+                    selectedItem.Content = settingsUc;
+                }
             }
         }
     }
