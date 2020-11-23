@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -10,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using CMCL.Client.Util;
 
 namespace CMCL.Client.UserControl
 {
@@ -21,6 +23,12 @@ namespace CMCL.Client.UserControl
         public MainTabUc()
         {
             InitializeComponent();
+        }
+
+        private void MainTabUc_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            var currentVersion = AppConfig.GetAppSettings("SelectedGameVersion");
+            TbSelectedVersion.Text = string.Format(TbSelectedVersion.Text, currentVersion);
         }
     }
 }

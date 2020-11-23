@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CMCL.Client.UserControl"
-             mc:Ignorable="d" 
+             mc:Ignorable="d" Loaded="MainTabUc_OnLoaded"
              d:DesignHeight="390" d:DesignWidth="800">
     <Grid Background="White">
         <Grid.RowDefinitions>
@@ -12,7 +12,7 @@
             <RowDefinition Height="4*"/>
         </Grid.RowDefinitions>
         <TextBlock Margin="0,80,0,0" Text="Component Launcher" FontSize="40" Foreground="#326CF3" Style="{StaticResource TextBlockLargeBold}" Grid.Row="0" VerticalAlignment="Top"/>
-        <TextBlock Margin="0,158,0,0" TextAlignment="Center" Text="Minecraft版本：1.16.4 ▽" Cursor="Hand" FontSize="16" Style="{StaticResource TextBlockDefaultPrimary}" VerticalAlignment="Top" Width="780" Grid.Row="0"/>
+        <TextBlock x:Name="TbSelectedVersion" Margin="0,158,0,0" TextAlignment="Center" Text="Minecraft版本：{0}" Cursor="Hand" FontSize="16" Style="{StaticResource TextBlockDefaultPrimary}" VerticalAlignment="Top" Width="780" Grid.Row="0"/>
         <Label Content="敬请期待" Style="{DynamicResource LabelPrimary}" Margin="0,40,0,0" VerticalAlignment="Top" Grid.Row="1" Width="150" Height="50"></Label>
     </Grid>
 </UserControl>

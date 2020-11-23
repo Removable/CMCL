@@ -17,7 +17,7 @@
     <None Remove="Resources\Images\Component_128.png" />
     <None Remove="Resources\Images\Component_32.png" />
     <None Remove="Resources\Images\Component_64.png" />
-    <None Update="appsettings.json">
+    <None Update="AppData\appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

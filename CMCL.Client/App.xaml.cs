@@ -25,7 +25,7 @@ namespace CMCL.Client
             // 初始化配置建造器
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+                .AddJsonFile("AppData/appsettings.json", optional: false, reloadOnChange: true);
 
             // 获取配置建造器创建的对象
             Configuration = builder.Build();
