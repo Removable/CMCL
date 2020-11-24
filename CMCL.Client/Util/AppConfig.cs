@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Unicode;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CMCL.Client.Util
@@ -34,7 +35,7 @@ namespace CMCL.Client.Util
             }
             catch (Exception e)
             {
-                await LogHelper.WriteLog(e);
+                await LogHelper.WriteLogAsync(e);
             }
         }
 
@@ -55,7 +56,7 @@ namespace CMCL.Client.Util
             }
             catch (Exception e)
             {
-                await LogHelper.WriteLog(e);
+                await LogHelper.WriteLogAsync(e);
                 throw;
             }
         }
@@ -79,7 +80,7 @@ namespace CMCL.Client.Util
             }
             catch (Exception e)
             {
-                await LogHelper.WriteLog(e);
+                await LogHelper.WriteLogAsync(e);
                 throw;
             }
         }

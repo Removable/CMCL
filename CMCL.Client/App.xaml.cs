@@ -4,8 +4,11 @@ using System.Configuration;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using CMCL.Client.Util;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -34,14 +37,22 @@ namespace CMCL.Client
             // 获取配置建造器创建的对象
             // Configuration = builder.Build();
 
-            //配置全局服务容器
-            var serviceCollection = new ServiceCollection();
-            ConfigureServices(serviceCollection);
+            try
+            {
+                //配置全局服务容器
+                var serviceCollection = new ServiceCollection();
+                ConfigureServices(serviceCollection);
 
-            ServiceProvider = serviceCollection.BuildServiceProvider();
+                ServiceProvider = serviceCollection.BuildServiceProvider();
 
-            var mainWindow = ServiceProvider.GetRequiredService<MainWindow>();
-            mainWindow.Show();
+                var mainWindow = ServiceProvider.GetRequiredService<MainWindow>();
+                mainWindow.Show();
+            }
+            catch (Exception exception)
+            {
+                LogHelper.WriteLog(exception);
+                throw;
+            }
         }
 
         private void ConfigureServices(IServiceCollection services)
