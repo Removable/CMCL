@@ -24,7 +24,7 @@ namespace CMCL.Client.Util
                 Directory.CreateDirectory(LogDirectory);
             }
             await File.AppendAllTextAsync(Path.Combine(LogDirectory, DateTime.Now.ToString("yyyyMMdd") + ".txt"),
-                logContent, Encoding.UTF8);
+                logContent, Encoding.UTF8).ConfigureAwait(false);
         }
 
         public static void WriteLog(Exception exception)

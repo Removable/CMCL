@@ -18,7 +18,7 @@ namespace CMCL.Client.Util
         /// <summary>
         /// 初始化配置文件
         /// </summary>
-        public static async void InitConfigFile()
+        public static async ValueTask InitConfigFile()
         {
             try
             {
@@ -31,11 +31,11 @@ namespace CMCL.Client.Util
                     WriteIndented = true,
                 });
 
-                await File.WriteAllTextAsync(_configFilePath, serialize, Encoding.UTF8);
+                await File.WriteAllTextAsync(_configFilePath, serialize, Encoding.UTF8).ConfigureAwait(false);
             }
             catch (Exception e)
             {
-                await LogHelper.WriteLogAsync(e);
+                await LogHelper.WriteLogAsync(e).ConfigureAwait(false);
             }
         }
 
@@ -48,7 +48,7 @@ namespace CMCL.Client.Util
         {
             try
             {
-                var configStr = await File.ReadAllTextAsync(_configFilePath, Encoding.UTF8);
+                var configStr = await File.ReadAllTextAsync(_configFilePath, Encoding.UTF8).ConfigureAwait(false);
                 var cmclConfig = JsonSerializer.Deserialize<CmclConfig>(configStr);
                 var o = typeof(CmclConfig).GetProperty(key)?.GetValue(cmclConfig, null);
                 var value = Convert.ToString(o);
@@ -56,7 +56,7 @@ namespace CMCL.Client.Util
             }
             catch (Exception e)
             {
-                await LogHelper.WriteLogAsync(e);
+                await LogHelper.WriteLogAsync(e).ConfigureAwait(false);
                 throw;
             }
         }
@@ -70,7 +70,7 @@ namespace CMCL.Client.Util
         {
             try
             {
-                var cmclConfig = await File.ReadAllTextAsync(_configFilePath, Encoding.UTF8);
+                var cmclConfig = await File.ReadAllTextAsync(_configFilePath, Encoding.UTF8).ConfigureAwait(false);
                 var type = typeof(CmclConfig);
                 var property = type.GetProperty(key);
                 if (property == null)
@@ -80,7 +80,7 @@ namespace CMCL.Client.Util
             }
             catch (Exception e)
             {
-                await LogHelper.WriteLogAsync(e);
+                await LogHelper.WriteLogAsync(e).ConfigureAwait(false);
                 throw;
             }
         }

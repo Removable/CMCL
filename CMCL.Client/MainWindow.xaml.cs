@@ -18,7 +18,7 @@ namespace CMCL.Client
         {
             InitializeComponent();
             _httpClientFactory = httpClientFactory;
-            AppConfig.InitConfigFile();
+            AppConfig.InitConfigFile().ConfigureAwait(false);
         }
 
         /// <summary>

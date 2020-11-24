@@ -21,10 +21,10 @@ namespace CMCL.Client.Download
         /// <returns></returns>
         public static async ValueTask<string> GetStringAsync(HttpClient httpClient, string url)
         {
-            using var response = await GetFinalResponse(httpClient, new Uri(url), default(CancellationToken), 0);
+            using var response = await GetFinalResponse(httpClient, new Uri(url), default(CancellationToken), 0).ConfigureAwait(false);
 
             if (response.StatusCode == HttpStatusCode.OK)
-                return await response.Content.ReadAsStringAsync();
+                return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             throw new Exception($"获取地址出错，状态码：{response.StatusCode}");
         }
 
@@ -52,7 +52,7 @@ namespace CMCL.Client.Download
             var uri = new Uri(url);
 
             //获取重定向后的响应
-            var response = await GetFinalResponse(httpClient, uri, token, 0);
+            var response = await GetFinalResponse(httpClient, uri, token, 0).ConfigureAwait(false);
 
             var total = response.Content.Headers.ContentLength ?? -1L;
             var canReportProgress = total != -1 && progress != null;
@@ -60,7 +60,7 @@ namespace CMCL.Client.Download
             try
             {
                 //读取流并写到文件
-                await using Stream stream = await response.Content.ReadAsStreamAsync(token),
+                await using Stream stream = await response.Content.ReadAsStreamAsync(token).ConfigureAwait(false),
                     fileStream = new FileStream(filePath, FileMode.Create,
                         FileAccess.Write, FileShare.None, 4096, true);
                 var totalRead = 0L;
@@ -71,7 +71,7 @@ namespace CMCL.Client.Download
                 {
                     token.ThrowIfCancellationRequested();
 
-                    var read = await stream.ReadAsync(buffer.AsMemory(0, buffer.Length), token);
+                    var read = await stream.ReadAsync(buffer.AsMemory(0, buffer.Length), token).ConfigureAwait(false);
 
                     if (read == 0)
                     {
@@ -82,7 +82,7 @@ namespace CMCL.Client.Download
                         var data = new byte[read];
                         buffer.ToList().CopyTo(0, data, 0, read);
 
-                        await fileStream.WriteAsync(buffer.AsMemory(0, read), token);
+                        await fileStream.WriteAsync(buffer.AsMemory(0, read), token).ConfigureAwait(false);
 
                         totalRead += read;
 
@@ -109,7 +109,7 @@ namespace CMCL.Client.Download
                 {
                     url = bmclMirror.TranslateToCurrentMirrorUrl(url);
 
-                    await GetFileAsync(httpClient, url, progress, directory, downloadInfo, token);
+                    await GetFileAsync(httpClient, url, progress, directory, downloadInfo, token).ConfigureAwait(false);
                 }
                 else
                     throw new Exception("下载失败");
@@ -130,7 +130,7 @@ namespace CMCL.Client.Download
             try
             {
                 var response = await httpClient.GetAsync(thisUri.ToString(),
-                    HttpCompletionOption.ResponseHeadersRead, token);
+                    HttpCompletionOption.ResponseHeadersRead, token).ConfigureAwait(false);
 
                 //若返回的状态码为302
                 switch (response.StatusCode)
@@ -144,7 +144,7 @@ namespace CMCL.Client.Download
                         else
                             thisUri = response.Headers.Location;
                         //递归
-                        return await GetFinalResponse(httpClient, thisUri, token, tryCount);
+                        return await GetFinalResponse(httpClient, thisUri, token, tryCount).ConfigureAwait(false);
                     case HttpStatusCode.OK:
                         return response;
                     default:
@@ -154,7 +154,7 @@ namespace CMCL.Client.Download
             catch (Exception ex)
             {
                 if (tryCount <= 3)
-                    return await GetFinalResponse(httpClient, thisUri, token, tryCount + 1); 
+                    return await GetFinalResponse(httpClient, thisUri, token, tryCount + 1).ConfigureAwait(false); 
                 throw;
             }
         }

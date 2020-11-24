@@ -25,7 +25,7 @@ namespace CMCL.Client.GameVersion
         /// <returns></returns>
         public static async ValueTask<GameVersionManifest> LoadGameVersionList(HttpClient httpClient)
         {
-            var jsonStr = await Downloader.GetStringAsync(httpClient, _versionManifestUrl);
+            var jsonStr = await Downloader.GetStringAsync(httpClient, _versionManifestUrl).ConfigureAwait(false);
             var options = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
@@ -64,7 +64,7 @@ namespace CMCL.Client.GameVersion
                     CurrentFileName = $"{versionId}.jar",
                     CurrentCategory = "游戏本体",
                     ReportFinish = false,
-                }, cancellationToken.Token);
+                }, cancellationToken.Token).ConfigureAwait(false);
             await Downloader.GetFileAsync(httpClient,
                 _gameDownloadUrl.Replace(":version", versionId).Replace(":category", "json"),
                 progress, fullPath,
@@ -75,7 +75,7 @@ namespace CMCL.Client.GameVersion
                     CurrentFileName = $"{versionId}.json",
                     CurrentCategory = "JSON文件",
                     ReportFinish = true
-                }, cancellationToken.Token);
+                }, cancellationToken.Token).ConfigureAwait(false);
             return (true, "");
         }
     }

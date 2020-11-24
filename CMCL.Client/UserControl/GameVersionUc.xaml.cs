@@ -18,6 +18,7 @@ using System.Windows.Shapes;
 using CMCL.Client.Download;
 using CMCL.Client.Game;
 using CMCL.Client.GameVersion;
+using CMCL.Client.Util;
 using CMCL.Client.Window;
 using HandyControl.Controls;
 using HandyControl.Data;
@@ -51,7 +52,7 @@ namespace CMCL.Client.UserControl
             var loadingCircle = new LoadingCircle();
             TopGrid.Children.Add(loadingCircle);
 
-            _gameVersionManifest = await VersionDownloader.LoadGameVersionList(_httpClientFactory.CreateClient());
+            _gameVersionManifest = await VersionDownloader.LoadGameVersionList(_httpClientFactory.CreateClient()).ConfigureAwait(true);
             var dataTable = new DataTable();
             dataTable.Columns.Add("版本");
             dataTable.Columns.Add("发布时间");
@@ -94,11 +95,12 @@ namespace CMCL.Client.UserControl
         {
             try
             {
-                await LoadGameVersionList();
+                await LoadGameVersionList().ConfigureAwait(false);
             }
             catch (Exception exception)
             {
-                await LoadGameVersionList();
+                await LogHelper.WriteLogAsync(exception).ConfigureAwait(false);
+                await LoadGameVersionList().ConfigureAwait(false);
             }
         }
 
@@ -137,7 +139,7 @@ namespace CMCL.Client.UserControl
                         this.Dispatcher.BeginInvoke(new Action(() => { downloadInfoFrm.Close(); }));
                     }
                 };
-                await VersionDownloader.DownloadClient(_httpClientFactory.CreateClient(), progress, selectVer["版本"].ToString(), "");
+                await VersionDownloader.DownloadClient(_httpClientFactory.CreateClient(), progress, selectVer["版本"].ToString(), "").ConfigureAwait(false);
             });
             thread.Start();
 
