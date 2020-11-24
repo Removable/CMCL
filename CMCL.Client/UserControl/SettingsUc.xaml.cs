@@ -29,7 +29,7 @@ namespace CMCL.Client.UserControl
 
         private void SettingsUc_OnLoaded(object sender, RoutedEventArgs e)
         {
-            TbJavaPath.Text = FileHelper.GetJavaDir();
+            TbJavaPath.Text = Utils.GetJavaDir();
         }
 
         /// <summary>

@@ -25,9 +25,9 @@ namespace CMCL.Client.UserControl
             InitializeComponent();
         }
 
-        private void MainTabUc_OnLoaded(object sender, RoutedEventArgs e)
+        private async void MainTabUc_OnLoaded(object sender, RoutedEventArgs e)
         {
-            var currentVersion = AppConfig.GetAppSettings("SelectedGameVersion");
+            var currentVersion = await AppConfig.GetAppSettings("CurrentVersion").ConfigureAwait(false);
             TbSelectedVersion.Text = string.Format(TbSelectedVersion.Text, currentVersion);
         }
     }

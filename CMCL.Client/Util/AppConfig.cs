@@ -25,11 +25,12 @@ namespace CMCL.Client.Util
                 if (File.Exists(_configFilePath)) return;
 
                 //序列化
-                var serialize = JsonSerializer.Serialize(new CmclConfig(), new JsonSerializerOptions
-                {
-                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-                    WriteIndented = true,
-                });
+                var serialize = JsonSerializer.Serialize(new CmclConfig {CustomJavaPath = Utils.GetJavaDir()},
+                    new JsonSerializerOptions
+                    {
+                        Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                        WriteIndented = true,
+                    });
 
                 await File.WriteAllTextAsync(_configFilePath, serialize, Encoding.UTF8).ConfigureAwait(false);
             }
