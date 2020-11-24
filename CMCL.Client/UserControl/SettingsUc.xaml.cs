@@ -27,9 +27,9 @@ namespace CMCL.Client.UserControl
             InitializeComponent();
         }
 
-        private void SettingsUc_OnLoaded(object sender, RoutedEventArgs e)
+        private async void SettingsUc_OnLoaded(object sender, RoutedEventArgs e)
         {
-            TbJavaPath.Text = Utils.GetJavaDir();
+            TbJavaPath.Text = await AppConfig.GetAppSettings("CustomJavaPath").ConfigureAwait(false);
         }
 
         /// <summary>
@@ -49,6 +49,18 @@ namespace CMCL.Client.UserControl
             if (dialog.ShowDialog() == true)
             {
                 TbJavaPath.Text = dialog.FileName;
+            }
+        }
+
+        private void ChooseCustomGameDir(object sender, RoutedEventArgs e)
+        {
+            var dialog = new OpenFileDialog
+            {
+               InitialDirectory = Environment.CurrentDirectory
+            };
+            if (dialog.ShowDialog() == true)
+            {
+                TbCustomGameDir.Text = dialog.FileName;
             }
         }
     }

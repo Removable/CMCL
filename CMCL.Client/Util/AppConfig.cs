@@ -25,7 +25,7 @@ namespace CMCL.Client.Util
                 if (File.Exists(_configFilePath)) return;
 
                 //序列化
-                var serialize = JsonSerializer.Serialize(new CmclConfig {CustomJavaPath = Utils.GetJavaDir()},
+                var serialize = JsonSerializer.Serialize(new CmclConfig(),
                     new JsonSerializerOptions
                     {
                         Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
@@ -110,6 +110,6 @@ namespace CMCL.Client.Util
         /// <summary>
         /// 自定义的java路径
         /// </summary>
-        public string CustomJavaPath { get; set; } = string.Empty;
+        public string CustomJavaPath { get; set; } = Utils.GetJavaDir();
     }
 }

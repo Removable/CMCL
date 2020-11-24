@@ -29,7 +29,7 @@ namespace CMCL.Client.Util
                 var openSubKey = reg.OpenSubKey("SOFTWARE");
                 var registryKey = openSubKey?.OpenSubKey("JavaSoft");
                 var jre = registryKey?.OpenSubKey("Java Runtime Environment");
-                if (jre == null) return null;
+                if (jre == null) return string.Empty;
                 var javaList = new List<string>();
                 foreach (var ver in jre.GetSubKeyNames())
                 {
@@ -41,7 +41,7 @@ namespace CMCL.Client.Util
                         if (!string.IsNullOrWhiteSpace(str))
                             javaList.Add(str + @"\bin\javaw.exe");
                     }
-                    catch { return null; }
+                    catch { return string.Empty; }
                 }
                 //优先java8
                 foreach (var java in javaList)
@@ -53,7 +53,7 @@ namespace CMCL.Client.Util
                 }
                 return javaList[0];
             }
-            catch { return null; }
+            catch { return string.Empty; }
         }
     }
 }
