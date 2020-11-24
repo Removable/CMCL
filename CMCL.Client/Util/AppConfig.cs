@@ -111,5 +111,15 @@ namespace CMCL.Client.Util
         /// 自定义的java路径
         /// </summary>
         public string CustomJavaPath { get; set; } = Utils.GetJavaDir();
+
+        /// <summary>
+        /// 使用默认游戏安装路径
+        /// </summary>
+        public bool UseDefaultGameDir { get; set; } = true;
+
+        /// <summary>
+        /// .minecraft文件夹位置
+        /// </summary>
+        public string MinecraftDir { get; set; } = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
     }
 }

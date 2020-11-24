@@ -12,7 +12,7 @@
         <hc:PasswordBox hc:TitleElement.Title="密码" hc:TitleElement.TitlePlacement="Top" Grid.Row="0" Grid.Column="0" Margin="40,82,570,243"/>
         <ComboBox hc:InfoElement.Placeholder="请选择版本" hc:InfoElement.Title="启动版本" Style="{StaticResource ComboBoxExtend}" Grid.Column="0" Margin="40,162,570,162"/>
         <hc:TextBox x:Name="TbJavaPath" IsReadOnly="True" hc:TitleElement.TitlePlacement="Top" hc:TitleElement.Title="Java路径" Grid.Row="0" Margin="300,10,0,320" HorizontalAlignment="Left" Width="387"/>
-        <TextBlock HorizontalAlignment="Left" Margin="308,88,0,0" Text="游戏安装路径" Style="{StaticResource TextBlockDefault}" Height="17" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="308,88,0,0" Text="游戏文件夹路径" Style="{StaticResource TextBlockDefault}" Height="17" VerticalAlignment="Top"/>
         <Button Style="{StaticResource ButtonPrimary}" Content="选择路径" HorizontalAlignment="Stretch" Margin="692,38,40,0" VerticalAlignment="Top" Grid.Row="0" Click="ChooseJavaPath"/>
         <RadioButton Cursor="Hand" Margin="300,114,425,0" BorderThickness="1" Style="{StaticResource RadioButtonIcon}" Content="原版默认" VerticalAlignment="Top"/>
         <RadioButton Cursor="Hand" Margin="400,114,325,0" BorderThickness="1" Style="{StaticResource RadioButtonIcon}" Content="自定义" VerticalAlignment="Top"/>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Microsoft.Win32;
 
@@ -25,11 +26,30 @@ namespace CMCL.Client.Util
         {
             try
             {
+                //从注册表查找
                 var reg = Registry.LocalMachine;
                 var openSubKey = reg.OpenSubKey("SOFTWARE");
                 var registryKey = openSubKey?.OpenSubKey("JavaSoft");
                 var jre = registryKey?.OpenSubKey("Java Runtime Environment");
-                if (jre == null) return string.Empty;
+                if (jre == null)
+                {
+                    //从环境变量查找
+                    var variables = Environment.GetEnvironmentVariables();
+                    var pathVariable = variables["Path"];
+                    if (pathVariable == null) return string.Empty;
+
+                    var array = pathVariable.ToString()?.Split(';');
+                    if (array == null || array.Length <= 0) return string.Empty;
+                        
+                    foreach (var s in array)
+                    {
+                        if (s.Contains("javapath"))
+                        {
+                            return s + ".javaw.exe";
+                        }
+                    }
+                    return string.Empty;
+                }
                 var javaList = new List<string>();
                 foreach (var ver in jre.GetSubKeyNames())
                 {
