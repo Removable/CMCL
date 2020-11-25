@@ -39,6 +39,8 @@ namespace CMCL.Client
 
             try
             {
+                AppConfig.InitConfig().ConfigureAwait(false);
+
                 //配置全局服务容器
                 var serviceCollection = new ServiceCollection();
                 ConfigureServices(serviceCollection);

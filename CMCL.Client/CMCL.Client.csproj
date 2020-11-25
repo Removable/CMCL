@@ -10,6 +10,7 @@
     <ApplicationIcon>Resources\Images\Component_128.ico</ApplicationIcon>
     <Win32Resource />
     <StartupObject>CMCL.Client.App</StartupObject>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,6 +29,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="5.0.0" />
+    <PackageReference Include="Ookii.Dialogs.Wpf" Version="3.0.1" />
   </ItemGroup>
 
   <ItemGroup>

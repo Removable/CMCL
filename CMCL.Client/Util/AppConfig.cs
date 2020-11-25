@@ -11,28 +11,36 @@ using System.Threading.Tasks;
 
 namespace CMCL.Client.Util
 {
-    public class AppConfig
+    public static class AppConfig
     {
+        private static CmclConfig Configure;
         private static string _configFilePath = Path.Combine(Environment.CurrentDirectory, "Cmcl.json");
 
         /// <summary>
-        /// 初始化配置文件
+        /// 初始化配置
         /// </summary>
-        public static async ValueTask InitConfigFile()
+        public static async ValueTask InitConfig()
         {
             try
             {
-                if (File.Exists(_configFilePath)) return;
+                var config = new CmclConfig();
+                if (!File.Exists(_configFilePath))
+                {
+                    //序列化
+                    var serialize = JsonSerializer.Serialize(config,
+                        new JsonSerializerOptions
+                        {
+                            Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                            WriteIndented = true,
+                        });
 
-                //序列化
-                var serialize = JsonSerializer.Serialize(new CmclConfig(),
-                    new JsonSerializerOptions
-                    {
-                        Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-                        WriteIndented = true,
-                    });
-
-                await File.WriteAllTextAsync(_configFilePath, serialize, Encoding.UTF8).ConfigureAwait(false);
+                    await File.WriteAllTextAsync(_configFilePath, serialize, Encoding.UTF8).ConfigureAwait(false);
+                }
+                else
+                {
+                    var json = await File.ReadAllTextAsync(_configFilePath, Encoding.UTF8).ConfigureAwait(false);
+                    Configure = JsonSerializer.Deserialize<CmclConfig>(json);
+                }
             }
             catch (Exception e)
             {
@@ -43,17 +51,30 @@ namespace CMCL.Client.Util
         /// <summary>
         /// 读取配置
         /// </summary>
-        /// <param name="key"></param>
         /// <returns></returns>
-        public static async Task<string> GetAppSettings(string key)
+        public static CmclConfig GetAppConfig()
+        {
+            return Configure;
+        }
+
+        /// <summary>
+        /// 按字段写入配置
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        public static async void SetAppConfig(string key, string value)
         {
             try
             {
-                var configStr = await File.ReadAllTextAsync(_configFilePath, Encoding.UTF8).ConfigureAwait(false);
-                var cmclConfig = JsonSerializer.Deserialize<CmclConfig>(configStr);
-                var o = typeof(CmclConfig).GetProperty(key)?.GetValue(cmclConfig, null);
-                var value = Convert.ToString(o);
-                return string.IsNullOrEmpty(value) ? null : value;
+                var cmclConfig = GetAppConfig();
+                var type = typeof(CmclConfig);
+                var property = type.GetProperty(key);
+                if (property == null)
+                    throw new Exception("找不到配置");
+                var v = Convert.ChangeType(value, property.PropertyType);
+                property.SetValue(cmclConfig, v, null);
+
+                SaveAppConfig(cmclConfig);
             }
             catch (Exception e)
             {
@@ -63,27 +84,19 @@ namespace CMCL.Client.Util
         }
 
         /// <summary>
-        /// 写入配置
+        /// 保存配置文件
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        public static async void SetAppSettings(string key, string value)
+        /// <param name="config"></param>
+        public static async ValueTask SaveAppConfig(CmclConfig config)
         {
-            try
-            {
-                var cmclConfig = await File.ReadAllTextAsync(_configFilePath, Encoding.UTF8).ConfigureAwait(false);
-                var type = typeof(CmclConfig);
-                var property = type.GetProperty(key);
-                if (property == null)
-                    throw new Exception("找不到配置");
-                var v = Convert.ChangeType(value, property.PropertyType);
-                property.SetValue(cmclConfig, v, null);
-            }
-            catch (Exception e)
-            {
-                await LogHelper.WriteLogAsync(e).ConfigureAwait(false);
-                throw;
-            }
+            //序列化
+            var json = JsonSerializer.Serialize(config,
+                new JsonSerializerOptions
+                {
+                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+                    WriteIndented = true,
+                });
+            await File.WriteAllTextAsync(_configFilePath, json, Encoding.UTF8).ConfigureAwait(false);
         }
     }
 
@@ -120,6 +133,6 @@ namespace CMCL.Client.Util
         /// <summary>
         /// .minecraft文件夹位置
         /// </summary>
-        public string MinecraftDir { get; set; } = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        public string MinecraftDir { get; set; } = GameHelper.GetDefaultMinecraftDir();
     }
 }
