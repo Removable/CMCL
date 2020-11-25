@@ -13,6 +13,6 @@
         </Grid.RowDefinitions>
         <TextBlock Margin="0,80,0,0" Text="Component Launcher" FontSize="40" Foreground="#326CF3" Style="{StaticResource TextBlockLargeBold}" Grid.Row="0" VerticalAlignment="Top"/>
         <TextBlock x:Name="TbSelectedVersion" Margin="0,158,0,0" TextAlignment="Center" Text="Minecraft版本：{0}" Cursor="Hand" FontSize="16" Style="{StaticResource TextBlockDefaultPrimary}" VerticalAlignment="Top" Width="780" Grid.Row="0"/>
-        <Label Content="敬请期待" Style="{DynamicResource LabelPrimary}" Margin="0,40,0,0" VerticalAlignment="Top" Grid.Row="1" Width="150" Height="50"></Label>
+        <Button Style="{StaticResource ButtonPrimary}" Content="开始游戏" Margin="0,40,0,0" Grid.Row="1" VerticalAlignment="Top" Height="50" Width="150" Click="StartGameBtnClick"/>
     </Grid>
 </UserControl>

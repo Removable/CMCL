@@ -28,5 +28,7 @@ namespace CMCL.Client.Util
             var versions = Directory.GetDirectories(gameDirectory);
             return versions.Select(i=> i.Substring(versions[0].LastIndexOf(@"\", StringComparison.Ordinal) + 1)).ToArray();
         }
+
+        
     }
 }

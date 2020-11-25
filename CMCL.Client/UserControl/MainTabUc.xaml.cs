@@ -30,5 +30,15 @@ namespace CMCL.Client.UserControl
             var currentVersion = AppConfig.GetAppConfig().CurrentVersion;
             TbSelectedVersion.Text = string.Format(TbSelectedVersion.Text, currentVersion);
         }
+
+        /// <summary>
+        /// 开始游戏按钮
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void StartGameBtnClick(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
