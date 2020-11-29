@@ -11,6 +11,7 @@ namespace CMCL.Client.Download
 {
     public static class Downloader
     {
+        public static CancellationTokenSource DownloadCancellationToken = new CancellationTokenSource();
         public static DownloadPropertyChangedHandler DownloadInfoHandler = new DownloadPropertyChangedHandler();
 
         /// <summary>
@@ -21,7 +22,7 @@ namespace CMCL.Client.Download
         /// <returns></returns>
         public static async ValueTask<string> GetStringAsync(HttpClient httpClient, string url)
         {
-            using var response = await GetFinalResponse(httpClient, new Uri(url), default(CancellationToken), 0).ConfigureAwait(false);
+            using var response = await GetFinalResponse(httpClient, new Uri(url), 0).ConfigureAwait(false);
 
             if (response.StatusCode == HttpStatusCode.OK)
                 return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -38,7 +39,7 @@ namespace CMCL.Client.Download
         /// <param name="directory">保存的文件夹</param>
         /// <param name="downloadInfo">下载信息</param>
         /// <returns></returns>
-        public static async ValueTask GetFileAsync(HttpClient httpClient, string url, IProgress<double> progress, string directory, DownloadInfo downloadInfo, CancellationToken token)
+        public static async ValueTask GetFileAsync(HttpClient httpClient, string url, IProgress<double> progress, string directory, DownloadInfo downloadInfo)
         {
             DownloadInfoHandler.CurrentDownloadProgress = 0;
             DownloadInfoHandler.CurrentDownloadSpeed = 0;
@@ -52,7 +53,7 @@ namespace CMCL.Client.Download
             var uri = new Uri(url);
 
             //获取重定向后的响应
-            var response = await GetFinalResponse(httpClient, uri, token, 0).ConfigureAwait(false);
+            var response = await GetFinalResponse(httpClient, uri, 0).ConfigureAwait(false);
 
             var total = response.Content.Headers.ContentLength ?? -1L;
             var canReportProgress = total != -1 && progress != null;
@@ -60,7 +61,7 @@ namespace CMCL.Client.Download
             try
             {
                 //读取流并写到文件
-                await using Stream stream = await response.Content.ReadAsStreamAsync(token).ConfigureAwait(false),
+                await using Stream stream = await response.Content.ReadAsStreamAsync(DownloadCancellationToken.Token).ConfigureAwait(false),
                     fileStream = new FileStream(filePath, FileMode.Create,
                         FileAccess.Write, FileShare.None, 4096, true);
                 var totalRead = 0L;
@@ -69,9 +70,9 @@ namespace CMCL.Client.Download
 
                 do
                 {
-                    token.ThrowIfCancellationRequested();
+                    DownloadCancellationToken.Token.ThrowIfCancellationRequested();
 
-                    var read = await stream.ReadAsync(buffer.AsMemory(0, buffer.Length), token).ConfigureAwait(false);
+                    var read = await stream.ReadAsync(buffer.AsMemory(0, buffer.Length), DownloadCancellationToken.Token).ConfigureAwait(false);
 
                     if (read == 0)
                     {
@@ -82,7 +83,7 @@ namespace CMCL.Client.Download
                         var data = new byte[read];
                         buffer.ToList().CopyTo(0, data, 0, read);
 
-                        await fileStream.WriteAsync(buffer.AsMemory(0, read), token).ConfigureAwait(false);
+                        await fileStream.WriteAsync(buffer.AsMemory(0, read), DownloadCancellationToken.Token).ConfigureAwait(false);
 
                         totalRead += read;
 
@@ -109,7 +110,7 @@ namespace CMCL.Client.Download
                 {
                     url = bmclMirror.TranslateToCurrentMirrorUrl(url);
 
-                    await GetFileAsync(httpClient, url, progress, directory, downloadInfo, token).ConfigureAwait(false);
+                    await GetFileAsync(httpClient, url, progress, directory, downloadInfo).ConfigureAwait(false);
                 }
                 else
                     throw new Exception("下载失败");
@@ -125,12 +126,12 @@ namespace CMCL.Client.Download
         /// <param name="tryCount"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        private static async ValueTask<HttpResponseMessage> GetFinalResponse(HttpClient httpClient, Uri thisUri, CancellationToken token, int tryCount)
+        private static async ValueTask<HttpResponseMessage> GetFinalResponse(HttpClient httpClient, Uri thisUri, int tryCount)
         {
             try
             {
                 var response = await httpClient.GetAsync(thisUri.ToString(),
-                    HttpCompletionOption.ResponseHeadersRead, token).ConfigureAwait(false);
+                    HttpCompletionOption.ResponseHeadersRead, DownloadCancellationToken.Token).ConfigureAwait(false);
 
                 //若返回的状态码为302
                 switch (response.StatusCode)
@@ -144,7 +145,7 @@ namespace CMCL.Client.Download
                         else
                             thisUri = response.Headers.Location;
                         //递归
-                        return await GetFinalResponse(httpClient, thisUri, token, tryCount).ConfigureAwait(false);
+                        return await GetFinalResponse(httpClient, thisUri, tryCount).ConfigureAwait(false);
                     case HttpStatusCode.OK:
                         return response;
                     default:
@@ -154,7 +155,7 @@ namespace CMCL.Client.Download
             catch (Exception ex)
             {
                 if (tryCount <= 3)
-                    return await GetFinalResponse(httpClient, thisUri, token, tryCount + 1).ConfigureAwait(false); 
+                    return await GetFinalResponse(httpClient, thisUri, tryCount + 1).ConfigureAwait(false); 
                 throw;
             }
         }

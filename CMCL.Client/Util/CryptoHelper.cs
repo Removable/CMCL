@@ -26,5 +26,12 @@ namespace CMCL.Client.Util
             }
             return sb.ToString();
         }
+        
+        public static string Md5(string str)
+        {
+            var md5 = new System.Security.Cryptography.MD5CryptoServiceProvider();
+            var retVal = md5.ComputeHash(Encoding.UTF8.GetBytes(str));
+            return Byte2String(retVal);
+        }
     }
 }

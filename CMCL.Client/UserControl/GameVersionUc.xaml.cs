@@ -49,8 +49,8 @@ namespace CMCL.Client.UserControl
         {
             BtnRefresh.IsEnabled = false;
             BtnDownload.IsEnabled = false;
-            var loadingCircle = new LoadingCircle();
-            TopGrid.Children.Add(loadingCircle);
+            LoadingBlock.Visibility = Visibility.Visible;
+            LoadingBlock.LoadingTip = "加载中...";
 
             _gameVersionManifest = await VersionDownloader.LoadGameVersionList(_httpClientFactory.CreateClient()).ConfigureAwait(true);
             var dataTable = new DataTable();
@@ -83,7 +83,7 @@ namespace CMCL.Client.UserControl
             BtnRefresh.IsEnabled = true;
             BtnRefresh.Content = "刷新列表";
             BtnDownload.IsEnabled = true;
-            TopGrid.Children.Remove(loadingCircle);
+            LoadingBlock.Visibility = Visibility.Hidden;
         }
 
         /// <summary>
@@ -139,7 +139,14 @@ namespace CMCL.Client.UserControl
                         this.Dispatcher.BeginInvoke(new Action(() => { downloadInfoFrm.Close(); }));
                     }
                 };
-                await VersionDownloader.DownloadClient(_httpClientFactory.CreateClient(), progress, selectVer["版本"].ToString(), "").ConfigureAwait(false);
+                try
+                {
+                    await VersionDownloader.DownloadClient(_httpClientFactory.CreateClient(), progress, selectVer["版本"].ToString(), "").ConfigureAwait(false);
+                }
+                catch (Exception exception)
+                {
+                    await LogHelper.WriteLogAsync(exception);
+                }
             });
             thread.Start();
 

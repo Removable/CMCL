@@ -23,11 +23,11 @@ namespace CMCL.Client.Util
         {
             try
             {
-                var config = new CmclConfig();
                 if (!File.Exists(_configFilePath))
                 {
+                    Configure = new CmclConfig();
                     //序列化
-                    var serialize = JsonSerializer.Serialize(config,
+                    var serialize = JsonSerializer.Serialize(Configure,
                         new JsonSerializerOptions
                         {
                             Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
@@ -97,6 +97,7 @@ namespace CMCL.Client.Util
                     WriteIndented = true,
                 });
             await File.WriteAllTextAsync(_configFilePath, json, Encoding.UTF8).ConfigureAwait(false);
+            Configure = config;
         }
     }
 

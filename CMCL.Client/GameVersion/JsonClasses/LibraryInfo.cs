@@ -4,71 +4,72 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Text.Json.Serialization;
 using CMCL.Client.Util;
 
 namespace CMCL.Client.GameVersion.JsonClasses
 {
-  [DataContract]
+  
   public class LibraryInfo
   {
-    [DataContract]
+    
     public class ExtractRule
     {
-      [DataMember(Name = "exclude")] public string[] Exclude;
+      [JsonPropertyName("exclude")] public string[] Exclude;
     }
 
-    [DataContract]
+    
     public class Download
     {
-      [DataContract]
+      
       public class ArtifactInfo
       {
-        [DataMember(Name = "size")] public int Size;
-        [DataMember(Name = "sha1")] public string Sha1;
-        [DataMember(Name = "path")] public string Path;
-        [DataMember(Name = "url")] public string Url;
+        [JsonPropertyName("size")] public int Size;
+        [JsonPropertyName("sha1")] public string Sha1;
+        [JsonPropertyName("path")] public string Path;
+        [JsonPropertyName("url")] public string Url;
       }
 
-      [DataContract]
+      
       public class ClassifiersInfo
       {
-        [DataMember(Name = "natives-linux")] public ArtifactInfo Linux;
-        [DataMember(Name = "natives-osx")] public ArtifactInfo OSX;
-        [DataMember(Name = "natives-windows")] public ArtifactInfo Windows;
-        [DataMember(Name = "natives-windows-32")] public ArtifactInfo Windowsx32;
-        [DataMember(Name = "natives-windows-64")] public ArtifactInfo Windowsx64;
+        [JsonPropertyName("natives-linux")] public ArtifactInfo Linux;
+        [JsonPropertyName("natives-osx")] public ArtifactInfo OSX;
+        [JsonPropertyName("natives-windows")] public ArtifactInfo Windows;
+        [JsonPropertyName("natives-windows-32")] public ArtifactInfo Windowsx32;
+        [JsonPropertyName("natives-windows-64")] public ArtifactInfo Windowsx64;
       }
 
-      [DataMember(Name = "artifact")] public ArtifactInfo Artifact;
-      [DataMember(Name = "classifiers")] public ClassifiersInfo Classifiers;
+      [JsonPropertyName("artifact")] public ArtifactInfo Artifact;
+      [JsonPropertyName("classifiers")] public ClassifiersInfo Classifiers;
     }
 
-    [DataContract]
+    
     public class Rule
     {
-      [DataContract]
+      
       public class OSInfo
       {
-        [DataMember(Name = "name")] public string Name;
+        [JsonPropertyName("name")] public string Name;
       }
 
-      [DataMember(Name = "action")] public string Action;
-      [DataMember(Name = "os")] public OSInfo OS;
+      [JsonPropertyName("action")] public string Action;
+      [JsonPropertyName("os")] public OSInfo OS;
     }
 
-    [DataContract]
+    
     public class NativesName
     {
-      [DataMember(Name = "linux")] public string Linux;
-      [DataMember(Name = "osx")] public string OSX;
-      [DataMember(Name = "windows")] public string Windows;
+      [JsonPropertyName("linux")] public string Linux;
+      [JsonPropertyName("osx")] public string OSX;
+      [JsonPropertyName("windows")] public string Windows;
     }
 
-    [DataMember(Name = "name")] public string Name;
-    [DataMember(Name = "downloads")] public Download Downloads;
-    [DataMember(Name = "rules")] public Rule[] Rules;
-    [DataMember(Name = "extract")] public ExtractRule Extract;
-    [DataMember(Name = "natives")] public NativesName Natives;
+    [JsonPropertyName("name")] public string Name;
+    [JsonPropertyName("downloads")] public Download Downloads;
+    [JsonPropertyName("rules")] public Rule[] Rules;
+    [JsonPropertyName("extract")] public ExtractRule Extract;
+    [JsonPropertyName("natives")] public NativesName Natives;
 
     public enum Type
     {

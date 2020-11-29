@@ -8,6 +8,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using CMCL.Client.Download;
 using CMCL.Client.Game;
+using CMCL.Client.UserControl;
+using CMCL.Client.Util;
+using HandyControl.Tools.Extension;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace CMCL.Client.GameVersion
@@ -53,7 +56,6 @@ namespace CMCL.Client.GameVersion
 
             var progress = new Progress<double>();
             progress.ProgressChanged += (sender, value) => mainProgress.Report(value);
-            var cancellationToken = new CancellationTokenSource();
             await Downloader.GetFileAsync(httpClient,
                 _gameDownloadUrl.Replace(":version", versionId).Replace(":category", "client"),
                 progress, fullPath,
@@ -64,7 +66,7 @@ namespace CMCL.Client.GameVersion
                     CurrentFileName = $"{versionId}.jar",
                     CurrentCategory = "游戏本体",
                     ReportFinish = false,
-                }, cancellationToken.Token).ConfigureAwait(false);
+                }).ConfigureAwait(false);
             await Downloader.GetFileAsync(httpClient,
                 _gameDownloadUrl.Replace(":version", versionId).Replace(":category", "json"),
                 progress, fullPath,
@@ -75,7 +77,10 @@ namespace CMCL.Client.GameVersion
                     CurrentFileName = $"{versionId}.json",
                     CurrentCategory = "JSON文件",
                     ReportFinish = true
-                }, cancellationToken.Token).ConfigureAwait(false);
+                }).ConfigureAwait(false);
+            //校验哈希值
+            var versionInfo = await GameHelper.GetVersionInfo(versionId);
+            
             return (true, "");
         }
     }

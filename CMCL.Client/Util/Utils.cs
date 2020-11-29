@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Net.Http;
 using Microsoft.Win32;
 
 namespace CMCL.Client.Util
 {
     public static class Utils
     {
+        public static IHttpClientFactory HttpClientFactory;
+        
         /// <summary>
         /// 格式化日期
         /// </summary>
@@ -40,16 +44,18 @@ namespace CMCL.Client.Util
 
                     var array = pathVariable.ToString()?.Split(';');
                     if (array == null || array.Length <= 0) return string.Empty;
-                        
+
                     foreach (var s in array)
                     {
                         if (s.Contains("javapath"))
                         {
-                            return s + ".javaw.exe";
+                            return Path.Combine(s, "javaw.exe");
                         }
                     }
+
                     return string.Empty;
                 }
+
                 var javaList = new List<string>();
                 foreach (var ver in jre.GetSubKeyNames())
                 {
@@ -61,19 +67,28 @@ namespace CMCL.Client.Util
                         if (!string.IsNullOrWhiteSpace(str))
                             javaList.Add(str + @"\bin\javaw.exe");
                     }
-                    catch { return string.Empty; }
+                    catch
+                    {
+                        return string.Empty;
+                    }
                 }
+
                 //优先java8
                 foreach (var java in javaList)
                 {
-                    if (java.ToLower().Contains("jre8") || java.ToLower().Contains("jdk1.8") || java.ToLower().Contains("jre1.8"))
+                    if (java.ToLower().Contains("jre8") || java.ToLower().Contains("jdk1.8") ||
+                        java.ToLower().Contains("jre1.8"))
                     {
                         return java;
                     }
                 }
+
                 return javaList[0];
             }
-            catch { return string.Empty; }
+            catch
+            {
+                return string.Empty;
+            }
         }
     }
 }

@@ -31,7 +31,8 @@ namespace CMCL.Client.Window
 
         private void DownloadInfoFrm_OnClosing(object sender, CancelEventArgs e)
         {
-            this.DialogResult = true;
+            Downloader.DownloadCancellationToken.Cancel();
+            this.DialogResult = Downloader.DownloadInfoHandler.DownloadFinished;
         }
 
         private void BtnStopDownload_OnMouseEnter(object sender, MouseEventArgs e)

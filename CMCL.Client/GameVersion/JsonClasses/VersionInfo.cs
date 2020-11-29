@@ -1,56 +1,59 @@
 using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 namespace CMCL.Client.GameVersion.JsonClasses
 {
-  [DataContract]
-  public class VersionInfo
-  {
-    [DataContract]
-    public class VersionAssetIndex
+    public class VersionInfo
     {
-      [DataMember(Name = "id")] public string Id;
-      [DataMember(Name = "sha1")] public string Sha1;
-      [DataMember(Name = "size")] public string Size;
-      [DataMember(Name = "url")] public string Url;
-      [DataMember(Name = "totalSize")] public string TotalSize;
+        public class VersionAssetIndex
+        {
+            [JsonPropertyName("id")] public string Id;
+            [JsonPropertyName("sha1")] public string Sha1;
+            [JsonPropertyName("size")] public string Size;
+            [JsonPropertyName("url")] public string Url;
+            [JsonPropertyName("totalSize")] public string TotalSize;
+        }
+
+
+        public class VersionDownload
+        {
+            public class File
+            {
+                [JsonPropertyName("sha1")] public string Sha1;
+                [JsonPropertyName("size")] public string Size;
+                [JsonPropertyName("url")] public string Url;
+            }
+
+            [JsonPropertyName("client")] public File Client;
+            [JsonPropertyName("server")] public File Server;
+        }
+
+
+        public class VersionArguments
+        {
+            [JsonPropertyName("game")] public object[] Game;
+            [JsonPropertyName("jvm")] public object[] Jvm;
+        }
+
+        [JsonPropertyName("id")] public string Id;
+        [JsonPropertyName("time")] public string Time;
+        [JsonPropertyName("releaseTime")] public string ReleaseTime;
+        [JsonPropertyName("type")] public string Type;
+
+        [JsonPropertyName("minecraftArguments")]
+        public string MinecraftArguments;
+
+        [JsonPropertyName("mainClass")] public string MainClass;
+
+        [JsonPropertyName("minimumLauncherVersion")]
+        public int MinimumLauncherVersion;
+
+        [JsonPropertyName("inheritsFrom")] public string InheritsFrom;
+        [JsonPropertyName("assetIndex")] public VersionAssetIndex AssetIndex;
+        [JsonPropertyName("libraries")] public LibraryInfo[] Libraries;
+        [JsonPropertyName("downloads")] public VersionDownload Downloads;
+        [JsonPropertyName("assets")] public string Assets;
+        [JsonPropertyName("jar")] public string Jar;
+        [JsonPropertyName("arguments")] public VersionArguments Arguments;
     }
-
-    [DataContract]
-    public class VersionDownload
-    {
-      [DataContract]
-      public class File
-      {
-        [DataMember(Name = "sha1")] public string Sha1;
-        [DataMember(Name = "size")] public string Size;
-        [DataMember(Name = "url")] public string Url;
-      }
-
-      [DataMember(Name = "client")] public File Client;
-      [DataMember(Name = "server")] public File Server;
-    }
-
-    [DataContract]
-    public class VersionArguments
-    {
-      [DataMember(Name = "game")] public object[] Game;
-      [DataMember(Name = "jvm")] public object[] Jvm;
-    }
-
-    [DataMember(Name = "id")] public string Id;
-    [DataMember(Name = "time")] public string Time;
-    [DataMember(Name = "releaseTime")] public string ReleaseTime;
-    [DataMember(Name = "type")] public string Type;
-    [DataMember(Name = "minecraftArguments")] public string MinecraftArguments;
-    [DataMember(Name = "mainClass")] public string MainClass;
-    [DataMember(Name = "minimumLauncherVersion")] public string MinimumLauncherVersion;
-    [DataMember(Name = "inheritsFrom")] public string InheritsFrom;
-    [DataMember(Name = "assetIndex")] public VersionAssetIndex AssetIndex;
-    [DataMember(Name = "libraries")] public LibraryInfo[] Libraries;
-    [DataMember(Name = "downloads")] public VersionDownload Downloads;
-    [DataMember(Name = "assets")] public string Assets;
-    [DataMember(Name = "jar")] public string Jar;
-    [DataMember(Name = "arguments")] public VersionArguments Arguments;
-
-  }
 }

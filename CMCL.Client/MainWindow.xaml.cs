@@ -18,6 +18,7 @@ namespace CMCL.Client
         {
             InitializeComponent();
             _httpClientFactory = httpClientFactory;
+            Utils.HttpClientFactory = _httpClientFactory;
         }
 
         /// <summary>
@@ -25,7 +26,7 @@ namespace CMCL.Client
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
+        private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
             var mainUc = new MainTabUc();
             MainTabItem.Content = mainUc;
