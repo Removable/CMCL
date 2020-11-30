@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
+using CMCL.Client.GameVersion.JsonClasses;
 using Microsoft.Win32;
 
 namespace CMCL.Client.Util
@@ -20,10 +23,12 @@ namespace CMCL.Client.Util
             {
                 Directory.CreateDirectory(to);
             }
+
             foreach (DirectoryInfo sondir in dir.GetDirectories())
             {
                 DirCopy(sondir.FullName, to + "\\" + sondir.Name);
             }
+
             foreach (FileInfo file in dir.GetFiles())
             {
                 File.Copy(file.FullName, to + "\\" + file.Name, true);
@@ -51,6 +56,39 @@ namespace CMCL.Client.Util
         {
             CreateDirectoryIfNotExist(path);
             File.WriteAllText(path, content);
+        }
+
+        /// <summary>
+        /// 获取文件sha1
+        /// </summary>
+        /// <param name="filePath">文件路径</param>
+        /// <returns></returns>
+        public static async ValueTask<string> GetSha1(string filePath)
+        {
+            var sc = new StringBuilder();
+            if (!File.Exists(filePath))
+            {
+                return string.Empty;
+            }
+            try
+            {
+                await using var file = new FileStream(filePath, FileMode.Open);
+                var sha1 = new SHA1CryptoServiceProvider();
+                var value = await sha1.ComputeHashAsync(file);
+                file.Close();
+
+                foreach (var v in value)
+                {
+                    sc.Append(v.ToString("x2"));
+                }
+
+                return sc.ToString();
+            }
+            catch (Exception ex)
+            {
+                await LogHelper.WriteLogAsync(ex);
+                return string.Empty;
+            }
         }
     }
 }

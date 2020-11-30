@@ -11,7 +11,7 @@
         <Border x:Name="VersionListLoading" Visibility="Visible" Background="{DynamicResource PrimaryBrush}" CornerRadius="10">
             <Grid>
                 <hc:LoadingCircle Style="{StaticResource LoadingCircleLight}" Margin="34,10,35,40" />
-                <TextBlock x:Name="LoadingText" TextAlignment="Center" Foreground="White" Text="加载中..." Margin="0,66,0,7"></TextBlock>
+                <TextBlock x:Name="LoadingBlock" TextAlignment="Center" Foreground="White" Text="加载中..." Margin="0,66,0,0"></TextBlock>
             </Grid>
         </Border>    
     </Grid>

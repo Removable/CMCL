@@ -40,7 +40,7 @@ namespace CMCL.Client.UserControl
         }
         protected void OnValueChanged(DependencyPropertyChangedEventArgs e)
         {
-            this.LoadingText.Text = e.NewValue.ToString();
+            this.LoadingBlock.Text = e.NewValue.ToString();
         }
     }
 }

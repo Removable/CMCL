@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,6 +16,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using CMCL.Client.LoginPlugin;
 using CMCL.Client.Util;
+using CMCL.Client.Window;
 using HandyControl.Controls;
 using HandyControl.Data;
 
@@ -51,7 +53,7 @@ namespace CMCL.Client.UserControl
                 var result = await MojangLogin.Login(config.Account, config.Password);
                 if (result.IsSuccess)
                 {
-                    
+
                 }
             }
             catch (Exception exception)
@@ -63,6 +65,11 @@ namespace CMCL.Client.UserControl
             {
                 btn.IsEnabled = true;
             }
+        }
+
+        private void Test()
+        {
+            Thread.Sleep(3000);
         }
     }
 }

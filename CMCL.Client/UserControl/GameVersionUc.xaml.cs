@@ -111,8 +111,7 @@ namespace CMCL.Client.UserControl
         /// <param name="e"></param>
         private void BtnDownload_OnClick(object sender, RoutedEventArgs e)
         {
-            var selectVer = VersionListView.SelectedItem as DataRowView;
-            if (selectVer == null)
+            if (!(VersionListView.SelectedItem is DataRowView selectVer))
             {
                 NotifyIcon.ShowBalloonTip("提示", "请选择一个版本", NotifyIconInfoType.Warning, "AppNotifyIcon");
                 return;

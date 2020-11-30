@@ -1,0 +1,12 @@
+﻿<Window x:Class="CMCL.Client.Window.LoadingFrm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:userControl="clr-namespace:CMCL.Client.UserControl"
+        mc:Ignorable="d" WindowStyle="None" Background="Transparent" AllowsTransparency="True" ResizeMode="NoResize"
+        Title="LoadingFrm" Height="96" Width="116" WindowStartupLocation="CenterOwner">
+    <Grid>
+        <userControl:LoadingUc x:Name="LoadingControl"></userControl:LoadingUc>
+    </Grid>
+</Window>

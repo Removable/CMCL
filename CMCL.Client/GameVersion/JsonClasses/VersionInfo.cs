@@ -17,15 +17,15 @@ namespace CMCL.Client.GameVersion.JsonClasses
 
         public class VersionDownload
         {
-            public class File
+            public class FileType
             {
                 [JsonPropertyName("sha1")] public string Sha1;
                 [JsonPropertyName("size")] public string Size;
                 [JsonPropertyName("url")] public string Url;
             }
 
-            [JsonPropertyName("client")] public File Client;
-            [JsonPropertyName("server")] public File Server;
+            [JsonPropertyName("client")] public FileType Client;
+            [JsonPropertyName("server")] public FileType Server;
         }
 
 

@@ -1,9 +1,8 @@
-﻿using System.Net.Http;
-using System.Threading;
+﻿using CMCL.Client.UserControl;
+using CMCL.Client.Util;
+using System.Net.Http;
 using System.Windows;
 using System.Windows.Controls;
-using CMCL.Client.UserControl;
-using CMCL.Client.Util;
 
 namespace CMCL.Client
 {
@@ -26,7 +25,7 @@ namespace CMCL.Client
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
+        private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
             var mainUc = new MainTabUc();
             MainTabItem.Content = mainUc;

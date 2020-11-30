@@ -74,7 +74,7 @@ namespace CMCL.Client.Util
                 var v = Convert.ChangeType(value, property.PropertyType);
                 property.SetValue(cmclConfig, v, null);
 
-                SaveAppConfig(cmclConfig);
+                await SaveAppConfig(cmclConfig);
             }
             catch (Exception e)
             {

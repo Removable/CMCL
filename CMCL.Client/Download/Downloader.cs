@@ -103,6 +103,7 @@ namespace CMCL.Client.Download
             }
             catch (Exception ex)
             {
+                await LogHelper.WriteLogAsync(ex);
                 response.Dispose();
                 //若以bmcl源下载失败，切换mcbbs源尝试
                 var bmclMirror = new BMCLMirror();
@@ -115,6 +116,14 @@ namespace CMCL.Client.Download
                 else
                     throw new Exception("下载失败");
             }
+        }
+
+        public static async ValueTask CheckFileSha1(string filePath, IProgress<double> progress, string fileName = "")
+        {
+            fileName = string.IsNullOrWhiteSpace(fileName) ? Path.GetFileName(filePath) : fileName;
+            DownloadInfoHandler.CurrentTaskProgress = 0;
+            DownloadInfoHandler.CurrentTaskName = $"正在校验 {fileName}";
+            DownloadInfoHandler.CurrentTaskGroup = "";
         }
 
         /// <summary>
@@ -154,6 +163,7 @@ namespace CMCL.Client.Download
             }
             catch (Exception ex)
             {
+                await LogHelper.WriteLogAsync(ex);
                 if (tryCount <= 3)
                     return await GetFinalResponse(httpClient, thisUri, tryCount + 1).ConfigureAwait(false); 
                 throw;
