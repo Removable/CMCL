@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace CMCL.Client.LoginPlugin
 {
@@ -13,22 +13,22 @@ namespace CMCL.Client.LoginPlugin
             Password = password;
         }
 
-        [JsonPropertyName("agent")] public AgentType Agent { get; set; }
+        [JsonProperty("agent")] public AgentType Agent { get; set; }
 
-        [JsonPropertyName("clientToken")] public string ClientToken { get; set; }
+        [JsonProperty("clientToken")] public string ClientToken { get; set; }
 
-        [JsonPropertyName("password")] public string Password { get; set; }
+        [JsonProperty("password")] public string Password { get; set; }
 
-        [JsonPropertyName("requestUser")] public bool RequestUser { get; set; }
+        [JsonProperty("requestUser")] public bool RequestUser { get; set; }
 
-        [JsonPropertyName("username")] public string Username { get; set; }
+        [JsonProperty("username")] public string Username { get; set; }
 
 
         public class AgentType
         {
-            [JsonPropertyName("name")] public string Name { get; set; }
+            [JsonProperty("name")] public string Name { get; set; }
 
-            [JsonPropertyName("version")] public int Version { get; set; }
+            [JsonProperty("version")] public int Version { get; set; }
         }
     }
 }

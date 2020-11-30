@@ -20,5 +20,6 @@
         <Button x:Name="BtnChooseMcDir" Style="{StaticResource ButtonPrimary}" Content="选择路径" HorizontalAlignment="Stretch" Margin="692,188,40,0" VerticalAlignment="Top" Grid.Row="0" Click="ChooseCustomGameDir"/>
         <Button x:Name="BtnSaveConfig" Style="{StaticResource ButtonPrimary}" Content="保存设置" HorizontalAlignment="Stretch" Margin="692,334,40,0" VerticalAlignment="Top" Grid.Row="0" Click="SaveConfig"/>
         <Button x:Name="BtnReloadConfig" Style="{StaticResource ButtonInfo}" Content="取消更改" HorizontalAlignment="Stretch" Margin="608,334,124,0" VerticalAlignment="Top" Grid.Row="0" Click="ReloadConfig"/>
+        <ComboBox x:Name="ComboSelectedDownloadSource" hc:InfoElement.Placeholder="请选择下载源" hc:TitleElement.Title="下载源" Style="{StaticResource ComboBoxExtend}" Grid.Column="0" Margin="40,243,570,81"/>
     </Grid>
 </UserControl>

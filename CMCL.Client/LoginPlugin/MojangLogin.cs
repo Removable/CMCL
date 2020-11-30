@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text.Json;
 using System.Threading.Tasks;
 using CMCL.Client.Util;
+using Newtonsoft.Json;
 
 namespace CMCL.Client.LoginPlugin
 {
@@ -28,7 +28,7 @@ namespace CMCL.Client.LoginPlugin
                 var loginRequest = new LoginRequest(username, psw);
                 //请求接口
                 var client = Utils.HttpClientFactory.CreateClient("loginClient");
-                var content = new StringContent(JsonSerializer.Serialize(loginRequest));
+                var content = new StringContent(JsonConvert.SerializeObject(loginRequest));
                 content.Headers.ContentType = new MediaTypeHeaderValue("application/json") {CharSet = "utf-8"};
                 var response = await client.PostAsync(_routeAuthenticate, content).ConfigureAwait(false);
                 
@@ -41,7 +41,7 @@ namespace CMCL.Client.LoginPlugin
                     throw new Exception(responseContent);
                 }
 
-                var loginResponse = JsonSerializer.Deserialize<LoginResponse>(responseContent);
+                var loginResponse = JsonConvert.DeserializeObject<LoginResponse>(responseContent);
                 if (loginResponse == null) throw new Exception("登录接口返回空值");
                 if (!loginResponse.ClientToken.Equals(ClientToken))
                 {

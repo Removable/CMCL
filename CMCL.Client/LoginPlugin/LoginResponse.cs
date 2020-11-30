@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace CMCL.Client.LoginPlugin
 {
@@ -6,23 +6,23 @@ namespace CMCL.Client.LoginPlugin
     {
         public class UserType
         {
-            [JsonPropertyName("username")] public string Username { get; set; }
-            [JsonPropertyName("id")] public string Id { get; set; }
+            [JsonProperty("username")] public string Username { get; set; }
+            [JsonProperty("id")] public string Id { get; set; }
         }
         
-        [JsonPropertyName("user")]
+        [JsonProperty("user")]
         public UserType User { get; set; }
         
-        [JsonPropertyName("accessToken")]
+        [JsonProperty("accessToken")]
         public string AccessToken { get; set; }
         
-        [JsonPropertyName("clientToken")]
+        [JsonProperty("clientToken")]
         public string ClientToken { get; set; }
         
-        [JsonPropertyName("availableProfiles")]
+        [JsonProperty("availableProfiles")]
         public GameProfile[] AvailableProfiles { get; set; }
         
-        [JsonPropertyName("selectedProfile")]
+        [JsonProperty("selectedProfile")]
         public GameProfile SelectedProfile { get; set; }
     }
 }

@@ -1,21 +1,21 @@
-﻿using System;
+﻿using CMCL.Client.Util;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
-using System.Text.Json.Serialization;
-using CMCL.Client.Util;
 
 namespace CMCL.Client.GameVersion.JsonClasses
 {
-  
-  public class LibraryInfo
+
+    public class LibraryInfo
   {
     
     public class ExtractRule
     {
-      [JsonPropertyName("exclude")] public string[] Exclude;
+      [JsonProperty("exclude")] public string[] Exclude;
     }
 
     
@@ -24,24 +24,24 @@ namespace CMCL.Client.GameVersion.JsonClasses
       
       public class ArtifactInfo
       {
-        [JsonPropertyName("size")] public int Size;
-        [JsonPropertyName("sha1")] public string Sha1;
-        [JsonPropertyName("path")] public string Path;
-        [JsonPropertyName("url")] public string Url;
+        [JsonProperty("size")] public int Size;
+        [JsonProperty("sha1")] public string Sha1;
+        [JsonProperty("path")] public string Path;
+        [JsonProperty("url")] public string Url;
       }
 
       
       public class ClassifiersInfo
       {
-        [JsonPropertyName("natives-linux")] public ArtifactInfo Linux;
-        [JsonPropertyName("natives-osx")] public ArtifactInfo OSX;
-        [JsonPropertyName("natives-windows")] public ArtifactInfo Windows;
-        [JsonPropertyName("natives-windows-32")] public ArtifactInfo Windowsx32;
-        [JsonPropertyName("natives-windows-64")] public ArtifactInfo Windowsx64;
+        [JsonProperty("natives-linux")] public ArtifactInfo Linux;
+        [JsonProperty("natives-osx")] public ArtifactInfo OSX;
+        [JsonProperty("natives-windows")] public ArtifactInfo Windows;
+        [JsonProperty("natives-windows-32")] public ArtifactInfo Windowsx32;
+        [JsonProperty("natives-windows-64")] public ArtifactInfo Windowsx64;
       }
 
-      [JsonPropertyName("artifact")] public ArtifactInfo Artifact;
-      [JsonPropertyName("classifiers")] public ClassifiersInfo Classifiers;
+      [JsonProperty("artifact")] public ArtifactInfo Artifact;
+      [JsonProperty("classifiers")] public ClassifiersInfo Classifiers;
     }
 
     
@@ -50,26 +50,26 @@ namespace CMCL.Client.GameVersion.JsonClasses
       
       public class OSInfo
       {
-        [JsonPropertyName("name")] public string Name;
+        [JsonProperty("name")] public string Name;
       }
 
-      [JsonPropertyName("action")] public string Action;
-      [JsonPropertyName("os")] public OSInfo OS;
+      [JsonProperty("action")] public string Action;
+      [JsonProperty("os")] public OSInfo OS;
     }
 
     
     public class NativesName
     {
-      [JsonPropertyName("linux")] public string Linux;
-      [JsonPropertyName("osx")] public string OSX;
-      [JsonPropertyName("windows")] public string Windows;
+      [JsonProperty("linux")] public string Linux;
+      [JsonProperty("osx")] public string OSX;
+      [JsonProperty("windows")] public string Windows;
     }
 
-    [JsonPropertyName("name")] public string Name;
-    [JsonPropertyName("downloads")] public Download Downloads;
-    [JsonPropertyName("rules")] public Rule[] Rules;
-    [JsonPropertyName("extract")] public ExtractRule Extract;
-    [JsonPropertyName("natives")] public NativesName Natives;
+    [JsonProperty("name")] public string Name;
+    [JsonProperty("downloads")] public Download Downloads;
+    [JsonProperty("rules")] public Rule[] Rules;
+    [JsonProperty("extract")] public ExtractRule Extract;
+    [JsonProperty("natives")] public NativesName Natives;
 
     public enum Type
     {
@@ -138,7 +138,7 @@ namespace CMCL.Client.GameVersion.JsonClasses
         return fileInfo.Exists;
       return fileInfo.Exists
              && fileInfo.Length == GetLibrary().Size
-             && CryptoHelper.GetSha1HashFromFile(path) == GetLibrary().Sha1;
+             && FileHelper.GetSha1HashFromFile(path) == GetLibrary().Sha1;
     }
 
     public bool IsVaildNative(string libraryPath)
@@ -150,7 +150,7 @@ namespace CMCL.Client.GameVersion.JsonClasses
         return fileInfo.Exists && fileInfo.Length > 0;
       return fileInfo.Exists
              && fileInfo.Length == GetNative().Size
-             && CryptoHelper.GetSha1HashFromFile(path) == GetNative().Sha1;
+             && FileHelper.GetSha1HashFromFile(path) == GetNative().Sha1;
     }
 
     public string GetLibraryPath() 

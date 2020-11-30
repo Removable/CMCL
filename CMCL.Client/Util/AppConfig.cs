@@ -8,6 +8,9 @@ using System.Text.Json;
 using System.Text.Unicode;
 using System.Threading;
 using System.Threading.Tasks;
+using CMCL.Client.Download;
+using ComponentUtil.Common.Data;
+using Newtonsoft.Json;
 
 namespace CMCL.Client.Util
 {
@@ -27,19 +30,14 @@ namespace CMCL.Client.Util
                 {
                     Configure = new CmclConfig();
                     //序列化
-                    var serialize = JsonSerializer.Serialize(Configure,
-                        new JsonSerializerOptions
-                        {
-                            Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-                            WriteIndented = true,
-                        });
+                    var serialize = JsonConvert.SerializeObject(Configure, Formatting.Indented);
 
                     await File.WriteAllTextAsync(_configFilePath, serialize, Encoding.UTF8).ConfigureAwait(false);
                 }
                 else
                 {
                     var json = await File.ReadAllTextAsync(_configFilePath, Encoding.UTF8).ConfigureAwait(false);
-                    Configure = JsonSerializer.Deserialize<CmclConfig>(json);
+                    Configure = JsonConvert.DeserializeObject<CmclConfig>(json);
                 }
             }
             catch (Exception e)
@@ -90,12 +88,7 @@ namespace CMCL.Client.Util
         public static async ValueTask SaveAppConfig(CmclConfig config)
         {
             //序列化
-            var json = JsonSerializer.Serialize(config,
-                new JsonSerializerOptions
-                {
-                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-                    WriteIndented = true,
-                });
+            var json = JsonConvert.SerializeObject(config, Formatting.Indented);
             await File.WriteAllTextAsync(_configFilePath, json, Encoding.UTF8).ConfigureAwait(false);
             Configure = config;
         }
@@ -135,5 +128,28 @@ namespace CMCL.Client.Util
         /// .minecraft文件夹位置
         /// </summary>
         public string MinecraftDir { get; set; } = GameHelper.GetDefaultMinecraftDir();
+
+        /// <summary>
+        /// 下载源
+        /// </summary>
+        public string DownloadSource { get; set; } = "MCBBS源";
+
+        /// <summary>
+        /// 下载源（枚举）
+        /// </summary>
+        [JsonIgnore]
+        public DownloadSource DownloadSourceEnum
+        {
+            get
+            {
+                var enumItems = EnumHelper.GetAllItemsAndDescriptions<DownloadSource>();
+                foreach (var (enumItem, description) in enumItems.Where(valueTuple => valueTuple.description == DownloadSource))
+                {
+                    return enumItem;
+                }
+
+                return Download.DownloadSource.MCBBS;
+            }
+        }
     }
 }

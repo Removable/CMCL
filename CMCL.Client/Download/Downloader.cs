@@ -105,26 +105,26 @@ namespace CMCL.Client.Download
             {
                 await LogHelper.WriteLogAsync(ex);
                 response.Dispose();
-                //若以bmcl源下载失败，切换mcbbs源尝试
-                var bmclMirror = new BMCLMirror();
-                if (bmclMirror.IsCurrentMirror(url))
-                {
-                    url = bmclMirror.TranslateToCurrentMirrorUrl(url);
+                ////若以bmcl源下载失败，切换mcbbs源尝试
+                //var bmclMirror = new BMCLMirror();
+                //if (bmclMirror.IsCurrentMirror(url))
+                //{
+                //    url = bmclMirror.TranslateToCurrentMirrorUrl(url);
 
-                    await GetFileAsync(httpClient, url, progress, directory, downloadInfo).ConfigureAwait(false);
-                }
-                else
+                //    await GetFileAsync(httpClient, url, progress, directory, downloadInfo).ConfigureAwait(false);
+                //}
+                //else
                     throw new Exception("下载失败");
             }
         }
 
-        public static async ValueTask CheckFileSha1(string filePath, IProgress<double> progress, string fileName = "")
-        {
-            fileName = string.IsNullOrWhiteSpace(fileName) ? Path.GetFileName(filePath) : fileName;
-            DownloadInfoHandler.CurrentTaskProgress = 0;
-            DownloadInfoHandler.CurrentTaskName = $"正在校验 {fileName}";
-            DownloadInfoHandler.CurrentTaskGroup = "";
-        }
+        //public static ValueTask CheckFileSha1(string filePath, IProgress<double> progress, string fileName = "")
+        //{
+        //    fileName = string.IsNullOrWhiteSpace(fileName) ? Path.GetFileName(filePath) : fileName;
+        //    DownloadInfoHandler.CurrentTaskProgress = 0;
+        //    DownloadInfoHandler.CurrentTaskName = $"正在校验 {fileName}";
+        //    DownloadInfoHandler.CurrentTaskGroup = "";
+        //}
 
         /// <summary>
         /// 获取经过重定向后的最终响应

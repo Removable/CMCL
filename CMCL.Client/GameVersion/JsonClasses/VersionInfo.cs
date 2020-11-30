@@ -1,5 +1,4 @@
-using System.Runtime.Serialization;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace CMCL.Client.GameVersion.JsonClasses
 {
@@ -7,11 +6,11 @@ namespace CMCL.Client.GameVersion.JsonClasses
     {
         public class VersionAssetIndex
         {
-            [JsonPropertyName("id")] public string Id;
-            [JsonPropertyName("sha1")] public string Sha1;
-            [JsonPropertyName("size")] public string Size;
-            [JsonPropertyName("url")] public string Url;
-            [JsonPropertyName("totalSize")] public string TotalSize;
+            [JsonProperty("id")] public string Id;
+            [JsonProperty("sha1")] public string Sha1;
+            [JsonProperty("size")] public string Size;
+            [JsonProperty("url")] public string Url;
+            [JsonProperty("totalSize")] public string TotalSize;
         }
 
 
@@ -19,41 +18,41 @@ namespace CMCL.Client.GameVersion.JsonClasses
         {
             public class FileType
             {
-                [JsonPropertyName("sha1")] public string Sha1;
-                [JsonPropertyName("size")] public string Size;
-                [JsonPropertyName("url")] public string Url;
+                [JsonProperty("sha1")] public string Sha1;
+                [JsonProperty("size")] public string Size;
+                [JsonProperty("url")] public string Url;
             }
 
-            [JsonPropertyName("client")] public FileType Client;
-            [JsonPropertyName("server")] public FileType Server;
+            [JsonProperty("client")] public FileType Client;
+            [JsonProperty("server")] public FileType Server;
         }
 
 
         public class VersionArguments
         {
-            [JsonPropertyName("game")] public object[] Game;
-            [JsonPropertyName("jvm")] public object[] Jvm;
+            [JsonProperty("game")] public object[] Game;
+            [JsonProperty("jvm")] public object[] Jvm;
         }
 
-        [JsonPropertyName("id")] public string Id;
-        [JsonPropertyName("time")] public string Time;
-        [JsonPropertyName("releaseTime")] public string ReleaseTime;
-        [JsonPropertyName("type")] public string Type;
+        [JsonProperty("id")] public string Id;
+        [JsonProperty("time")] public string Time;
+        [JsonProperty("releaseTime")] public string ReleaseTime;
+        [JsonProperty("type")] public string Type;
 
-        [JsonPropertyName("minecraftArguments")]
+        [JsonProperty("minecraftArguments")]
         public string MinecraftArguments;
 
-        [JsonPropertyName("mainClass")] public string MainClass;
+        [JsonProperty("mainClass")] public string MainClass;
 
-        [JsonPropertyName("minimumLauncherVersion")]
+        [JsonProperty("minimumLauncherVersion")]
         public int MinimumLauncherVersion;
 
-        [JsonPropertyName("inheritsFrom")] public string InheritsFrom;
-        [JsonPropertyName("assetIndex")] public VersionAssetIndex AssetIndex;
-        [JsonPropertyName("libraries")] public LibraryInfo[] Libraries;
-        [JsonPropertyName("downloads")] public VersionDownload Downloads;
-        [JsonPropertyName("assets")] public string Assets;
-        [JsonPropertyName("jar")] public string Jar;
-        [JsonPropertyName("arguments")] public VersionArguments Arguments;
+        [JsonProperty("inheritsFrom")] public string InheritsFrom;
+        [JsonProperty("assetIndex")] public VersionAssetIndex AssetIndex;
+        [JsonProperty("libraries")] public LibraryInfo[] Libraries;
+        [JsonProperty("downloads")] public VersionDownload Downloads;
+        [JsonProperty("assets")] public string Assets;
+        [JsonProperty("jar")] public string Jar;
+        [JsonProperty("arguments")] public VersionArguments Arguments;
     }
 }

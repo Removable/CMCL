@@ -10,8 +10,9 @@ using CMCL.Client.Download;
 using CMCL.Client.Game;
 using CMCL.Client.UserControl;
 using CMCL.Client.Util;
+using CMCL.Client.Window;
 using HandyControl.Tools.Extension;
-using JsonSerializer = System.Text.Json.JsonSerializer;
+using Newtonsoft.Json;
 
 namespace CMCL.Client.GameVersion
 {
@@ -29,11 +30,7 @@ namespace CMCL.Client.GameVersion
         public static async ValueTask<GameVersionManifest> LoadGameVersionList(HttpClient httpClient)
         {
             var jsonStr = await Downloader.GetStringAsync(httpClient, _versionManifestUrl).ConfigureAwait(false);
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-            };
-            var gameVersionManifest = JsonSerializer.Deserialize<GameVersionManifest>(jsonStr, options);
+            var gameVersionManifest = JsonConvert.DeserializeObject<GameVersionManifest>(jsonStr);
             return gameVersionManifest;
         }
 
@@ -56,32 +53,40 @@ namespace CMCL.Client.GameVersion
 
             var progress = new Progress<double>();
             progress.ProgressChanged += (sender, value) => mainProgress.Report(value);
-            await Downloader.GetFileAsync(httpClient,
-                _gameDownloadUrl.Replace(":version", versionId).Replace(":category", "client"),
-                progress, fullPath,
-                new DownloadInfo
-                {
-                    TotalFilesCount = 1,
-                    CurrentFileIndex = 1,
-                    CurrentFileName = $"{versionId}.jar",
-                    CurrentCategory = "游戏本体",
-                    ReportFinish = false,
-                }).ConfigureAwait(false);
-            await Downloader.GetFileAsync(httpClient,
-                _gameDownloadUrl.Replace(":version", versionId).Replace(":category", "json"),
-                progress, fullPath,
+            //await Downloader.GetFileAsync(httpClient,
+            //    _gameDownloadUrl.Replace(":version", versionId).Replace(":category", "client"),
+            //    progress, fullPath,
+            //    new DownloadInfo
+            //    {
+            //        TotalFilesCount = 1,
+            //        CurrentFileIndex = 1,
+            //        CurrentFileName = $"{versionId}.jar",
+            //        CurrentCategory = "游戏本体",
+            //        ReportFinish = false,
+            //    }).ConfigureAwait(false);
+            
+            //先下载版本json
+            var jsonPath = _gameDownloadUrl.Replace(":version", versionId).Replace(":category", "json");
+            await Downloader.GetFileAsync(httpClient, jsonPath, progress, fullPath,
                 new DownloadInfo
                 {
                     TotalFilesCount = 1,
                     CurrentFileIndex = 1,
                     CurrentFileName = $"{versionId}.json",
-                    CurrentCategory = "JSON文件",
+                    CurrentCategory = "游戏版本文件",
                     ReportFinish = true
                 }).ConfigureAwait(false);
-            //校验哈希值
+            //校验json自身哈希值
             var versionInfo = await GameHelper.GetVersionInfo(versionId);
+            //var loadingFrm = LoadingFrm.GetInstance();
+            //loadingFrm.DoWork("正在校验文件...", () =>
+            //{
+            //    FileHelper.GetSha1()
+            //});
             
             return (true, "");
         }
+
+
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using CMCL.Client.Util;
+using ComponentUtil.Common.Crypto;
 
 namespace CMCL.Client.LoginPlugin
 {
@@ -8,7 +9,7 @@ namespace CMCL.Client.LoginPlugin
         public LoginResult(string username, string uid = null, string clientIdentifier = null)
         {
             Username = username;
-            Uuid = AccessToken = uid ?? Guid.Parse(CryptoHelper.Md5("OfflinePlayer:" + username)).ToString();
+            Uuid = AccessToken = uid ?? Guid.Parse(EncryptionHelper.Md5("OfflinePlayer:" + username)).ToString();
             ClientIdentifier = clientIdentifier ?? Guid.NewGuid().ToString();
         }
         

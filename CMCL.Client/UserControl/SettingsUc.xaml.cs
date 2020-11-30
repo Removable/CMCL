@@ -1,22 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+﻿using CMCL.Client.Download;
 using CMCL.Client.Util;
+using ComponentUtil.Common.Data;
 using HandyControl.Controls;
 using HandyControl.Data;
 using Microsoft.Win32;
 using Ookii.Dialogs.Wpf;
+using System;
+using System.Windows;
 
 namespace CMCL.Client.UserControl
 {
@@ -32,6 +22,7 @@ namespace CMCL.Client.UserControl
 
         private void SettingsUc_OnLoaded(object sender, RoutedEventArgs e)
         {
+            ComboSelectedDownloadSource.ItemsSource = EnumHelper.GetAllDescriptions<DownloadSource>();
             InitSettingsControls();
         }
 
@@ -46,6 +37,7 @@ namespace CMCL.Client.UserControl
             LoadDownloadVersion(appConfig.CurrentVersion);
             TbJavaPath.Text = appConfig.CustomJavaPath;
             TbMinecraftDir.Text = appConfig.MinecraftDir;
+            ComboSelectedDownloadSource.Text = appConfig.DownloadSource;
             if (appConfig.UseDefaultGameDir)
             {
                 CbUseDefaultGameDir.IsChecked = true;
@@ -155,6 +147,7 @@ namespace CMCL.Client.UserControl
                     CustomJavaPath = TbJavaPath.Text,
                     MinecraftDir = TbMinecraftDir.Text,
                     UseDefaultGameDir = CbUseDefaultGameDir.IsChecked ?? false,
+                    DownloadSource = ComboSelectedDownloadSource.Text,
                 };
 
                 await AppConfig.SaveAppConfig(newConfig);

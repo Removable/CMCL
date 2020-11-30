@@ -1,10 +1,10 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace CMCL.Client.LoginPlugin
 {
     public class GameProfile
     {
-        [JsonPropertyName("name")] public string Name { get; init; }
-        [JsonPropertyName("id")] public string Id { get; init; }
+        [JsonProperty("name")] public string Name { get; init; }
+        [JsonProperty("id")] public string Id { get; init; }
     }
 }
