@@ -140,7 +140,7 @@ namespace CMCL.Client.UserControl
                 };
                 try
                 {
-                    await VersionDownloader.DownloadClient(_httpClientFactory.CreateClient(), progress, selectVer["版本"].ToString(), "").ConfigureAwait(false);
+                    await VersionDownloader.DownloadClient(_httpClientFactory.CreateClient(), progress, selectVer["版本"].ToString(), AppConfig.GetAppConfig().MinecraftDir).ConfigureAwait(false);
                 }
                 catch (Exception exception)
                 {
