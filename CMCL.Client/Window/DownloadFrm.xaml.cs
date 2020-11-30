@@ -1,23 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace CMCL.Client.Window
 {
-    public partial class LoadingFrm : System.Windows.Window
+    public partial class DownloadFrm : System.Windows.Window
     {
-        private static LoadingFrm _loadingFrm;
-        private LoadingFrm()
+        public DownloadFrm()
         {
             InitializeComponent();
-        }
-
-        /// <summary>
-        /// 单例：获取窗口
-        /// </summary>
-        /// <returns></returns>
-        public static LoadingFrm GetInstance()
-        {
-            return _loadingFrm ??= new LoadingFrm();
         }
 
         /// <summary>
@@ -25,11 +16,10 @@ namespace CMCL.Client.Window
         /// </summary>
         /// <param name="loadingText">加载文字</param>
         /// <param name="actions">要执行的任务数组</param>
-        public void DoWork(string loadingText, params Action[] actions)
+        public void DoWork(params Action[] actions)
         {
 
             var currentTaskIndex = 1;
-            LoadingControl.LoadingTip = loadingText.Replace("$CurrentTaskIndex", currentTaskIndex.ToString()); ;
             this.Show();
             var taskFactory = new TaskFactory();
 
@@ -43,7 +33,8 @@ namespace CMCL.Client.Window
                 currentTaskIndex++;
                 this.Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    LoadingControl.LoadingTip = loadingText.Replace("$CurrentTaskIndex", currentTaskIndex.ToString());
+                    //LoadingControl.LoadingTip = loadingText.Replace("$CurrentTaskIndex", currentTaskIndex.ToString());
+                    TbCurrentTaskDetail.Text = currentTaskIndex.ToString();
                 }));
             });
             taskFactory.ContinueWhenAll(taskArray, result => { this.Dispatcher.BeginInvoke(new Action(this.Close)); });

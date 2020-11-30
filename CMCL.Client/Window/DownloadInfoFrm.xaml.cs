@@ -34,20 +34,29 @@ namespace CMCL.Client.Window
             Downloader.DownloadCancellationToken.Cancel();
             this.DialogResult = Downloader.DownloadInfoHandler.TaskFinished;
         }
-
-        private void BtnStopDownload_OnMouseEnter(object sender, MouseEventArgs e)
+        
+        public void DoWork(params Action[] actions)
         {
-            // BtnStopDownload.TextDecorations = TextDecorations.Underline;
-        }
 
-        private void BtnStopDownload_OnMouseLeave(object sender, MouseEventArgs e)
-        {
-            // BtnStopDownload.TextDecorations = null;
-        }
+            var currentTaskIndex = 1;
+            LoadingControl.LoadingTip = loadingText.Replace("$CurrentTaskIndex", currentTaskIndex.ToString()); ;
+            this.Show();
+            var taskFactory = new TaskFactory();
 
-        private void BtnStopDownload_OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            
+            var taskArray = new Task[actions.Length];
+            for (var i = 0; i < actions.Length; i++)
+            {
+                taskArray[i] = taskFactory.StartNew(actions[i]);
+            }
+            taskFactory.ContinueWhenAny(taskArray, result =>
+            {
+                currentTaskIndex++;
+                this.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    LoadingControl.LoadingTip = loadingText.Replace("$CurrentTaskIndex", currentTaskIndex.ToString());
+                }));
+            });
+            taskFactory.ContinueWhenAll(taskArray, result => { this.Dispatcher.BeginInvoke(new Action(this.Close)); });
         }
     }
 }

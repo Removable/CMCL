@@ -35,7 +35,6 @@ namespace CMCL.Client.Download
         /// <param name="httpClient"></param>
         /// <param name="url">下载地址</param>
         /// <param name="progress">进度报告器</param>
-        /// <param name="token">任务取消控制</param>
         /// <param name="directory">保存的文件夹</param>
         /// <param name="downloadInfo">下载信息</param>
         /// <returns></returns>
@@ -115,6 +114,77 @@ namespace CMCL.Client.Download
                 //}
                 //else
                     throw new Exception("下载失败");
+            }
+        }
+
+        /// <summary>
+        ///     异步下载文件
+        /// </summary>
+        /// <param name="httpClient"></param>
+        /// <param name="url">下载地址</param>
+        /// <param name="progress">进度报告器</param>
+        /// <param name="savePath">保存路径</param>
+        /// <returns></returns>
+        public static async ValueTask GetFileAsync(HttpClient httpClient, string url, IProgress<double> progress, string savePath)
+        {
+            DownloadInfoHandler.CurrentTaskProgress = 0;
+            DownloadInfoHandler.CurrentDownloadSpeed = 0;
+            DownloadInfoHandler.CurrentTaskName = Path.GetFileName(savePath);
+
+            FileHelper.CreateDirectoryIfNotExist(Path.GetFullPath(savePath));
+
+            var uri = new Uri(url);
+
+            //获取重定向后的响应
+            var response = await GetFinalResponse(httpClient, uri, 0).ConfigureAwait(false);
+
+            var total = response.Content.Headers.ContentLength ?? -1L;
+            var canReportProgress = total != -1 && progress != null;
+
+            try
+            {
+                //读取流并写到文件
+                await using Stream stream = await response.Content.ReadAsStreamAsync(DownloadCancellationToken.Token).ConfigureAwait(false),
+                    fileStream = new FileStream(savePath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, true);
+                var totalRead = 0L;
+                var buffer = new byte[4096];
+                var isMoreToRead = true;
+
+                do
+                {
+                    DownloadCancellationToken.Token.ThrowIfCancellationRequested();
+
+                    var read = await stream.ReadAsync(buffer.AsMemory(0, buffer.Length), DownloadCancellationToken.Token).ConfigureAwait(false);
+
+                    if (read == 0)
+                    {
+                        isMoreToRead = false;
+                    }
+                    else
+                    {
+                        var data = new byte[read];
+                        buffer.ToList().CopyTo(0, data, 0, read);
+
+                        await fileStream.WriteAsync(buffer.AsMemory(0, read), DownloadCancellationToken.Token).ConfigureAwait(false);
+
+                        totalRead += read;
+
+                        //进度报告
+                        if (canReportProgress)
+                        {
+                            var progressValue = totalRead * 1d / (total * 1d) * 100;
+                            progress.Report(progressValue);
+                        }
+                    }
+                } while (isMoreToRead);
+
+                response.Dispose();
+            }
+            catch (Exception ex)
+            {
+                await LogHelper.WriteLogAsync(ex);
+                response.Dispose();
+                throw new Exception("下载失败");
             }
         }
 
