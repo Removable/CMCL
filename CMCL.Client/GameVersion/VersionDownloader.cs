@@ -52,7 +52,7 @@ namespace CMCL.Client.GameVersion
             }
 
             var fullPath = Path.Combine(path, ".minecraft", "versions", versionId);
-            Downloader.DownloadInfoHandler.DownloadFinished = false;
+            Downloader.DownloadInfoHandler.TaskFinished = false;
 
             var progress = new Progress<double>();
             progress.ProgressChanged += (sender, value) => mainProgress.Report(value);

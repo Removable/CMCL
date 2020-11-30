@@ -16,19 +16,19 @@
         <!-- </TextBlock> -->
         <hc:CircleProgressBar Margin="50,37,50,108" Style="{DynamicResource ProgressBarInfoCircle}" x:Name="DownloadProgressBar">
             <hc:CircleProgressBar.Value>
-                <Binding Path="CurrentDownloadProgress"></Binding>
+                <Binding Path="CurrentTaskProgress"></Binding>
             </hc:CircleProgressBar.Value>
         </hc:CircleProgressBar>
         <!--<Label x:Name="InfoLabel" Content="暂无信息" Margin="30,182,30,36" VerticalAlignment="Stretch"  Style="{DynamicResource LabelInfo}" HorizontalAlignment="Stretch"></Label>-->
 
         <TextBlock x:Name="TbDownloadGroup" Height="20" TextAlignment="Center" Margin="0,160,0,65">
             <TextBlock.Text>
-                <Binding Path="CurrentDownloadGroup"></Binding>
+                <Binding Path="CurrentTaskGroup"></Binding>
             </TextBlock.Text>
         </TextBlock>
         <TextBlock x:Name="TbDownloadFile" Height="20" TextAlignment="Center" Margin="0,185,0,40">
             <TextBlock.Text>
-                <Binding Path="CurrentDownloadFile"></Binding>
+                <Binding Path="CurrentTaskName"></Binding>
             </TextBlock.Text>
         </TextBlock>
     </Grid>

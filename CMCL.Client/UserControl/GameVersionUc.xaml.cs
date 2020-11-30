@@ -133,8 +133,8 @@ namespace CMCL.Client.UserControl
                 var progress = new Progress<double>();
                 progress.ProgressChanged += (sender, value) =>
                 {
-                    Downloader.DownloadInfoHandler.CurrentDownloadProgress = value;
-                    if (Downloader.DownloadInfoHandler.DownloadFinished)
+                    Downloader.DownloadInfoHandler.CurrentTaskProgress = value;
+                    if (Downloader.DownloadInfoHandler.TaskFinished)
                     {
                         this.Dispatcher.BeginInvoke(new Action(() => { downloadInfoFrm.Close(); }));
                     }

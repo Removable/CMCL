@@ -41,10 +41,10 @@ namespace CMCL.Client.Download
         /// <returns></returns>
         public static async ValueTask GetFileAsync(HttpClient httpClient, string url, IProgress<double> progress, string directory, DownloadInfo downloadInfo)
         {
-            DownloadInfoHandler.CurrentDownloadProgress = 0;
+            DownloadInfoHandler.CurrentTaskProgress = 0;
             DownloadInfoHandler.CurrentDownloadSpeed = 0;
-            DownloadInfoHandler.CurrentDownloadFile = downloadInfo.CurrentFileName;
-            DownloadInfoHandler.CurrentDownloadGroup =
+            DownloadInfoHandler.CurrentTaskName = downloadInfo.CurrentFileName;
+            DownloadInfoHandler.CurrentTaskGroup =
                 $"正在下载 {downloadInfo.CurrentCategory}({downloadInfo.CurrentFileIndex}/{downloadInfo.TotalFilesCount})";
 
             FileHelper.CreateDirectoryIfNotExist(directory);
@@ -93,7 +93,7 @@ namespace CMCL.Client.Download
                             //TODO 通过这里比上次多的数据差，统计下载速度
                             var progressValue = totalRead * 1d / (total * 1d) * 100;
                             if (progressValue >= 100 && downloadInfo.ReportFinish)
-                                DownloadInfoHandler.DownloadFinished = true;
+                                DownloadInfoHandler.TaskFinished = true;
                             progress.Report(progressValue);
                         }
                     }

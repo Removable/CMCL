@@ -14,18 +14,18 @@ namespace CMCL.Client.Download
             PropertyChanged?.Invoke(this, e);
         }
 
-        private double _currentDownloadProgress;
+        private double _currentTaskProgress;
 
         /// <summary>
         /// 下载进度
         /// </summary>
-        public double CurrentDownloadProgress
+        public double CurrentTaskProgress
         {
-            get => _currentDownloadProgress;
+            get => _currentTaskProgress;
             set
             {
-                _currentDownloadProgress = value;
-                OnPropertyChanged(new PropertyChangedEventArgs("CurrentDownloadProgress"));
+                _currentTaskProgress = value;
+                OnPropertyChanged(new PropertyChangedEventArgs("CurrentTaskProgress"));
             }
         }
 
@@ -44,48 +44,48 @@ namespace CMCL.Client.Download
             }
         }
 
-        private string _currentDownloadGroup;
+        private string _currentTaskGroup;
 
         /// <summary>
         /// 下载类型
         /// </summary>
-        public string CurrentDownloadGroup
+        public string CurrentTaskGroup
         {
-            get => _currentDownloadGroup;
+            get => _currentTaskGroup;
             set
             {
-                _currentDownloadGroup = value;
-                OnPropertyChanged(new PropertyChangedEventArgs("CurrentDownloadGroup"));
+                _currentTaskGroup = value;
+                OnPropertyChanged(new PropertyChangedEventArgs("CurrentTaskGroup"));
             }
         }
 
-        private string _currentDownloadFile;
+        private string _currentTaskName;
 
         /// <summary>
         /// 当前下载文件名
         /// </summary>
-        public string CurrentDownloadFile
+        public string CurrentTaskName
         {
-            get => _currentDownloadFile;
+            get => _currentTaskName;
             set
             {
-                _currentDownloadFile = value;
-                OnPropertyChanged(new PropertyChangedEventArgs("CurrentDownloadFile"));
+                _currentTaskName = value;
+                OnPropertyChanged(new PropertyChangedEventArgs("CurrentTaskName"));
             }
         }
 
-        private bool _downloadFinished;
+        private bool _taskFinished;
 
         /// <summary>
         /// 当前下载任务是否结束
         /// </summary>
-        public bool DownloadFinished
+        public bool TaskFinished
         {
-            get => _downloadFinished;
+            get => _taskFinished;
             set
             {
-                _downloadFinished = value;
-                OnPropertyChanged(new PropertyChangedEventArgs("DownloadFinished"));
+                _taskFinished = value;
+                OnPropertyChanged(new PropertyChangedEventArgs("TaskFinished"));
             }
         }
     }
