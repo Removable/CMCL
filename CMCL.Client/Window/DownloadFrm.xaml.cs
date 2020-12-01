@@ -44,17 +44,9 @@ namespace CMCL.Client.Window
                 var index = currentTaskIndex;
                 Downloader.DownloadInfoHandler.CurrentTaskName = index.ToString();
                 await func();
-                //await this.Dispatcher.BeginInvoke(new Action(() =>
-                //{
-                //    // LoadingControl.LoadingTip = loadingText.Replace("$CurrentTaskIndex", currentTaskIndex.ToString());
-                //    TbCurrentTaskName.Text = index.ToString();
-                //}));
-                if (currentTaskIndex >= funcs.Length)
-                    Close();
-                //await this.Dispatcher.BeginInvoke(new Action(this.Close));
             }
 
-            await Dispatcher.BeginInvoke(new Action(Close));
+            Close();
         }
 
         private void DownloadFrm_OnClosed(object sender, EventArgs e)
