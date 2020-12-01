@@ -5,8 +5,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:CMCL.Client.Window"
         xmlns:hc="https://handyorg.github.io/handycontrol"
-        mc:Ignorable="d" WindowStyle="None"
-        Title="DownloadFrm" Height="280" Width="220">
+        mc:Ignorable="d" WindowStyle="None" WindowStartupLocation="CenterOwner"
+        Title="DownloadFrm" Height="280" Width="220" Closed="DownloadFrm_OnClosed">
     <Grid>
         <hc:CircleProgressBar Margin="50,37,50,108" Style="{DynamicResource ProgressBarInfoCircle}" x:Name="DownloadProgressBar">
             <hc:CircleProgressBar.Value>
@@ -19,6 +19,6 @@
                 <Binding Path="CurrentTaskName"></Binding>
             </TextBlock.Text>
         </TextBlock>
-        <TextBlock Text="关闭" TextAlignment="Center" FontSize="8" Foreground="LightGray" Cursor="Hand" Margin="100,259,100,10"/>
+        <TextBlock Text="关闭" TextAlignment="Center" FontSize="8" Foreground="LightGray" Cursor="Hand" Margin="100,259,100,10" MouseLeftButtonUp="UIElement_OnMouseLeftButtonUp"/>
     </Grid>
 </Window>

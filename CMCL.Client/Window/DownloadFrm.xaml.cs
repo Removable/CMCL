@@ -1,43 +1,107 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace CMCL.Client.Window
 {
     public partial class DownloadFrm : System.Windows.Window
     {
-        public DownloadFrm()
+        private static DownloadFrm _downloadFrm;
+
+        private DownloadFrm()
         {
             InitializeComponent();
+        }
+
+        ~DownloadFrm()
+        {
+            _downloadFrm = null;
+        }
+
+        /// <summary>
+        /// 获取单例实例
+        /// </summary>
+        /// <returns></returns>
+        public static DownloadFrm GetInstance()
+        {
+            return _downloadFrm ??= new DownloadFrm();
         }
 
         /// <summary>
         /// 打开窗口=>执行任务=>关闭窗口
         /// </summary>
-        /// <param name="loadingText">加载文字</param>
-        /// <param name="actions">要执行的任务数组</param>
-        public void DoWork(params Action[] actions)
+        /// <param name="tasks">要执行的任务数组</param>
+        public void DoWork(params Task[] tasks)
         {
-
-            var currentTaskIndex = 1;
+            var currentTaskIndex = 0;
             this.Show();
-            var taskFactory = new TaskFactory();
 
-            var taskArray = new Task[actions.Length];
-            for (var i = 0; i < actions.Length; i++)
+            foreach (var task in tasks)
             {
-                taskArray[i] = taskFactory.StartNew(actions[i]);
-            }
-            taskFactory.ContinueWhenAny(taskArray, result =>
-            {
-                currentTaskIndex++;
-                this.Dispatcher.BeginInvoke(new Action(() =>
+                task.Start();
+                task.ContinueWith(result =>
                 {
-                    //LoadingControl.LoadingTip = loadingText.Replace("$CurrentTaskIndex", currentTaskIndex.ToString());
-                    TbCurrentTaskDetail.Text = currentTaskIndex.ToString();
-                }));
-            });
-            taskFactory.ContinueWhenAll(taskArray, result => { this.Dispatcher.BeginInvoke(new Action(this.Close)); });
+                    currentTaskIndex++;
+                    var index = currentTaskIndex;
+                    this.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        // LoadingControl.LoadingTip = loadingText.Replace("$CurrentTaskIndex", currentTaskIndex.ToString());
+                        TbCurrentTaskName.Text = index.ToString();
+                    }));
+                    if (currentTaskIndex >= tasks.Length)
+                    {
+                        this.Dispatcher.BeginInvoke(new Action(this.Close));
+                    }
+                });
+            }
+
+            // var whenAll = Task.WhenAll(tasks);
+            // whenAll.ContinueWith(result => { this.Dispatcher.BeginInvoke(new Action(this.Close)); });
+        }
+
+        /// <summary>
+        /// 打开窗口=>执行任务=>关闭窗口
+        /// </summary>
+        /// <param name="funcs">要执行的任务数组</param>
+        public async Task DoWork(params Func<ValueTask>[] funcs)
+        {
+            var currentTaskIndex = 0;
+            this.Show();
+
+            foreach (var func in funcs)
+            {
+                await func();
+                // await Task.Run(() => { action(); });
+                // action.ContinueWith(result =>
+                // {
+                //     currentTaskIndex++;
+                //     var index = currentTaskIndex;
+                //     this.Dispatcher.BeginInvoke(new Action(() =>
+                //     {
+                //         // LoadingControl.LoadingTip = loadingText.Replace("$CurrentTaskIndex", currentTaskIndex.ToString());
+                //         TbCurrentTaskName.Text = index.ToString();
+                //     }));
+                //     if (currentTaskIndex >= actions.Length)
+                //     {
+                //         this.Dispatcher.BeginInvoke(new Action(this.Close));
+                //     }
+                // });
+            }
+
+            // var whenAll = Task.WhenAll(tasks);
+            // whenAll.ContinueWith(result => { this.Dispatcher.BeginInvoke(new Action(this.Close)); });
+            this.Dispatcher.BeginInvoke(new Action(this.Close));
+        }
+
+        private void DownloadFrm_OnClosed(object? sender, EventArgs e)
+        {
+            _downloadFrm = null;
+        }
+
+        private void UIElement_OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            this.Close();
         }
     }
 }

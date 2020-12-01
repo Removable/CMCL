@@ -27,7 +27,7 @@ namespace CMCL.Client.LoginPlugin
             {
                 var loginRequest = new LoginRequest(username, psw);
                 //请求接口
-                var client = Utils.HttpClientFactory.CreateClient("loginClient");
+                var client = GlobalStaticResource.HttpClientFactory.CreateClient("loginClient");
                 var content = new StringContent(JsonConvert.SerializeObject(loginRequest));
                 content.Headers.ContentType = new MediaTypeHeaderValue("application/json") {CharSet = "utf-8"};
                 var response = await client.PostAsync(_routeAuthenticate, content).ConfigureAwait(false);

@@ -25,7 +25,11 @@ namespace CMCL.Client.Download
             using var response = await GetFinalResponse(httpClient, new Uri(url), 0).ConfigureAwait(false);
 
             if (response.StatusCode == HttpStatusCode.OK)
-                return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            {
+                var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                return json;
+            }
+
             throw new Exception($"获取地址出错，状态码：{response.StatusCode}");
         }
 
@@ -38,7 +42,8 @@ namespace CMCL.Client.Download
         /// <param name="directory">保存的文件夹</param>
         /// <param name="downloadInfo">下载信息</param>
         /// <returns></returns>
-        public static async ValueTask GetFileAsync(HttpClient httpClient, string url, IProgress<double> progress, string directory, DownloadInfo downloadInfo)
+        public static async ValueTask GetFileAsync(HttpClient httpClient, string url, IProgress<double> progress,
+            string directory, DownloadInfo downloadInfo)
         {
             DownloadInfoHandler.CurrentTaskProgress = 0;
             DownloadInfoHandler.CurrentDownloadSpeed = 0;
@@ -60,7 +65,8 @@ namespace CMCL.Client.Download
             try
             {
                 //读取流并写到文件
-                await using Stream stream = await response.Content.ReadAsStreamAsync(DownloadCancellationToken.Token).ConfigureAwait(false),
+                await using Stream stream =
+                        await response.Content.ReadAsStreamAsync(DownloadCancellationToken.Token).ConfigureAwait(false),
                     fileStream = new FileStream(filePath, FileMode.Create,
                         FileAccess.Write, FileShare.None, 4096, true);
                 var totalRead = 0L;
@@ -71,7 +77,9 @@ namespace CMCL.Client.Download
                 {
                     DownloadCancellationToken.Token.ThrowIfCancellationRequested();
 
-                    var read = await stream.ReadAsync(buffer.AsMemory(0, buffer.Length), DownloadCancellationToken.Token).ConfigureAwait(false);
+                    var read = await stream
+                        .ReadAsync(buffer.AsMemory(0, buffer.Length), DownloadCancellationToken.Token)
+                        .ConfigureAwait(false);
 
                     if (read == 0)
                     {
@@ -82,7 +90,8 @@ namespace CMCL.Client.Download
                         var data = new byte[read];
                         buffer.ToList().CopyTo(0, data, 0, read);
 
-                        await fileStream.WriteAsync(buffer.AsMemory(0, read), DownloadCancellationToken.Token).ConfigureAwait(false);
+                        await fileStream.WriteAsync(buffer.AsMemory(0, read), DownloadCancellationToken.Token)
+                            .ConfigureAwait(false);
 
                         totalRead += read;
 
@@ -93,7 +102,8 @@ namespace CMCL.Client.Download
                             var progressValue = totalRead * 1d / (total * 1d) * 100;
                             if (progressValue >= 100 && downloadInfo.ReportFinish)
                                 DownloadInfoHandler.TaskFinished = true;
-                            progress.Report(progressValue);
+                            // progress.Report(progressValue);
+                            DownloadInfoHandler.CurrentTaskProgress = progressValue;
                         }
                     }
                 } while (isMoreToRead);
@@ -113,7 +123,7 @@ namespace CMCL.Client.Download
                 //    await GetFileAsync(httpClient, url, progress, directory, downloadInfo).ConfigureAwait(false);
                 //}
                 //else
-                    throw new Exception("下载失败");
+                throw new Exception("下载失败");
             }
         }
 
@@ -121,17 +131,18 @@ namespace CMCL.Client.Download
         ///     异步下载文件
         /// </summary>
         /// <param name="httpClient"></param>
+        /// <param name="progress"></param>
         /// <param name="url">下载地址</param>
-        /// <param name="progress">进度报告器</param>
         /// <param name="savePath">保存路径</param>
         /// <returns></returns>
-        public static async ValueTask GetFileAsync(HttpClient httpClient, string url, IProgress<double> progress, string savePath)
+        public static async ValueTask GetFileAsync(HttpClient httpClient, IProgress<double> progress, string url,
+            string savePath)
         {
             DownloadInfoHandler.CurrentTaskProgress = 0;
             DownloadInfoHandler.CurrentDownloadSpeed = 0;
             DownloadInfoHandler.CurrentTaskName = Path.GetFileName(savePath);
 
-            FileHelper.CreateDirectoryIfNotExist(Path.GetFullPath(savePath));
+            FileHelper.CreateDirectoryIfNotExist(Path.GetDirectoryName(savePath));
 
             var uri = new Uri(url);
 
@@ -144,17 +155,22 @@ namespace CMCL.Client.Download
             try
             {
                 //读取流并写到文件
-                await using Stream stream = await response.Content.ReadAsStreamAsync(DownloadCancellationToken.Token).ConfigureAwait(false),
-                    fileStream = new FileStream(savePath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, true);
+                await using Stream stream =
+                        await response.Content
+                            .ReadAsStreamAsync(GlobalStaticResource.GetDownloadCancellationToken().Token)
+                            .ConfigureAwait(false),
+                    fileStream = new FileStream(savePath, FileMode.Create, FileAccess.Write, FileShare.None, 4096,
+                        true);
                 var totalRead = 0L;
                 var buffer = new byte[4096];
                 var isMoreToRead = true;
 
                 do
                 {
-                    DownloadCancellationToken.Token.ThrowIfCancellationRequested();
+                    GlobalStaticResource.GetDownloadCancellationToken().Token.ThrowIfCancellationRequested();
 
-                    var read = await stream.ReadAsync(buffer.AsMemory(0, buffer.Length), DownloadCancellationToken.Token).ConfigureAwait(false);
+                    var read = await stream.ReadAsync(buffer.AsMemory(0, buffer.Length),
+                        GlobalStaticResource.GetDownloadCancellationToken().Token).ConfigureAwait(false);
 
                     if (read == 0)
                     {
@@ -165,7 +181,8 @@ namespace CMCL.Client.Download
                         var data = new byte[read];
                         buffer.ToList().CopyTo(0, data, 0, read);
 
-                        await fileStream.WriteAsync(buffer.AsMemory(0, read), DownloadCancellationToken.Token).ConfigureAwait(false);
+                        await fileStream.WriteAsync(buffer.AsMemory(0, read),
+                            GlobalStaticResource.GetDownloadCancellationToken().Token).ConfigureAwait(false);
 
                         totalRead += read;
 
@@ -205,7 +222,8 @@ namespace CMCL.Client.Download
         /// <param name="tryCount"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        private static async ValueTask<HttpResponseMessage> GetFinalResponse(HttpClient httpClient, Uri thisUri, int tryCount)
+        private static async ValueTask<HttpResponseMessage> GetFinalResponse(HttpClient httpClient, Uri thisUri,
+            int tryCount)
         {
             try
             {
@@ -235,7 +253,7 @@ namespace CMCL.Client.Download
             {
                 await LogHelper.WriteLogAsync(ex);
                 if (tryCount <= 3)
-                    return await GetFinalResponse(httpClient, thisUri, tryCount + 1).ConfigureAwait(false); 
+                    return await GetFinalResponse(httpClient, thisUri, tryCount + 1).ConfigureAwait(false);
                 throw;
             }
         }

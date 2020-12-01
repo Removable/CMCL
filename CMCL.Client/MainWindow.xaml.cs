@@ -17,7 +17,7 @@ namespace CMCL.Client
         {
             InitializeComponent();
             _httpClientFactory = httpClientFactory;
-            Utils.HttpClientFactory = _httpClientFactory;
+            GlobalStaticResource.HttpClientFactory = _httpClientFactory;
         }
 
         /// <summary>

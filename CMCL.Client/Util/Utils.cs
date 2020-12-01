@@ -9,8 +9,6 @@ namespace CMCL.Client.Util
 {
     public static class Utils
     {
-        public static IHttpClientFactory HttpClientFactory;
-        
         /// <summary>
         /// 格式化日期
         /// </summary>
