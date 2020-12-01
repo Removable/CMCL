@@ -1,23 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text;
+﻿using System.ComponentModel;
 
 namespace CMCL.Client.Download
 {
     public class DownloadPropertyChangedHandler : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
+        private string _currentTaskGroup;
 
-        public void OnPropertyChanged(PropertyChangedEventArgs e)
-        {
-            PropertyChanged?.Invoke(this, e);
-        }
+        private string _currentTaskName;
 
         private double _currentTaskProgress;
 
+        private bool _taskFinished;
+
         /// <summary>
-        /// 下载进度
+        ///     下载进度
         /// </summary>
         public double CurrentTaskProgress
         {
@@ -29,10 +25,8 @@ namespace CMCL.Client.Download
             }
         }
 
-        private string _currentTaskGroup;
-
         /// <summary>
-        /// 下载类型
+        ///     下载类型
         /// </summary>
         public string CurrentTaskGroup
         {
@@ -44,10 +38,8 @@ namespace CMCL.Client.Download
             }
         }
 
-        private string _currentTaskName;
-
         /// <summary>
-        /// 当前下载文件名
+        ///     当前下载文件名
         /// </summary>
         public string CurrentTaskName
         {
@@ -59,10 +51,8 @@ namespace CMCL.Client.Download
             }
         }
 
-        private bool _taskFinished;
-
         /// <summary>
-        /// 当前下载任务是否结束
+        ///     当前下载任务是否结束
         /// </summary>
         public bool TaskFinished
         {
@@ -72,6 +62,13 @@ namespace CMCL.Client.Download
                 _taskFinished = value;
                 OnPropertyChanged(new PropertyChangedEventArgs("TaskFinished"));
             }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void OnPropertyChanged(PropertyChangedEventArgs e)
+        {
+            PropertyChanged?.Invoke(this, e);
         }
     }
 }

@@ -1,18 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 using CMCL.Client.GameVersion.JsonClasses;
+using Newtonsoft.Json;
 
 namespace CMCL.Client.Util
 {
     public static class GameHelper
     {
         /// <summary>
-        /// 返回默认.minecraft文件夹位置
+        ///     返回默认.minecraft文件夹位置
         /// </summary>
         /// <returns></returns>
         public static string GetDefaultMinecraftDir()
@@ -21,7 +19,7 @@ namespace CMCL.Client.Util
         }
 
         /// <summary>
-        /// 获取已下载的版本
+        ///     获取已下载的版本
         /// </summary>
         /// <returns></returns>
         public static string[] GetDownloadedVersions()
@@ -33,7 +31,7 @@ namespace CMCL.Client.Util
         }
 
         /// <summary>
-        /// 获取游戏版本json的信息
+        ///     获取游戏版本json的信息
         /// </summary>
         /// <param name="gameVersionId">游戏版本，如：1.16.1</param>
         /// <returns></returns>
@@ -45,7 +43,7 @@ namespace CMCL.Client.Util
             var jsonStr = await File.ReadAllTextAsync(jsonPath);
             if (string.IsNullOrWhiteSpace(jsonStr)) throw new Exception("找不到版本信息文件");
             //替换下载地址
-            var data = Newtonsoft.Json.JsonConvert.DeserializeObject<VersionInfo>(jsonStr);
+            var data = JsonConvert.DeserializeObject<VersionInfo>(jsonStr);
             if (data == null) throw new Exception("找不到版本信息文件");
             return data;
         }

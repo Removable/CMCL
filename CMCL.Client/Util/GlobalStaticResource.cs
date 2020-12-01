@@ -6,7 +6,7 @@ namespace CMCL.Client.Util
     public static class GlobalStaticResource
     {
         /// <summary>
-        /// HttpClientFactory
+        ///     HttpClientFactory
         /// </summary>
         public static IHttpClientFactory HttpClientFactory;
 
@@ -15,15 +15,13 @@ namespace CMCL.Client.Util
         private static CancellationTokenSource _downloadCancellationTokenSource;
 
         /// <summary>
-        /// 获取下载CancellationTokenSource
+        ///     获取下载CancellationTokenSource
         /// </summary>
         /// <returns></returns>
         public static CancellationTokenSource GetDownloadCancellationToken()
         {
             if (_downloadCancellationTokenSource == null || _downloadCancellationTokenSource.IsCancellationRequested)
-            {
                 _downloadCancellationTokenSource = new CancellationTokenSource();
-            }
 
             return _downloadCancellationTokenSource;
         }

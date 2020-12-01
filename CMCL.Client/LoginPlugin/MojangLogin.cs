@@ -14,7 +14,7 @@ namespace CMCL.Client.LoginPlugin
         public static string ClientToken;
 
         /// <summary>
-        /// 官方正版登录
+        ///     官方正版登录
         /// </summary>
         /// <param name="username"></param>
         /// <param name="psw"></param>
@@ -31,7 +31,7 @@ namespace CMCL.Client.LoginPlugin
                 var content = new StringContent(JsonConvert.SerializeObject(loginRequest));
                 content.Headers.ContentType = new MediaTypeHeaderValue("application/json") {CharSet = "utf-8"};
                 var response = await client.PostAsync(_routeAuthenticate, content).ConfigureAwait(false);
-                
+
                 //读取返回字符
                 var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 

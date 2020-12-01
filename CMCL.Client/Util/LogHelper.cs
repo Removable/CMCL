@@ -19,10 +19,7 @@ namespace CMCL.Client.Util
         public static async Task WriteLogAsync(Exception exception)
         {
             var logContent = GetLogContent(exception);
-            if (!Directory.Exists(LogDirectory))
-            {
-                Directory.CreateDirectory(LogDirectory);
-            }
+            if (!Directory.Exists(LogDirectory)) Directory.CreateDirectory(LogDirectory);
             await File.AppendAllTextAsync(Path.Combine(LogDirectory, DateTime.Now.ToString("yyyyMMdd") + ".txt"),
                 logContent, Encoding.UTF8).ConfigureAwait(false);
         }
@@ -30,10 +27,7 @@ namespace CMCL.Client.Util
         public static void WriteLog(Exception exception)
         {
             var logContent = GetLogContent(exception);
-            if (!Directory.Exists(LogDirectory))
-            {
-                Directory.CreateDirectory(LogDirectory);
-            }
+            if (!Directory.Exists(LogDirectory)) Directory.CreateDirectory(LogDirectory);
             File.AppendAllText(Path.Combine(LogDirectory, DateTime.Now.ToString("yyyyMMdd") + ".txt"), logContent,
                 Encoding.UTF8);
         }

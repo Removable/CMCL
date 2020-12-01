@@ -4,22 +4,38 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:hc="https://handyorg.github.io/handycontrol"
-             xmlns:local="clr-namespace:CMCL.Client.UserControl"
              mc:Ignorable="d" Loaded="SettingsUc_OnLoaded"
              d:DesignHeight="390" d:DesignWidth="800">
     <Grid Background="White">
-        <hc:TextBox x:Name="TbAccount" hc:InfoElement.TitlePlacement="Top" hc:InfoElement.Title="账号" Grid.Row="0" Grid.Column="0" Margin="40,10,570,315"/>
-        <hc:PasswordBox x:Name="TbPassword" hc:TitleElement.Title="密码" hc:TitleElement.TitlePlacement="Top" Grid.Row="0" Grid.Column="0" Margin="40,82,570,243"/>
-        <ComboBox x:Name="ComboSelectedVersion" hc:InfoElement.Placeholder="请选择版本" hc:InfoElement.Title="启动版本" Style="{StaticResource ComboBoxExtend}" Grid.Column="0" Margin="40,162,570,162"/>
-        <hc:TextBox x:Name="TbJavaPath" IsReadOnly="True" hc:TitleElement.TitlePlacement="Top" hc:TitleElement.Title="Java路径" Grid.Row="0" Margin="300,10,0,320" HorizontalAlignment="Left" Width="387"/>
-        <TextBlock HorizontalAlignment="Left" Margin="308,88,0,0" Text="游戏文件夹路径" Style="{StaticResource TextBlockDefault}" Height="17" VerticalAlignment="Top"/>
-        <Button Style="{StaticResource ButtonPrimary}" Content="选择路径" HorizontalAlignment="Stretch" Margin="692,38,40,0" VerticalAlignment="Top" Grid.Row="0" Click="ChooseJavaPath"/>
-        <RadioButton Cursor="Hand" Margin="300,117,425,0" BorderThickness="1" Style="{StaticResource RadioButtonIcon}" Content="原版默认" VerticalAlignment="Top" Checked="UseDefaultGameDir" x:Name="CbUseDefaultGameDir"/>
-        <RadioButton Cursor="Hand" Margin="402,117,323,0" BorderThickness="1" Style="{StaticResource RadioButtonIcon}" Content="自定义" VerticalAlignment="Top" Checked="UseCustomGameDir" x:Name="CbUseCustomGameDir"/>
-        <hc:TextBox x:Name="TbMinecraftDir" IsReadOnly="True" hc:TitleElement.TitlePlacement="Top" hc:TitleElement.Title="" Grid.Row="0" Margin="300,188,0,170" HorizontalAlignment="Left" Width="387"/>
-        <Button x:Name="BtnChooseMcDir" Style="{StaticResource ButtonPrimary}" Content="选择路径" HorizontalAlignment="Stretch" Margin="692,188,40,0" VerticalAlignment="Top" Grid.Row="0" Click="ChooseCustomGameDir"/>
-        <Button x:Name="BtnSaveConfig" Style="{StaticResource ButtonPrimary}" Content="保存设置" HorizontalAlignment="Stretch" Margin="692,334,40,0" VerticalAlignment="Top" Grid.Row="0" Click="SaveConfig"/>
-        <Button x:Name="BtnReloadConfig" Style="{StaticResource ButtonInfo}" Content="取消更改" HorizontalAlignment="Stretch" Margin="608,334,124,0" VerticalAlignment="Top" Grid.Row="0" Click="ReloadConfig"/>
-        <ComboBox x:Name="ComboSelectedDownloadSource" hc:InfoElement.Placeholder="请选择下载源" hc:TitleElement.Title="下载源" Style="{StaticResource ComboBoxExtend}" Grid.Column="0" Margin="40,243,570,81"/>
+        <hc:TextBox x:Name="TbAccount" hc:InfoElement.TitlePlacement="Top" hc:InfoElement.Title="账号" Grid.Row="0"
+                    Grid.Column="0" Margin="40,10,570,315" />
+        <hc:PasswordBox x:Name="TbPassword" hc:TitleElement.Title="密码" hc:TitleElement.TitlePlacement="Top"
+                        Grid.Row="0" Grid.Column="0" Margin="40,82,570,243" />
+        <ComboBox x:Name="ComboSelectedVersion" hc:InfoElement.Placeholder="请选择版本" hc:InfoElement.Title="启动版本"
+                  Style="{StaticResource ComboBoxExtend}" Grid.Column="0" Margin="40,162,570,162" />
+        <hc:TextBox x:Name="TbJavaPath" IsReadOnly="True" hc:TitleElement.TitlePlacement="Top"
+                    hc:TitleElement.Title="Java路径" Grid.Row="0" Margin="300,10,0,320" HorizontalAlignment="Left"
+                    Width="387" />
+        <TextBlock HorizontalAlignment="Left" Margin="308,88,0,0" Text="游戏文件夹路径"
+                   Style="{StaticResource TextBlockDefault}" Height="17" VerticalAlignment="Top" />
+        <Button Style="{StaticResource ButtonPrimary}" Content="选择路径" HorizontalAlignment="Stretch"
+                Margin="692,38,40,0" VerticalAlignment="Top" Grid.Row="0" Click="ChooseJavaPath" />
+        <RadioButton Cursor="Hand" Margin="300,117,425,0" BorderThickness="1" Style="{StaticResource RadioButtonIcon}"
+                     Content="原版默认" VerticalAlignment="Top" Checked="UseDefaultGameDir" x:Name="CbUseDefaultGameDir" />
+        <RadioButton Cursor="Hand" Margin="402,117,323,0" BorderThickness="1" Style="{StaticResource RadioButtonIcon}"
+                     Content="自定义" VerticalAlignment="Top" Checked="UseCustomGameDir" x:Name="CbUseCustomGameDir" />
+        <hc:TextBox x:Name="TbMinecraftDir" IsReadOnly="True" hc:TitleElement.TitlePlacement="Top"
+                    hc:TitleElement.Title="" Grid.Row="0" Margin="300,188,0,170" HorizontalAlignment="Left" Width="387" />
+        <Button x:Name="BtnChooseMcDir" Style="{StaticResource ButtonPrimary}" Content="选择路径"
+                HorizontalAlignment="Stretch" Margin="692,188,40,0" VerticalAlignment="Top" Grid.Row="0"
+                Click="ChooseCustomGameDir" />
+        <Button x:Name="BtnSaveConfig" Style="{StaticResource ButtonPrimary}" Content="保存设置"
+                HorizontalAlignment="Stretch" Margin="692,334,40,0" VerticalAlignment="Top" Grid.Row="0"
+                Click="SaveConfig" />
+        <Button x:Name="BtnReloadConfig" Style="{StaticResource ButtonInfo}" Content="取消更改"
+                HorizontalAlignment="Stretch" Margin="608,334,124,0" VerticalAlignment="Top" Grid.Row="0"
+                Click="ReloadConfig" />
+        <ComboBox x:Name="ComboSelectedDownloadSource" hc:InfoElement.Placeholder="请选择下载源" hc:TitleElement.Title="下载源"
+                  Style="{StaticResource ComboBoxExtend}" Grid.Column="0" Margin="40,243,570,81" />
     </Grid>
 </UserControl>

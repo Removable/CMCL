@@ -6,7 +6,7 @@ namespace CMCL.Client.Download.Mirrors.BMCLApi
     {
         public BMCLApi()
         {
-            this.Version = new Version();
+            Version = new Version();
         }
 
         public override string MirrorName { get; } = "BMCLApi源";

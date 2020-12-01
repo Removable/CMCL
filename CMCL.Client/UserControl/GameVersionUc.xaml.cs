@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using CMCL.Client.Download.Mirrors;
 using CMCL.Client.Game;
-using CMCL.Client.GameVersion;
 using CMCL.Client.Util;
 using CMCL.Client.Window;
 using HandyControl.Controls;
@@ -14,12 +13,12 @@ using HandyControl.Data;
 namespace CMCL.Client.UserControl
 {
     /// <summary>
-    /// GameVersionUc.xaml 的交互逻辑
+    ///     GameVersionUc.xaml 的交互逻辑
     /// </summary>
     public partial class GameVersionUc : System.Windows.Controls.UserControl
     {
-        private GameVersionManifest _gameVersionManifest = null;
         private readonly IHttpClientFactory _httpClientFactory;
+        private GameVersionManifest _gameVersionManifest;
 
         public GameVersionUc(IHttpClientFactory httpClientFactory)
         {
@@ -54,13 +53,8 @@ namespace CMCL.Client.UserControl
             {
                 var remark = string.Empty;
                 if (gameVersionInfo.Id == _gameVersionManifest.Latest.Release)
-                {
                     remark = "(最新稳定版)";
-                }
-                else if (gameVersionInfo.Id == _gameVersionManifest.Latest.Snapshot)
-                {
-                    remark = "(最新快照)";
-                }
+                else if (gameVersionInfo.Id == _gameVersionManifest.Latest.Snapshot) remark = "(最新快照)";
 
                 var dr = dataTable.NewRow();
                 dr["版本"] = gameVersionInfo.Id;
@@ -81,7 +75,7 @@ namespace CMCL.Client.UserControl
         }
 
         /// <summary>
-        /// 刷新列表按钮
+        ///     刷新列表按钮
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -99,7 +93,7 @@ namespace CMCL.Client.UserControl
         }
 
         /// <summary>
-        /// 下载按钮
+        ///     下载按钮
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -116,12 +110,13 @@ namespace CMCL.Client.UserControl
 
             var mirror = MirrorManager.GetCurrentMirror();
 
-
             var downloadFrm = DownloadFrm.GetInstance();
             downloadFrm.Owner = System.Windows.Window.GetWindow(this);
             var versionId = selectVer["版本"].ToString();
             await downloadFrm.DoWork(
+                //下载json
                 async () => { await mirror.Version.DownloadJsonAsync(versionId); },
+                //下载jar
                 async () => { await mirror.Version.DownloadJarAsync(versionId); }
             );
 

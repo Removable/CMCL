@@ -7,6 +7,6 @@
         mc:Ignorable="d" WindowStyle="None" Background="Transparent" AllowsTransparency="True" ResizeMode="NoResize"
         Title="LoadingFrm" Height="96" Width="116" WindowStartupLocation="CenterOwner">
     <Grid>
-        <userControl:LoadingUc x:Name="LoadingControl"></userControl:LoadingUc>
+        <userControl:LoadingUc x:Name="LoadingControl" />
     </Grid>
 </Window>

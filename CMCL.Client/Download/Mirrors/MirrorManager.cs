@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using CMCL.Client.Download.Mirrors.Interface;
 using CMCL.Client.Util;
 using ComponentUtil.Common.Data;
@@ -9,14 +8,14 @@ namespace CMCL.Client.Download.Mirrors
 {
     public static class MirrorManager
     {
-        private static readonly List<Mirror> Mirrors = new List<Mirror>
+        private static readonly List<Mirror> Mirrors = new()
         {
             new MCBBS.MCBBS(),
-            new BMCLApi.BMCLApi(),
+            new BMCLApi.BMCLApi()
         };
 
         /// <summary>
-        /// 根据下载源名称获取镜像
+        ///     根据下载源名称获取镜像
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
@@ -26,7 +25,7 @@ namespace CMCL.Client.Download.Mirrors
         }
 
         /// <summary>
-        /// 根据下载源枚举获取镜像
+        ///     根据下载源枚举获取镜像
         /// </summary>
         /// <param name="downloadSource"></param>
         /// <returns></returns>
@@ -36,7 +35,7 @@ namespace CMCL.Client.Download.Mirrors
         }
 
         /// <summary>
-        /// 获取当前配置的下载源
+        ///     获取当前配置的下载源
         /// </summary>
         /// <returns></returns>
         public static Mirror GetCurrentMirror()

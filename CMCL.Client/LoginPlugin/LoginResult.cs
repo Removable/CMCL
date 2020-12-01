@@ -1,5 +1,4 @@
 ﻿using System;
-using CMCL.Client.Util;
 using ComponentUtil.Common.Crypto;
 
 namespace CMCL.Client.LoginPlugin
@@ -12,7 +11,7 @@ namespace CMCL.Client.LoginPlugin
             Uuid = AccessToken = uid ?? Guid.Parse(EncryptionHelper.Md5("OfflinePlayer:" + username)).ToString();
             ClientIdentifier = clientIdentifier ?? Guid.NewGuid().ToString();
         }
-        
+
         public string Username { get; set; }
         public string Uuid { get; set; }
         public string AccessToken { get; set; }

@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 using CMCL.Client.Download;
 
@@ -22,7 +20,7 @@ namespace CMCL.Client.Window
         }
 
         /// <summary>
-        /// 获取单例实例
+        ///     获取单例实例
         /// </summary>
         /// <returns></returns>
         public static DownloadFrm GetInstance()
@@ -31,14 +29,14 @@ namespace CMCL.Client.Window
         }
 
         /// <summary>
-        /// 打开窗口=>执行任务=>关闭窗口
+        ///     打开窗口=>执行任务=>关闭窗口
         /// </summary>
         /// <param name="funcs">要执行的任务数组</param>
         public async Task DoWork(params Func<ValueTask>[] funcs)
         {
-            this.DataContext = Downloader.DownloadInfoHandler;
+            DataContext = Downloader.DownloadInfoHandler;
             var currentTaskIndex = 0;
-            this.Show();
+            Show();
 
             foreach (var func in funcs)
             {
@@ -52,13 +50,11 @@ namespace CMCL.Client.Window
                 //    TbCurrentTaskName.Text = index.ToString();
                 //}));
                 if (currentTaskIndex >= funcs.Length)
-                {
-                    this.Close();
-                    //await this.Dispatcher.BeginInvoke(new Action(this.Close));
-                }
+                    Close();
+                //await this.Dispatcher.BeginInvoke(new Action(this.Close));
             }
 
-            await this.Dispatcher.BeginInvoke(new Action(this.Close));
+            await Dispatcher.BeginInvoke(new Action(Close));
         }
 
         private void DownloadFrm_OnClosed(object sender, EventArgs e)
@@ -68,7 +64,7 @@ namespace CMCL.Client.Window
 
         private void UIElement_OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            this.Close();
+            Close();
         }
     }
 }

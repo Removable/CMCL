@@ -118,7 +118,7 @@ namespace CMCL.Client.Download
         //}
 
         /// <summary>
-        /// 获取经过重定向后的最终响应
+        ///     获取经过重定向后的最终响应
         /// </summary>
         /// <param name="httpClient"></param>
         /// <param name="thisUri"></param>
