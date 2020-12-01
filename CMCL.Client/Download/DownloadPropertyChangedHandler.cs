@@ -25,22 +25,7 @@ namespace CMCL.Client.Download
             set
             {
                 _currentTaskProgress = value;
-                OnPropertyChanged(new PropertyChangedEventArgs("CurrentTaskProgress"));
-            }
-        }
-
-        private double _currentDownloadSpeed;
-
-        /// <summary>
-        /// 下载速度
-        /// </summary>
-        public double CurrentDownloadSpeed
-        {
-            get => _currentDownloadSpeed;
-            set
-            {
-                _currentDownloadSpeed = value;
-                OnPropertyChanged(new PropertyChangedEventArgs("CurrentDownloadSpeed"));
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(CurrentTaskProgress)));
             }
         }
 

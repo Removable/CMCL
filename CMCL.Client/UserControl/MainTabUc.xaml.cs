@@ -66,10 +66,5 @@ namespace CMCL.Client.UserControl
                 btn.IsEnabled = true;
             }
         }
-
-        private void Test()
-        {
-            Thread.Sleep(3000);
-        }
     }
 }

@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace CMCL.Client.GameVersion.JsonClasses
 {
@@ -124,7 +125,7 @@ namespace CMCL.Client.GameVersion.JsonClasses
       return true;
     }
 
-    public bool IsVaildLibrary(string libraryPath)
+    public async ValueTask<bool> IsValidLibrary(string libraryPath)
     {
       var path = Path.Combine(libraryPath, GetLibraryPath());
 
@@ -138,10 +139,10 @@ namespace CMCL.Client.GameVersion.JsonClasses
         return fileInfo.Exists;
       return fileInfo.Exists
              && fileInfo.Length == GetLibrary().Size
-             && FileHelper.GetSha1HashFromFile(path) == GetLibrary().Sha1;
+             && await FileHelper.GetSha1HashFromFileAsync(path) == GetLibrary().Sha1;
     }
 
-    public bool IsVaildNative(string libraryPath)
+    public async ValueTask<bool> IsValidNative(string libraryPath)
     {
       var path = Path.Combine(libraryPath, GetNativePath());
 
@@ -150,7 +151,7 @@ namespace CMCL.Client.GameVersion.JsonClasses
         return fileInfo.Exists && fileInfo.Length > 0;
       return fileInfo.Exists
              && fileInfo.Length == GetNative().Size
-             && FileHelper.GetSha1HashFromFile(path) == GetNative().Sha1;
+             && await FileHelper.GetSha1HashFromFileAsync(path) == GetNative().Sha1;
     }
 
     public string GetLibraryPath() 

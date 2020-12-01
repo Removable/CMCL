@@ -39,16 +39,15 @@ namespace CMCL.Client.Util
         /// <returns></returns>
         public static async Task<VersionInfo> GetVersionInfo(string gameVersionId)
         {
-            var originServers = new[] {"https://launchermeta.mojang.com/", "https://launcher.mojang.com/"};
-            var finalServer = string.Empty;
-
             var jsonPath = Path.Combine(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "versions", gameVersionId,
                 $"{gameVersionId}.json");
             if (!File.Exists(jsonPath)) throw new Exception("找不到版本信息文件");
             var jsonStr = await File.ReadAllTextAsync(jsonPath);
+            if (string.IsNullOrWhiteSpace(jsonStr)) throw new Exception("找不到版本信息文件");
             //替换下载地址
-            //originServers.Aggregate()
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<VersionInfo>(jsonStr);
+            var data = Newtonsoft.Json.JsonConvert.DeserializeObject<VersionInfo>(jsonStr);
+            if (data == null) throw new Exception("找不到版本信息文件");
+            return data;
         }
     }
 }

@@ -114,56 +114,16 @@ namespace CMCL.Client.UserControl
             BtnDownload.IsEnabled = false;
             BtnRefresh.IsEnabled = false;
 
-            // var downloadInfoFrm = new DownloadInfoFrm()
-            // {
-            //     Owner = App.Current.MainWindow,
-            //     WindowStartupLocation = WindowStartupLocation.CenterOwner,
-            // };
-
             var mirror = MirrorManager.GetCurrentMirror();
 
 
             var downloadFrm = DownloadFrm.GetInstance();
             downloadFrm.Owner = System.Windows.Window.GetWindow(this);
-            var func = new Func<ValueTask>(async () =>
-            {
-                await mirror.Version.DownloadJsonAsync(selectVer["版本"].ToString());
-            });
-            await downloadFrm.DoWork(func);
-
-            // //下载本体文件和json
-            // var thread = new Thread(async () =>
-            // {
-            //     var progress = new Progress<double>();
-            //     progress.ProgressChanged += (sender, value) =>
-            //     {
-            //         Downloader.DownloadInfoHandler.CurrentTaskProgress = value;
-            //         if (Downloader.DownloadInfoHandler.TaskFinished)
-            //         {
-            //             this.Dispatcher.BeginInvoke(new Action(() => { downloadInfoFrm.Close(); }));
-            //         }
-            //     };
-            //     try
-            //     {
-            //         await VersionDownloader.DownloadClient(_httpClientFactory.CreateClient(), progress,
-            //             selectVer["版本"].ToString(), AppConfig.GetAppConfig().MinecraftDir).ConfigureAwait(false);
-            //     }
-            //     catch (Exception exception)
-            //     {
-            //         await LogHelper.WriteLogAsync(exception);
-            //     }
-            // });
-            // thread.Start();
-            //
-            // if (downloadInfoFrm.ShowDialog() == true)
-            // {
-            //     NotifyIcon.ShowBalloonTip("提示", "下载成功", NotifyIconInfoType.Info, "AppNotifyIcon");
-            //     var path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            //     var fullPath = System.IO.Path.Combine(path, ".minecraft", "versions", selectVer["版本"].ToString());
-            //     System.Diagnostics.Process.Start("Explorer.exe", fullPath);
-            // }
-
-            // var 
+            var versionId = selectVer["版本"].ToString();
+            await downloadFrm.DoWork(
+                async () => { await mirror.Version.DownloadJsonAsync(versionId); },
+                async () => { await mirror.Version.DownloadJarAsync(versionId); }
+            );
 
             BtnDownload.IsEnabled = true;
             BtnRefresh.IsEnabled = true;

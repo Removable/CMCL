@@ -11,8 +11,8 @@ namespace CMCL.Client.Download
 {
     public static class Downloader
     {
-        public static CancellationTokenSource DownloadCancellationToken = new CancellationTokenSource();
-        public static DownloadPropertyChangedHandler DownloadInfoHandler = new DownloadPropertyChangedHandler();
+        public static CancellationTokenSource DownloadCancellationToken = new();
+        public static DownloadPropertyChangedHandler DownloadInfoHandler = new();
 
         /// <summary>
         ///     异步获取字符串
@@ -37,109 +37,13 @@ namespace CMCL.Client.Download
         ///     异步下载文件
         /// </summary>
         /// <param name="httpClient"></param>
-        /// <param name="url">下载地址</param>
-        /// <param name="progress">进度报告器</param>
-        /// <param name="directory">保存的文件夹</param>
-        /// <param name="downloadInfo">下载信息</param>
-        /// <returns></returns>
-        public static async ValueTask GetFileAsync(HttpClient httpClient, string url, IProgress<double> progress,
-            string directory, DownloadInfo downloadInfo)
-        {
-            DownloadInfoHandler.CurrentTaskProgress = 0;
-            DownloadInfoHandler.CurrentDownloadSpeed = 0;
-            DownloadInfoHandler.CurrentTaskName = downloadInfo.CurrentFileName;
-            DownloadInfoHandler.CurrentTaskGroup =
-                $"正在下载 {downloadInfo.CurrentCategory}({downloadInfo.CurrentFileIndex}/{downloadInfo.TotalFilesCount})";
-
-            FileHelper.CreateDirectoryIfNotExist(directory);
-            var filePath = Path.Combine(directory, downloadInfo.CurrentFileName);
-
-            var uri = new Uri(url);
-
-            //获取重定向后的响应
-            var response = await GetFinalResponse(httpClient, uri, 0).ConfigureAwait(false);
-
-            var total = response.Content.Headers.ContentLength ?? -1L;
-            var canReportProgress = total != -1 && progress != null;
-
-            try
-            {
-                //读取流并写到文件
-                await using Stream stream =
-                        await response.Content.ReadAsStreamAsync(DownloadCancellationToken.Token).ConfigureAwait(false),
-                    fileStream = new FileStream(filePath, FileMode.Create,
-                        FileAccess.Write, FileShare.None, 4096, true);
-                var totalRead = 0L;
-                var buffer = new byte[4096];
-                var isMoreToRead = true;
-
-                do
-                {
-                    DownloadCancellationToken.Token.ThrowIfCancellationRequested();
-
-                    var read = await stream
-                        .ReadAsync(buffer.AsMemory(0, buffer.Length), DownloadCancellationToken.Token)
-                        .ConfigureAwait(false);
-
-                    if (read == 0)
-                    {
-                        isMoreToRead = false;
-                    }
-                    else
-                    {
-                        var data = new byte[read];
-                        buffer.ToList().CopyTo(0, data, 0, read);
-
-                        await fileStream.WriteAsync(buffer.AsMemory(0, read), DownloadCancellationToken.Token)
-                            .ConfigureAwait(false);
-
-                        totalRead += read;
-
-                        //进度报告
-                        if (canReportProgress)
-                        {
-                            //TODO 通过这里比上次多的数据差，统计下载速度
-                            var progressValue = totalRead * 1d / (total * 1d) * 100;
-                            if (progressValue >= 100 && downloadInfo.ReportFinish)
-                                DownloadInfoHandler.TaskFinished = true;
-                            // progress.Report(progressValue);
-                            DownloadInfoHandler.CurrentTaskProgress = progressValue;
-                        }
-                    }
-                } while (isMoreToRead);
-
-                response.Dispose();
-            }
-            catch (Exception ex)
-            {
-                await LogHelper.WriteLogAsync(ex);
-                response.Dispose();
-                ////若以bmcl源下载失败，切换mcbbs源尝试
-                //var bmclMirror = new BMCLMirror();
-                //if (bmclMirror.IsCurrentMirror(url))
-                //{
-                //    url = bmclMirror.TranslateToCurrentMirrorUrl(url);
-
-                //    await GetFileAsync(httpClient, url, progress, directory, downloadInfo).ConfigureAwait(false);
-                //}
-                //else
-                throw new Exception("下载失败");
-            }
-        }
-
-        /// <summary>
-        ///     异步下载文件
-        /// </summary>
-        /// <param name="httpClient"></param>
         /// <param name="progress"></param>
         /// <param name="url">下载地址</param>
         /// <param name="savePath">保存路径</param>
         /// <returns></returns>
-        public static async ValueTask GetFileAsync(HttpClient httpClient, IProgress<double> progress, string url,
-            string savePath)
+        public static async ValueTask GetFileAsync(HttpClient httpClient, string url, string savePath)
         {
             DownloadInfoHandler.CurrentTaskProgress = 0;
-            DownloadInfoHandler.CurrentDownloadSpeed = 0;
             DownloadInfoHandler.CurrentTaskName = Path.GetFileName(savePath);
 
             FileHelper.CreateDirectoryIfNotExist(Path.GetDirectoryName(savePath));
@@ -150,7 +54,7 @@ namespace CMCL.Client.Download
             var response = await GetFinalResponse(httpClient, uri, 0).ConfigureAwait(false);
 
             var total = response.Content.Headers.ContentLength ?? -1L;
-            var canReportProgress = total != -1 && progress != null;
+            var canReportProgress = total != -1;
 
             try
             {
@@ -190,7 +94,7 @@ namespace CMCL.Client.Download
                         if (canReportProgress)
                         {
                             var progressValue = totalRead * 1d / (total * 1d) * 100;
-                            progress.Report(progressValue);
+                            DownloadInfoHandler.CurrentTaskProgress = progressValue;
                         }
                     }
                 } while (isMoreToRead);

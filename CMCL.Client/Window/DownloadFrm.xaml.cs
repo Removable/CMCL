@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using CMCL.Client.Download;
 
 namespace CMCL.Client.Window
 {
@@ -31,70 +33,35 @@ namespace CMCL.Client.Window
         /// <summary>
         /// 打开窗口=>执行任务=>关闭窗口
         /// </summary>
-        /// <param name="tasks">要执行的任务数组</param>
-        public void DoWork(params Task[] tasks)
-        {
-            var currentTaskIndex = 0;
-            this.Show();
-
-            foreach (var task in tasks)
-            {
-                task.Start();
-                task.ContinueWith(result =>
-                {
-                    currentTaskIndex++;
-                    var index = currentTaskIndex;
-                    this.Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                        // LoadingControl.LoadingTip = loadingText.Replace("$CurrentTaskIndex", currentTaskIndex.ToString());
-                        TbCurrentTaskName.Text = index.ToString();
-                    }));
-                    if (currentTaskIndex >= tasks.Length)
-                    {
-                        this.Dispatcher.BeginInvoke(new Action(this.Close));
-                    }
-                });
-            }
-
-            // var whenAll = Task.WhenAll(tasks);
-            // whenAll.ContinueWith(result => { this.Dispatcher.BeginInvoke(new Action(this.Close)); });
-        }
-
-        /// <summary>
-        /// 打开窗口=>执行任务=>关闭窗口
-        /// </summary>
         /// <param name="funcs">要执行的任务数组</param>
         public async Task DoWork(params Func<ValueTask>[] funcs)
         {
+            this.DataContext = Downloader.DownloadInfoHandler;
             var currentTaskIndex = 0;
             this.Show();
 
             foreach (var func in funcs)
             {
+                currentTaskIndex++;
+                var index = currentTaskIndex;
+                Downloader.DownloadInfoHandler.CurrentTaskName = index.ToString();
                 await func();
-                // await Task.Run(() => { action(); });
-                // action.ContinueWith(result =>
-                // {
-                //     currentTaskIndex++;
-                //     var index = currentTaskIndex;
-                //     this.Dispatcher.BeginInvoke(new Action(() =>
-                //     {
-                //         // LoadingControl.LoadingTip = loadingText.Replace("$CurrentTaskIndex", currentTaskIndex.ToString());
-                //         TbCurrentTaskName.Text = index.ToString();
-                //     }));
-                //     if (currentTaskIndex >= actions.Length)
-                //     {
-                //         this.Dispatcher.BeginInvoke(new Action(this.Close));
-                //     }
-                // });
+                //await this.Dispatcher.BeginInvoke(new Action(() =>
+                //{
+                //    // LoadingControl.LoadingTip = loadingText.Replace("$CurrentTaskIndex", currentTaskIndex.ToString());
+                //    TbCurrentTaskName.Text = index.ToString();
+                //}));
+                if (currentTaskIndex >= funcs.Length)
+                {
+                    this.Close();
+                    //await this.Dispatcher.BeginInvoke(new Action(this.Close));
+                }
             }
 
-            // var whenAll = Task.WhenAll(tasks);
-            // whenAll.ContinueWith(result => { this.Dispatcher.BeginInvoke(new Action(this.Close)); });
-            this.Dispatcher.BeginInvoke(new Action(this.Close));
+            await this.Dispatcher.BeginInvoke(new Action(this.Close));
         }
 
-        private void DownloadFrm_OnClosed(object? sender, EventArgs e)
+        private void DownloadFrm_OnClosed(object sender, EventArgs e)
         {
             _downloadFrm = null;
         }

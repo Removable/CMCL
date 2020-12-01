@@ -11,26 +11,6 @@ namespace CMCL.Client.Util
 {
     internal static class FileHelper
     {
-        public static string GetSha1HashFromFile(string filename)
-        {
-            if (!File.Exists(filename)) return null;
-            var file = new FileStream(filename, FileMode.Open);
-            var sha1 = new System.Security.Cryptography.SHA1CryptoServiceProvider();
-            var retVal = sha1.ComputeHash(file);
-            file.Close();
-
-            return Byte2String(retVal);
-
-            static string Byte2String(IEnumerable<byte> buffer)
-            {
-                var sb = new StringBuilder();
-                foreach (var t in buffer)
-                {
-                    sb.Append(t.ToString("x2"));
-                }
-                return sb.ToString();
-            }
-        }
 
         /// <summary>
         /// 复制文件夹
@@ -84,7 +64,7 @@ namespace CMCL.Client.Util
         /// </summary>
         /// <param name="filePath">文件路径</param>
         /// <returns></returns>
-        public static async ValueTask<string> GetSha1(string filePath)
+        public static async ValueTask<string> GetSha1HashFromFileAsync(string filePath)
         {
             var sc = new StringBuilder();
             if (!File.Exists(filePath))
@@ -109,6 +89,32 @@ namespace CMCL.Client.Util
             {
                 await LogHelper.WriteLogAsync(ex);
                 return string.Empty;
+            }
+        }
+        
+        /// <summary>
+        /// 获取文件sha1
+        /// </summary>
+        /// <param name="filePath">文件路径</param>
+        /// <returns></returns>
+        public static string GetSha1HashFromFile(string filePath)
+        {
+            if (!File.Exists(filePath)) return null;
+            var file = new FileStream(filePath, FileMode.Open);
+            var sha1 = new System.Security.Cryptography.SHA1CryptoServiceProvider();
+            var retVal = sha1.ComputeHash(file);
+            file.Close();
+
+            return Byte2String(retVal);
+
+            static string Byte2String(IEnumerable<byte> buffer)
+            {
+                var sb = new StringBuilder();
+                foreach (var t in buffer)
+                {
+                    sb.Append(t.ToString("x2"));
+                }
+                return sb.ToString();
             }
         }
     }
