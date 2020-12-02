@@ -7,11 +7,13 @@ namespace CMCL.Client.Download.Mirrors.MCBBS
         public MCBBS()
         {
             Version = new Version();
+            Library = new Library();
         }
 
         public override string MirrorName { get; } = "MCBBS源";
 
         public override DownloadSource MirrorEnum { get; } = DownloadSource.MCBBS;
         public override Interface.Version Version { get; }
+        public override Interface.Library Library { get; }
     }
 }

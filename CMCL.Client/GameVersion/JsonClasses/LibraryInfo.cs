@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CMCL.Client.Util;
 using Newtonsoft.Json;
@@ -57,9 +58,11 @@ namespace CMCL.Client.GameVersion.JsonClasses
             if (Rules == null) return true;
             var disallow = _rule["disallow"];
             var allow = _rule["allow"];
-            if (disallow.Count != 0 && allow.Count == 0) return disallow.All(osInfo => osInfo.Name != os);
-            if (allow.Count != 0 && disallow.Count == 0) return allow.Any(osInfo => osInfo.Name == os);
-            return true;
+            //有允许无禁止时，找有无符合条件的系统
+            if (!disallow.Any() && allow.Any())
+                return allow.Any(osInfo => osInfo.Name == os && (osInfo.Version == null || Regex.IsMatch(Environment.OSVersion.Version.ToString(), osInfo.Version)));
+            //无禁止或有禁止但无符合条件的系统
+            return !disallow.Any(osInfo => osInfo.Name == os && (osInfo.Version == null || Regex.IsMatch(Environment.OSVersion.Version.ToString(), osInfo.Version)));
         }
 
         public async ValueTask<bool> IsValidLibrary(string libraryPath)
@@ -193,6 +196,8 @@ namespace CMCL.Client.GameVersion.JsonClasses
             public class OSInfo
             {
                 [JsonProperty("name")] public string Name;
+                [JsonProperty("version")] public string Version;
+                [JsonProperty("arch")] public string Arch;
             }
         }
 

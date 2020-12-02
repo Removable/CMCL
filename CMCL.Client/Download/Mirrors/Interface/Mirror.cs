@@ -16,5 +16,10 @@ namespace CMCL.Client.Download.Mirrors.Interface
         ///     版本
         /// </summary>
         public abstract Version Version { get; }
+
+        /// <summary>
+        ///     库
+        /// </summary>
+        public abstract Library Library { get; }
     }
 }

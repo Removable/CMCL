@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
+using CMCL.Client.Download;
 using CMCL.Client.Download.Mirrors;
 using CMCL.Client.Game;
 using CMCL.Client.Util;
@@ -107,21 +109,27 @@ namespace CMCL.Client.UserControl
 
             BtnDownload.IsEnabled = false;
             BtnRefresh.IsEnabled = false;
+            Downloader.DownloadInfoHandler.TaskFinished = false;
 
             var mirror = MirrorManager.GetCurrentMirror();
 
             var downloadFrm = DownloadFrm.GetInstance();
             downloadFrm.Owner = System.Windows.Window.GetWindow(this);
             var versionId = selectVer["版本"].ToString();
-            await downloadFrm.DoWork(
-                //下载json
-                async () => { await mirror.Version.DownloadJsonAsync(versionId); },
-                //下载jar
-                async () => { await mirror.Version.DownloadJarAsync(versionId); }
-            );
+
+            var funcList = new List<Func<ValueTask>>();
+            //下载json
+            funcList.Add(async () => { await mirror.Version.DownloadJsonAsync(versionId); });
+            //下载jar
+            funcList.Add(async () => { await mirror.Version.DownloadJarAsync(versionId); });
+            //下载库文件
+            funcList.AddRange(await mirror.Library.DownloadLibrariesAsync(versionId));
+
+            await downloadFrm.DoWork(funcList.ToArray());
 
             BtnDownload.IsEnabled = true;
             BtnRefresh.IsEnabled = true;
+            Downloader.DownloadInfoHandler.TaskFinished = true;
         }
     }
 }
