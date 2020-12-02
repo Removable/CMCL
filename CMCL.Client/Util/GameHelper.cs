@@ -24,7 +24,7 @@ namespace CMCL.Client.Util
         /// <returns></returns>
         public static string[] GetDownloadedVersions()
         {
-            var gameDirectory = Path.Combine(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "versions");
+            var gameDirectory = IOHelper.CombineAndCheckDirectory(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "versions");
             var versions = Directory.GetDirectories(gameDirectory);
             return versions.Select(i => i.Substring(versions[0].LastIndexOf(@"\", StringComparison.Ordinal) + 1))
                 .ToArray();
@@ -37,7 +37,7 @@ namespace CMCL.Client.Util
         /// <returns></returns>
         public static async Task<VersionInfo> GetVersionInfo(string gameVersionId)
         {
-            var jsonPath = Path.Combine(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "versions", gameVersionId,
+            var jsonPath = IOHelper.CombineAndCheckDirectory(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "versions", gameVersionId,
                 $"{gameVersionId}.json");
             if (!File.Exists(jsonPath)) throw new Exception("找不到版本信息文件");
             var jsonStr = await File.ReadAllTextAsync(jsonPath);

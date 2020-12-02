@@ -67,7 +67,7 @@ namespace CMCL.Client.GameVersion.JsonClasses
 
         public async ValueTask<bool> IsValidLibrary(string libraryPath)
         {
-            var path = Path.Combine(libraryPath, GetLibraryPath());
+            var path = IOHelper.CombineAndCheckDirectory(libraryPath, GetLibraryPath());
 
             var fileInfo = new FileInfo(path);
             var library = GetLibrary();
@@ -76,19 +76,19 @@ namespace CMCL.Client.GameVersion.JsonClasses
                 return fileInfo.Exists;
             return fileInfo.Exists
                    && fileInfo.Length == GetLibrary().Size
-                   && await FileHelper.GetSha1HashFromFileAsync(path) == GetLibrary().Sha1;
+                   && await IOHelper.GetSha1HashFromFileAsync(path) == GetLibrary().Sha1;
         }
 
         public async ValueTask<bool> IsValidNative(string libraryPath)
         {
-            var path = Path.Combine(libraryPath, GetNativePath());
+            var path = IOHelper.CombineAndCheckDirectory(libraryPath, GetNativePath());
 
             var fileInfo = new FileInfo(path);
             if (GetNative().Size == 0 || GetNative().Sha1 == null)
                 return fileInfo.Exists && fileInfo.Length > 0;
             return fileInfo.Exists
                    && fileInfo.Length == GetNative().Size
-                   && await FileHelper.GetSha1HashFromFileAsync(path) == GetNative().Sha1;
+                   && await IOHelper.GetSha1HashFromFileAsync(path) == GetNative().Sha1;
         }
 
         public string GetLibraryPath()

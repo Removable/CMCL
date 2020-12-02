@@ -20,14 +20,14 @@ namespace CMCL.Client.Download.Mirrors.Interface
         public async ValueTask<Func<ValueTask>[]> DownloadLibrariesAsync(string versionId)
         {
             var versionInfo = await GameHelper.GetVersionInfo(versionId).ConfigureAwait(false);
-            var libraries = versionInfo.Libraries.Where(i => !i.IsNative && i.ShouldDeployOnOs()).ToList();
+            var libraries = versionInfo.Libraries.Where(i => i.ShouldDeployOnOs()).ToList();
 
             var funcArray = new Func<ValueTask>[libraries.Count];
             for (var i = 0; i < libraries.Count; i++)
             {
                 //转换地址
                 var url = TransUrl(libraries[i].Downloads.Artifact.Url);
-                var savePath = Path.Combine(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "libraries",
+                var savePath = IOHelper.CombineAndCheckDirectory(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "libraries",
                     libraries[i].Downloads.Artifact.Path);
                 var newFunc = new Func<ValueTask>(async () =>
                 {

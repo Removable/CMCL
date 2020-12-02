@@ -40,7 +40,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
             var url = TransUrl(version.Url);
 
             await Downloader.GetFileAsync(GlobalStaticResource.HttpClientFactory.CreateClient(), url,
-                Path.Combine(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "versions", versionId,
+                IOHelper.CombineAndCheckDirectory(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "versions", versionId,
                     $"{versionId}.json"));
         }
 
@@ -53,7 +53,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
         {
             var versionInfo = await GameHelper.GetVersionInfo(versionId).ConfigureAwait(false);
 
-            var filePath = Path.Combine(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "versions", versionId,
+            var filePath = IOHelper.CombineAndCheckDirectory(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "versions", versionId,
                 $"{versionId}.jar");
 
             //转换地址
@@ -61,7 +61,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
 
             await Downloader.GetFileAsync(GlobalStaticResource.HttpClientFactory.CreateClient(), url, filePath);
             //校验sha1
-            if (!string.Equals(await FileHelper.GetSha1HashFromFileAsync(filePath).ConfigureAwait(false),
+            if (!string.Equals(await IOHelper.GetSha1HashFromFileAsync(filePath).ConfigureAwait(false),
                 versionInfo.Downloads.Client.Sha1, StringComparison.CurrentCultureIgnoreCase))
                 throw new FileSha1Error("文件校验错误，请重新下载");
         }

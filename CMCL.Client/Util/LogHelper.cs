@@ -7,7 +7,7 @@ namespace CMCL.Client.Util
 {
     public class LogHelper
     {
-        private static readonly string LogDirectory = Path.Combine(Environment.CurrentDirectory, "logs");
+        private static readonly string LogDirectory = IOHelper.CombineAndCheckDirectory(Environment.CurrentDirectory, "logs");
 
         private static string GetLogContent(Exception exception)
         {
@@ -20,7 +20,7 @@ namespace CMCL.Client.Util
         {
             var logContent = GetLogContent(exception);
             if (!Directory.Exists(LogDirectory)) Directory.CreateDirectory(LogDirectory);
-            await File.AppendAllTextAsync(Path.Combine(LogDirectory, DateTime.Now.ToString("yyyyMMdd") + ".txt"),
+            await File.AppendAllTextAsync(IOHelper.CombineAndCheckDirectory(LogDirectory, DateTime.Now.ToString("yyyyMMdd") + ".txt"),
                 logContent, Encoding.UTF8).ConfigureAwait(false);
         }
 
@@ -28,7 +28,7 @@ namespace CMCL.Client.Util
         {
             var logContent = GetLogContent(exception);
             if (!Directory.Exists(LogDirectory)) Directory.CreateDirectory(LogDirectory);
-            File.AppendAllText(Path.Combine(LogDirectory, DateTime.Now.ToString("yyyyMMdd") + ".txt"), logContent,
+            File.AppendAllText(IOHelper.CombineAndCheckDirectory(LogDirectory, DateTime.Now.ToString("yyyyMMdd") + ".txt"), logContent,
                 Encoding.UTF8);
         }
     }

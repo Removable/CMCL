@@ -31,8 +31,9 @@ namespace CMCL.Client.Window
         /// <summary>
         ///     打开窗口=>执行任务=>关闭窗口
         /// </summary>
+        /// <param name="closeWhenFinish">任务执行结束后是否关闭窗口</param>
         /// <param name="funcs">要执行的任务数组</param>
-        public async Task DoWork(params Func<ValueTask>[] funcs)
+        public async Task DoWork(bool closeWhenFinish, params Func<ValueTask>[] funcs)
         {
             DataContext = Downloader.DownloadInfoHandler;
             var currentTaskIndex = 0;
@@ -46,7 +47,8 @@ namespace CMCL.Client.Window
                 await func();
             }
 
-            Close();
+            if (closeWhenFinish)
+                Close();
         }
 
         private void DownloadFrm_OnClosed(object sender, EventArgs e)

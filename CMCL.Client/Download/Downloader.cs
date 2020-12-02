@@ -46,7 +46,7 @@ namespace CMCL.Client.Download
             DownloadInfoHandler.CurrentTaskProgress = 0;
             DownloadInfoHandler.CurrentTaskName = Path.GetFileName(savePath);
 
-            FileHelper.CreateDirectoryIfNotExist(Path.GetDirectoryName(savePath));
+            IOHelper.CreateDirectoryIfNotExist(Path.GetDirectoryName(savePath));
 
             var uri = new Uri(url);
 

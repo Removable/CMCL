@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Windows;
 using CMCL.Client.Download;
 using CMCL.Client.Util;
@@ -105,6 +106,7 @@ namespace CMCL.Client.UserControl
 
                 await AppConfig.SaveAppConfig(newConfig);
                 NotifyIcon.ShowBalloonTip("提示", "保存成功", NotifyIconInfoType.Info, "AppNotifyIcon");
+                IOHelper.CreateDirectoryIfNotExist(Path.Combine(newConfig.MinecraftDir, ".minecraft"));
             }
             catch (Exception exception)
             {

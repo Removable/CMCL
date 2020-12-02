@@ -43,7 +43,7 @@ namespace CMCL.Client.Util
 
                     foreach (var s in array)
                         if (s.Contains("javapath"))
-                            return Path.Combine(s, "javaw.exe");
+                            return IOHelper.CombineAndCheckDirectory(s, "javaw.exe");
 
                     return string.Empty;
                 }

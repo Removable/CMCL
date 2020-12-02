@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CMCL.Client.Util
 {
-    internal static class FileHelper
+    internal static class IOHelper
     {
         /// <summary>
         ///     复制文件夹
@@ -22,6 +22,23 @@ namespace CMCL.Client.Util
             foreach (var sondir in dir.GetDirectories()) DirCopy(sondir.FullName, to + "\\" + sondir.Name);
 
             foreach (var file in dir.GetFiles()) File.Copy(file.FullName, to + "\\" + file.Name, true);
+        }
+
+
+        /// <summary>
+        /// 拼接地址，地址中的文件夹若不存在则创建
+        /// </summary>
+        /// <param name="path"></param>
+        public static string CombineAndCheckDirectory(params string[] path)
+        {
+            var newPath = Path.Combine(path);
+            var theLastPart = newPath.Substring(newPath.LastIndexOf(@"\", StringComparison.Ordinal) + 1);
+            if (!string.IsNullOrWhiteSpace(theLastPart) && !theLastPart.StartsWith('.') && theLastPart.Contains('.'))
+                CreateDirectoryIfNotExist(newPath.Substring(0, newPath.LastIndexOf(@"\", StringComparison.Ordinal)));
+            else
+                CreateDirectoryIfNotExist(newPath);
+
+            return newPath;
         }
 
         /// <summary>
