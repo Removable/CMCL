@@ -12,7 +12,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
     public abstract class Version
     {
         protected GameVersionManifest VersionManifest;
-        public virtual string ManifestUrl { get; } = "https://launchermeta.mojang.com/mc/game/version_manifest.json";
+        public virtual string ManifestUrl { get; } = "";
 
         /// <summary>
         ///     获取版本列表
@@ -36,7 +36,10 @@ namespace CMCL.Client.Download.Mirrors.Interface
             var version = VersionManifest.Versions.FirstOrDefault(i => i.Id == versionId);
             if (version == null) throw new Exception("找不到指定版本");
 
-            await Downloader.GetFileAsync(GlobalStaticResource.HttpClientFactory.CreateClient(), version.Url,
+            //转换地址
+            var url = TransUrl(version.Url);
+
+            await Downloader.GetFileAsync(GlobalStaticResource.HttpClientFactory.CreateClient(), url,
                 Path.Combine(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "versions", versionId,
                     $"{versionId}.json"));
         }
@@ -52,12 +55,28 @@ namespace CMCL.Client.Download.Mirrors.Interface
 
             var filePath = Path.Combine(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "versions", versionId,
                 $"{versionId}.jar");
-            await Downloader.GetFileAsync(GlobalStaticResource.HttpClientFactory.CreateClient(),
-                versionInfo.Downloads.Client.Url, filePath);
+
+            //转换地址
+            var url = TransUrl(versionInfo.Downloads.Client.Url);
+
+            await Downloader.GetFileAsync(GlobalStaticResource.HttpClientFactory.CreateClient(), url, filePath);
             //校验sha1
             if (!string.Equals(await FileHelper.GetSha1HashFromFileAsync(filePath).ConfigureAwait(false),
                 versionInfo.Downloads.Client.Sha1, StringComparison.CurrentCultureIgnoreCase))
                 throw new FileSha1Error("文件校验错误，请重新下载");
+        }
+
+        /// <summary>
+        /// 转换下载地址
+        /// </summary>
+        /// <param name="originUrl"></param>
+        /// <returns></returns>
+        protected virtual string TransUrl(string originUrl)
+        {
+            const string server = "";
+            var originServers = new[] {"https://launchermeta.mojang.com/", "https://launcher.mojang.com/"};
+
+            return originServers.Aggregate(originUrl, (current, originServer) => current.Replace(originServer, server));
         }
     }
 }
