@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using CMCL.Client.Download.Mirrors;
 using CMCL.Client.GameVersion.JsonClasses;
 using Newtonsoft.Json;
 
@@ -48,12 +50,35 @@ namespace CMCL.Client.Util
         /// </summary>
         /// <param name="gameVersionId">游戏版本，如：1.16.1</param>
         /// <returns></returns>
-        public static async Task<VersionInfo> GetVersionInfo(string gameVersionId)
+        public static async ValueTask<VersionInfo> GetVersionInfo(string gameVersionId)
         {
             var jsonPath = IOHelper.CombineAndCheckDirectory(AppConfig.GetAppConfig().MinecraftDir, ".minecraft",
-                "versions", gameVersionId,
-                $"{gameVersionId}.json");
-            if (!File.Exists(jsonPath)) throw new Exception("找不到版本信息文件");
+                "versions", gameVersionId, $"{gameVersionId}.json");
+            if (!File.Exists(jsonPath))
+            {
+                await MirrorManager.GetCurrentMirror().Version.DownloadJsonAsync(gameVersionId);
+            }
+
+            //校验sha1，如果sha1不正确就重新下载一次
+            var sha1 = await IOHelper.GetSha1HashFromFileAsync(jsonPath);
+            var correctSha1 =
+                Regex.Match(
+                    MirrorManager.GetCurrentMirror().Version.VersionManifest.Versions
+                        .FirstOrDefault(i => i.Id == gameVersionId)?.Url ?? string.Empty, @"(?<=/)\w{40}(?=/)");
+            if (!string.Equals(sha1, correctSha1.Value, StringComparison.OrdinalIgnoreCase))
+            {
+                await MirrorManager.GetCurrentMirror().Version.DownloadJsonAsync(gameVersionId);
+                sha1 = await IOHelper.GetSha1HashFromFileAsync(jsonPath);
+                correctSha1 =
+                    Regex.Match(
+                        MirrorManager.GetCurrentMirror().Version.VersionManifest.Versions
+                            .FirstOrDefault(i => i.Id == gameVersionId)?.Url ?? string.Empty, @"(?<=/)\w{40}(?=/)");
+                 if (!string.Equals(sha1, correctSha1.Value, StringComparison.OrdinalIgnoreCase))
+                 {
+                     throw new Exception("找不到版本信息文件");
+                 }
+            }
+
             var jsonStr = await File.ReadAllTextAsync(jsonPath);
             if (string.IsNullOrWhiteSpace(jsonStr)) throw new Exception("找不到版本信息文件");
             //替换下载地址

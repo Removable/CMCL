@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -41,6 +42,7 @@ namespace CMCL.Client.Download
         /// <param name="url">下载地址</param>
         /// <param name="savePath">保存路径</param>
         /// <returns></returns>
+        [SuppressMessage("ReSharper.DPA", "DPA0002: Excessive memory allocations in SOH", MessageId = "type: System.Byte[]")]
         public static async ValueTask GetFileAsync(HttpClient httpClient, string url, string savePath)
         {
             DownloadInfoHandler.CurrentTaskProgress = 0;

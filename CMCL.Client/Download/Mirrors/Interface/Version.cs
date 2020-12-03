@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -11,7 +10,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
 {
     public abstract class Version
     {
-        protected GameVersionManifest VersionManifest;
+        public GameVersionManifest VersionManifest;
         public virtual string ManifestUrl { get; } = "";
 
         /// <summary>
@@ -69,7 +68,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
         }
 
         /// <summary>
-        /// 转换下载地址
+        ///     转换下载地址
         /// </summary>
         /// <param name="originUrl"></param>
         /// <returns></returns>
