@@ -7,7 +7,7 @@
            mc:Ignorable="d" WindowStyle="None" Title="Component" Height="450" Width="800" ShowTitle="False"
            OtherButtonForeground="Black" CloseButtonForeground="Black" ResizeMode="CanMinimize"
            WindowStartupLocation="CenterScreen" ShowNonClientArea="True" NonClientAreaHeight="30" x:Name="MainWin"
-           Loaded="MainWindow_OnLoaded" Icon="/Resources/Images/Component_128.ico">
+           Loaded="MainWindow_OnLoaded" Icon="/Resources/Images/Component_128.ico" Closing="MainWindow_OnClosing">
     <hc:Window.NonClientAreaContent>
         <StackPanel Orientation="Horizontal" Height="0" />
     </hc:Window.NonClientAreaContent>

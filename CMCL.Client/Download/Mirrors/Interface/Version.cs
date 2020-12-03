@@ -18,7 +18,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
         ///     获取版本列表
         /// </summary>
         /// <returns></returns>
-        public async ValueTask<GameVersionManifest> LoadGameVersionList(HttpClient httpClient)
+        public virtual async ValueTask<GameVersionManifest> LoadGameVersionList(HttpClient httpClient)
         {
             var jsonStr = await Downloader.GetStringAsync(httpClient, ManifestUrl).ConfigureAwait(false);
             var gameVersionManifest = JsonConvert.DeserializeObject<GameVersionManifest>(jsonStr);
@@ -31,7 +31,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
         /// </summary>
         /// <param name="versionId">游戏版本号</param>
         /// <returns></returns>
-        public async ValueTask DownloadJsonAsync(string versionId)
+        public virtual async ValueTask DownloadJsonAsync(string versionId)
         {
             var version = VersionManifest.Versions.FirstOrDefault(i => i.Id == versionId);
             if (version == null) throw new Exception("找不到指定版本");
@@ -40,7 +40,8 @@ namespace CMCL.Client.Download.Mirrors.Interface
             var url = TransUrl(version.Url);
 
             await Downloader.GetFileAsync(GlobalStaticResource.HttpClientFactory.CreateClient(), url,
-                IOHelper.CombineAndCheckDirectory(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "versions", versionId,
+                IOHelper.CombineAndCheckDirectory(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "versions",
+                    versionId,
                     $"{versionId}.json"));
         }
 
@@ -49,11 +50,12 @@ namespace CMCL.Client.Download.Mirrors.Interface
         /// </summary>
         /// <param name="versionId">游戏版本号</param>
         /// <returns></returns>
-        public async ValueTask DownloadJarAsync(string versionId)
+        public virtual async ValueTask DownloadJarAsync(string versionId)
         {
             var versionInfo = await GameHelper.GetVersionInfo(versionId).ConfigureAwait(false);
 
-            var filePath = IOHelper.CombineAndCheckDirectory(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "versions", versionId,
+            var filePath = IOHelper.CombineAndCheckDirectory(AppConfig.GetAppConfig().MinecraftDir, ".minecraft",
+                "versions", versionId,
                 $"{versionId}.jar");
 
             //转换地址

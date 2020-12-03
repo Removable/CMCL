@@ -1,4 +1,5 @@
-﻿using CMCL.Client.UserControl;
+﻿using System.ComponentModel;
+using CMCL.Client.UserControl;
 using CMCL.Client.Util;
 using System.Net.Http;
 using System.Windows;
@@ -47,6 +48,14 @@ namespace CMCL.Client
                     selectedItem.Content = settingsUc;
                 }
             }
+        }
+
+        private void MainWindow_OnClosing(object sender, CancelEventArgs e)
+        {
+            //清理缓存文件夹
+            var tempDir = GameHelper.GetCmclCacheDir(false);
+            if (System.IO.Directory.Exists(tempDir))
+                System.IO.Directory.Delete(tempDir, true);
         }
     }
 }

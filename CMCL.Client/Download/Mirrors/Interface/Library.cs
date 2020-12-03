@@ -10,14 +10,12 @@ namespace CMCL.Client.Download.Mirrors.Interface
 {
     public abstract class Library
     {
-        protected GameVersionManifest VersionManifest;
-
         /// <summary>
         ///     下载Libraries
         /// </summary>
         /// <param name="versionId">游戏版本号</param>
         /// <returns></returns>
-        public async ValueTask<Func<ValueTask>[]> DownloadLibrariesAsync(string versionId)
+        public virtual async ValueTask<Func<ValueTask>[]> DownloadLibrariesAsync(string versionId)
         {
             var versionInfo = await GameHelper.GetVersionInfo(versionId).ConfigureAwait(false);
             var libraries = versionInfo.Libraries.Where(i => i.ShouldDeployOnOs()).ToList();
