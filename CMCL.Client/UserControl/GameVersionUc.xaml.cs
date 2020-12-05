@@ -116,14 +116,18 @@ namespace CMCL.Client.UserControl
             var downloadFrm = DownloadFrm.GetInstance();
             downloadFrm.Owner = System.Windows.Window.GetWindow(this);
             var versionId = selectVer["版本"].ToString();
-            //下载json
-            await downloadFrm.DoWork(false, async () => { await mirror.Version.DownloadJsonAsync(versionId); });
+            //下载版本json和资源json
+            await downloadFrm.DoWork(false,
+                async () => { await mirror.Version.DownloadJsonAsync(versionId); },
+                async () => { await mirror.Asset.GetAssetIndexJson(versionId);});
 
             var funcList = new List<Func<ValueTask>>();
             //下载jar
             funcList.Add(async () => { await mirror.Version.DownloadJarAsync(versionId); });
             //下载库文件
             funcList.AddRange(await mirror.Library.DownloadLibrariesAsync(versionId));
+            //下载资源文件
+            funcList.AddRange(await mirror.Asset.DownloadAssets(versionId));
 
             await downloadFrm.DoWork(true, funcList.ToArray());
 

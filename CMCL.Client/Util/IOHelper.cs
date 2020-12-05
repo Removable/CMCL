@@ -24,7 +24,6 @@ namespace CMCL.Client.Util
             foreach (var file in dir.GetFiles()) File.Copy(file.FullName, to + "\\" + file.Name, true);
         }
 
-
         /// <summary>
         /// 拼接地址，地址中的文件夹若不存在则创建
         /// </summary>
@@ -34,6 +33,23 @@ namespace CMCL.Client.Util
             var newPath = Path.Combine(path);
             var theLastPart = newPath.Substring(newPath.LastIndexOf(@"\", StringComparison.Ordinal) + 1);
             if (!string.IsNullOrWhiteSpace(theLastPart) && !theLastPart.StartsWith('.') && theLastPart.Contains('.'))
+                CreateDirectoryIfNotExist(newPath.Substring(0, newPath.LastIndexOf(@"\", StringComparison.Ordinal)));
+            else
+                CreateDirectoryIfNotExist(newPath);
+
+            return newPath;
+        }
+
+        /// <summary>
+        /// 拼接地址，地址中的文件夹若不存在则创建
+        /// </summary>
+        /// <param name="isFile">是否为文件</param>
+        /// <param name="path"></param>
+        public static string CombineAndCheckDirectory(bool isFile, params string[] path)
+        {
+            var newPath = Path.Combine(path);
+            var theLastPart = newPath.Substring(newPath.LastIndexOf(@"\", StringComparison.Ordinal) + 1);
+            if (isFile)
                 CreateDirectoryIfNotExist(newPath.Substring(0, newPath.LastIndexOf(@"\", StringComparison.Ordinal)));
             else
                 CreateDirectoryIfNotExist(newPath);

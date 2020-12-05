@@ -38,15 +38,19 @@ namespace CMCL.Client.Download
         ///     异步下载文件
         /// </summary>
         /// <param name="httpClient"></param>
-        /// <param name="progress"></param>
         /// <param name="url">下载地址</param>
         /// <param name="savePath">保存路径</param>
+        /// <param name="taskName">任务名</param>
         /// <returns></returns>
-        [SuppressMessage("ReSharper.DPA", "DPA0002: Excessive memory allocations in SOH", MessageId = "type: System.Byte[]")]
-        public static async ValueTask GetFileAsync(HttpClient httpClient, string url, string savePath)
+        [SuppressMessage("ReSharper.DPA", "DPA0002: Excessive memory allocations in SOH",
+            MessageId = "type: System.Byte[]")]
+        public static async ValueTask GetFileAsync(HttpClient httpClient, string url, string savePath, string taskName)
         {
             DownloadInfoHandler.CurrentTaskProgress = 0;
-            DownloadInfoHandler.CurrentTaskName = Path.GetFileName(savePath);
+            if (string.IsNullOrWhiteSpace(taskName))
+                DownloadInfoHandler.CurrentTaskName = $"下载{Path.GetFileName(savePath)}";
+            else
+                DownloadInfoHandler.CurrentTaskName = taskName;
 
             IOHelper.CreateDirectoryIfNotExist(Path.GetDirectoryName(savePath));
 

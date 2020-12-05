@@ -40,8 +40,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
 
             await Downloader.GetFileAsync(GlobalStaticResource.HttpClientFactory.CreateClient(), url,
                 IOHelper.CombineAndCheckDirectory(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "versions",
-                    versionId,
-                    $"{versionId}.json"));
+                    versionId, $"{versionId}.json"), $"下载{versionId}.json");
         }
 
         /// <summary>
@@ -60,7 +59,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
             //转换地址
             var url = TransUrl(versionInfo.Downloads.Client.Url);
 
-            await Downloader.GetFileAsync(GlobalStaticResource.HttpClientFactory.CreateClient(), url, filePath);
+            await Downloader.GetFileAsync(GlobalStaticResource.HttpClientFactory.CreateClient(), url, filePath, "");
             //校验sha1
             if (!string.Equals(await IOHelper.GetSha1HashFromFileAsync(filePath).ConfigureAwait(false),
                 versionInfo.Downloads.Client.Sha1, StringComparison.CurrentCultureIgnoreCase))

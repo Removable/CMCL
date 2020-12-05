@@ -21,5 +21,10 @@ namespace CMCL.Client.Download.Mirrors.Interface
         ///     库
         /// </summary>
         public abstract Library Library { get; }
+
+        /// <summary>
+        ///     资源
+        /// </summary>
+        public abstract Asset Asset { get; }
     }
 }

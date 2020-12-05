@@ -9,8 +9,8 @@
     <Grid>
         <hc:CircleProgressBar Value="{Binding CurrentTaskProgress}" Margin="50,37,50,108"
                               Style="{DynamicResource ProgressBarInfoCircle}" x:Name="DownloadProgressBar" />
-        <TextBlock Text="正在下载" x:Name="TbCurrentTaskName" Height="20" TextAlignment="Center" Margin="0,160,0,65" />
-        <TextBlock Text="{Binding CurrentTaskName}" x:Name="TbCurrentTaskDetail" Height="20" TextAlignment="Center"
+        <TextBlock Text="{Binding CurrentTaskName}" x:Name="TbCurrentTaskName" Height="20" TextAlignment="Center" Margin="0,160,0,65" />
+        <TextBlock Text="{Binding CurrentTaskGroup}" x:Name="TbCurrentTaskDetail" Height="20" TextAlignment="Center"
                    Margin="0,185,0,40" />
         <TextBlock Text="关闭" TextAlignment="Center" FontSize="10" Foreground="LightGray" Cursor="Hand"
                    Margin="100,259,100,10" MouseLeftButtonUp="UIElement_OnMouseLeftButtonUp" />

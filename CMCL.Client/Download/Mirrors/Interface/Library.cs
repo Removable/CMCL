@@ -30,7 +30,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
                 var newFunc = new Func<ValueTask>(async () =>
                 {
                     await Downloader.GetFileAsync(GlobalStaticResource.HttpClientFactory.CreateClient(), url,
-                        savePath);
+                        savePath, "下载Library文件");
                 });
                 funcArray[i] = newFunc;
             }
