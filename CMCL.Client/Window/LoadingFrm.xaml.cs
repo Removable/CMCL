@@ -25,12 +25,13 @@ namespace CMCL.Client.Window
         ///     打开窗口=>执行任务=>关闭窗口
         /// </summary>
         /// <param name="loadingText">加载文字</param>
+        /// <param name="closeWhenFinish">任务结束后是否关闭</param>
         /// <param name="actions">要执行的任务数组</param>
-        public void DoWork(string loadingText, params Action[] actions)
+        public void DoWork(string loadingText, bool closeWhenFinish, params Action[] actions)
         {
             var currentTaskIndex = 1;
             LoadingControl.LoadingTip = loadingText.Replace("$CurrentTaskIndex", currentTaskIndex.ToString());
-            ;
+            
             Show();
             var taskFactory = new TaskFactory();
 
@@ -39,13 +40,10 @@ namespace CMCL.Client.Window
             taskFactory.ContinueWhenAny(taskArray, result =>
             {
                 currentTaskIndex++;
-                Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    LoadingControl.LoadingTip =
-                        loadingText.Replace("$CurrentTaskIndex", currentTaskIndex.ToString());
-                }));
+                LoadingControl.LoadingTip =
+                    loadingText.Replace("$CurrentTaskIndex", currentTaskIndex.ToString());
             });
-            taskFactory.ContinueWhenAll(taskArray, result => { Dispatcher.BeginInvoke(new Action(Close)); });
+            taskFactory.ContinueWhenAll(taskArray, result => { if (closeWhenFinish) Close(); });
         }
     }
 }

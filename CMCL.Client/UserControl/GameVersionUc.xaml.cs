@@ -126,10 +126,10 @@ namespace CMCL.Client.UserControl
             funcList.Add(async () => { await mirror.Version.DownloadJarAsync(versionId); });
             //下载库文件
             funcList.AddRange(await mirror.Library.DownloadLibrariesAsync(versionId));
-            //下载资源文件
-            funcList.AddRange(await mirror.Asset.DownloadAssets(versionId));
-
             await downloadFrm.DoWork(true, funcList.ToArray());
+            
+            //下载资源文件
+            await downloadFrm.DoWork(true, async () => { await mirror.Asset.DownloadAssets(versionId); });
 
             BtnDownload.IsEnabled = true;
             BtnRefresh.IsEnabled = true;
