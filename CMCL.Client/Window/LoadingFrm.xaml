@@ -5,7 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:userControl="clr-namespace:CMCL.Client.UserControl"
         mc:Ignorable="d" WindowStyle="None" Background="Transparent" AllowsTransparency="True" ResizeMode="NoResize"
-        Title="LoadingFrm" Height="96" Width="116" WindowStartupLocation="CenterOwner">
+        Title="LoadingFrm" Height="96" Width="116" WindowStartupLocation="CenterOwner" Closing="LoadingFrm_OnClosing">
     <Grid>
         <userControl:LoadingUc x:Name="LoadingControl" />
     </Grid>

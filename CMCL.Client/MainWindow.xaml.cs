@@ -52,10 +52,10 @@ namespace CMCL.Client
 
         private void MainWindow_OnClosing(object sender, CancelEventArgs e)
         {
-            //清理缓存文件夹
-            var tempDir = GameHelper.GetCmclCacheDir(false);
-            if (System.IO.Directory.Exists(tempDir))
-                System.IO.Directory.Delete(tempDir, true);
+            // //清理缓存文件夹
+            // var tempDir = GameHelper.GetCmclCacheDir(false);
+            // if (System.IO.Directory.Exists(tempDir))
+            //     System.IO.Directory.Delete(tempDir, true);
         }
     }
 }

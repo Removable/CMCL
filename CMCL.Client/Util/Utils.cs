@@ -77,4 +77,25 @@ namespace CMCL.Client.Util
             }
         }
     }
+
+    /// <summary>
+    /// 窗口消失的处理方法
+    /// </summary>
+    public enum WindowDisappear
+    {
+        /// <summary>
+        /// 无处理
+        /// </summary>
+        None,
+
+        /// <summary>
+        /// 关闭
+        /// </summary>
+        Close,
+
+        /// <summary>
+        /// 隐藏
+        /// </summary>
+        Hide,
+    }
 }

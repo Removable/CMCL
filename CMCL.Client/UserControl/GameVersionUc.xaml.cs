@@ -113,11 +113,11 @@ namespace CMCL.Client.UserControl
 
             var mirror = MirrorManager.GetCurrentMirror();
 
-            var downloadFrm = DownloadFrm.GetInstance();
-            downloadFrm.Owner = System.Windows.Window.GetWindow(this);
+            var downloadFrm = DownloadFrm.GetInstance(System.Windows.Window.GetWindow(this));
+            // downloadFrm.Owner = System.Windows.Window.GetWindow(this);
             var versionId = selectVer["版本"].ToString();
             //下载版本json和资源json
-            await downloadFrm.DoWork(false,
+            await downloadFrm.DoWork(WindowDisappear.None,
                 async () => { await mirror.Version.DownloadJsonAsync(versionId); },
                 async () => { await mirror.Asset.GetAssetIndexJson(versionId); });
 
@@ -126,7 +126,7 @@ namespace CMCL.Client.UserControl
             funcList.Add(async () => { await mirror.Version.DownloadJarAsync(versionId); });
             //下载库文件
             funcList.AddRange(await mirror.Library.DownloadLibrariesAsync(versionId));
-            await downloadFrm.DoWork(true, funcList.ToArray());
+            await downloadFrm.DoWork(WindowDisappear.Hide, funcList.ToArray());
 
             #region 下载资源文件
 
@@ -137,9 +137,7 @@ namespace CMCL.Client.UserControl
 
             if (assetsToDownload.Count > 0)
             {
-                downloadFrm = DownloadFrm.GetInstance();
-                downloadFrm.Owner = System.Windows.Window.GetWindow(this);
-                await downloadFrm.DoWork(true, mirror.Asset.DownloadAssets(assetsToDownload));
+                await downloadFrm.DoWork(WindowDisappear.Close, mirror.Asset.DownloadAssets(assetsToDownload));
             }
 
             #endregion

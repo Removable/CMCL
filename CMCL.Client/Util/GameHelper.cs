@@ -21,6 +21,25 @@ namespace CMCL.Client.Util
         }
 
         /// <summary>
+        /// 返回natives文件夹地址
+        /// </summary>
+        /// <param name="versionId"></param>
+        /// <returns></returns>
+        public static string GetNativesDir(string versionId)
+        {
+            return IOHelper.CombineAndCheckDirectory(GetCmclCacheDir(), $"natives-{versionId}-{Guid.NewGuid():N}");
+        }
+
+        public static async Task CleanNativesDir()
+        {
+            var baseDir = new DirectoryInfo(GetCmclCacheDir());
+            if (baseDir.Exists)
+            {
+                var nativesDir = baseDir.GetDirectories($"natives-*");
+            }
+        }
+
+        /// <summary>
         /// 返回本启动器缓存文件夹位置
         /// </summary>
         /// <param name="checkExist">不存在时是否创建</param>
