@@ -119,7 +119,7 @@ namespace CMCL.Client.UserControl
             //下载版本json和资源json
             await downloadFrm.DoWork(false,
                 async () => { await mirror.Version.DownloadJsonAsync(versionId); },
-                async () => { await mirror.Asset.GetAssetIndexJson(versionId);});
+                async () => { await mirror.Asset.GetAssetIndexJson(versionId); });
 
             var funcList = new List<Func<ValueTask>>();
             //下载jar
@@ -127,9 +127,23 @@ namespace CMCL.Client.UserControl
             //下载库文件
             funcList.AddRange(await mirror.Library.DownloadLibrariesAsync(versionId));
             await downloadFrm.DoWork(true, funcList.ToArray());
-            
-            //下载资源文件
-            await downloadFrm.DoWork(true, async () => { await mirror.Asset.DownloadAssets(versionId); });
+
+            #region 下载资源文件
+
+            LoadingBlock.Visibility = Visibility.Visible;
+            LoadingBlock.LoadingTip = "检查资源文件...";
+            var assetsToDownload = await mirror.Asset.GetAssetsDownloadList(versionId, true);
+            LoadingBlock.Visibility = Visibility.Hidden;
+
+            if (assetsToDownload.Count > 0)
+            {
+                downloadFrm = DownloadFrm.GetInstance();
+                downloadFrm.Owner = System.Windows.Window.GetWindow(this);
+                await downloadFrm.DoWork(true, mirror.Asset.DownloadAssets(assetsToDownload));
+            }
+
+            #endregion
+
 
             BtnDownload.IsEnabled = true;
             BtnRefresh.IsEnabled = true;

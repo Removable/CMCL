@@ -97,34 +97,57 @@ namespace CMCL.Client.Download.Mirrors.Interface
         }
 
         /// <summary>
-        /// 下载资源文件
+        /// 获取待下载资源文件的列表
         /// </summary>
-        /// <param name="versionId"></param>
+        /// <param name="versionId">版本</param>
+        /// <param name="checkBeforeDownload">下载前校验文件sha1，如正确则不重复下载</param>
         /// <returns></returns>
-        public virtual async ValueTask<Func<ValueTask>[]> DownloadAssets(string versionId)
+        public virtual async ValueTask<List<(string savePath, string downloadUrl)>> GetAssetsDownloadList(
+            string versionId, bool checkBeforeDownload = false)
         {
             var assetsIndex = await HandleAssetIndexJson(versionId);
+            var basePath = Path.Combine(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "assets", "objects");
+            var assetsToDownload = new List<(string savePath, string downloadUrl)>();
 
-            var funcArray = new List<Func<ValueTask>>();
-            for (var i = 0; i < assetsIndex.Count; i++)
+            foreach (var asset in assetsIndex)
             {
+                var savePath = IOHelper.CombineAndCheckDirectory(true, basePath, asset.SavePath);
                 //转换地址
-                var url = TransUrl(assetsIndex[i].DownloadUrl);
-                var savePath = IOHelper.CombineAndCheckDirectory(true, AppConfig.GetAppConfig().MinecraftDir,
-                    ".minecraft", "assets", "objects", assetsIndex[i].SavePath);
-                if (!File.Exists(savePath) || !string.Equals(await IOHelper.GetSha1HashFromFileAsync(savePath),
-                    assetsIndex[i].Hash, StringComparison.OrdinalIgnoreCase))
+                var url = TransUrl(asset.DownloadUrl);
+                //校验sha1
+                if (checkBeforeDownload && File.Exists(savePath) && string.Equals(
+                    await IOHelper.GetSha1HashFromFileAsync(savePath), asset.Hash, StringComparison.OrdinalIgnoreCase))
                 {
-                    var newFunc = new Func<ValueTask>(async () =>
-                    {
-                        await Downloader.GetFileAsync(GlobalStaticResource.HttpClientFactory.CreateClient(), url,
-                            savePath, "下载Asset文件");
-                    });
-                    funcArray.Add(newFunc);
+                    continue;
                 }
+
+                assetsToDownload.Add((savePath, url));
             }
 
-            return funcArray.ToArray();
+            return assetsToDownload;
+        }
+
+        /// <summary>
+        /// 下载资源文件
+        /// </summary>
+        /// <param name="assetsToDownload">待下载的资源列表</param>
+        /// <returns></returns>
+        public virtual Func<ValueTask>[] DownloadAssets(List<(string savePath, string downloadUrl)> assetsToDownload)
+        {
+            var funcArray = new Func<ValueTask>[assetsToDownload.Count];
+
+            for (var i = 0; i < assetsToDownload.Count; i++)
+            {
+                var k = i;
+                var newFunc = new Func<ValueTask>(async () =>
+                {
+                    await Downloader.GetFileAsync(GlobalStaticResource.HttpClientFactory.CreateClient(),
+                        assetsToDownload[k].downloadUrl, assetsToDownload[k].savePath, "下载Asset文件");
+                });
+                funcArray[k] = newFunc;
+            }
+
+            return funcArray;
         }
 
         /// <summary>

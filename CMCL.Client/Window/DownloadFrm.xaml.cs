@@ -32,7 +32,6 @@ namespace CMCL.Client.Window
         ///     打开窗口=>执行任务=>关闭窗口
         /// </summary>
         /// <param name="closeWhenFinish">任务执行结束后是否关闭窗口</param>
-        /// <param name="taskName">任务名</param>
         /// <param name="funcs">要执行的任务数组</param>
         public async Task DoWork(bool closeWhenFinish, params Func<ValueTask>[] funcs)
         {
@@ -44,7 +43,8 @@ namespace CMCL.Client.Window
             {
                 currentTaskIndex++;
                 var index = currentTaskIndex;
-                Downloader.DownloadInfoHandler.CurrentTaskGroup = $"({currentTaskIndex}/{funcs.Length})";
+                Downloader.DownloadInfoHandler.CurrentTaskGroup = $"({index.ToString()}/{funcs.Length.ToString()})";
+                if (func == null) continue;
                 await func();
             }
 
