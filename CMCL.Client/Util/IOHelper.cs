@@ -48,13 +48,12 @@ namespace CMCL.Client.Util
         public static string CombineAndCheckDirectory(bool isFile, params string[] path)
         {
             var newPath = Path.Combine(path);
-            var theLastPart = newPath.Substring(newPath.LastIndexOf(@"\", StringComparison.Ordinal) + 1);
             if (isFile)
                 CreateDirectoryIfNotExist(newPath.Substring(0, newPath.LastIndexOf(@"\", StringComparison.Ordinal)));
             else
                 CreateDirectoryIfNotExist(newPath);
 
-            return newPath;
+            return newPath.Replace(@"\", @"/");
         }
 
         /// <summary>

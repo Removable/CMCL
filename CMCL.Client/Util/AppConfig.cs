@@ -130,6 +130,11 @@ namespace CMCL.Client.Util
         public string DownloadSource { get; set; } = "MCBBS源";
 
         /// <summary>
+        /// 最大线程数（下载、校验文件等）
+        /// </summary>
+        public int MaxThreadCount { get; set; } = 4;
+
+        /// <summary>
         ///     下载源（枚举）
         /// </summary>
         [JsonIgnore]

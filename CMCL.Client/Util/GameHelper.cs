@@ -30,12 +30,30 @@ namespace CMCL.Client.Util
             return IOHelper.CombineAndCheckDirectory(GetCmclCacheDir(), $"natives-{versionId}-{Guid.NewGuid():N}");
         }
 
-        public static async Task CleanNativesDir()
+        /// <summary>
+        /// 清理natives文件夹
+        /// </summary>
+        /// <returns></returns>
+        public static async Task<bool> CleanNativesDir()
         {
-            var baseDir = new DirectoryInfo(GetCmclCacheDir());
-            if (baseDir.Exists)
+            try
             {
-                var nativesDir = baseDir.GetDirectories($"natives-*");
+                var baseDir = new DirectoryInfo(GetCmclCacheDir());
+                if (baseDir.Exists)
+                {
+                    var nativesDir = baseDir.GetDirectories($"natives-*");
+                    foreach (var di in nativesDir)
+                    {
+                        di.Delete(true);
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                await LogHelper.WriteLogAsync(e);
+                return false;
             }
         }
 

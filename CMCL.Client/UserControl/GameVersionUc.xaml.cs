@@ -121,12 +121,18 @@ namespace CMCL.Client.UserControl
                 async () => { await mirror.Version.DownloadJsonAsync(versionId); },
                 async () => { await mirror.Asset.GetAssetIndexJson(versionId); });
 
-            var funcList = new List<Func<ValueTask>>();
+            // var funcList = new List<Func<ValueTask>>();
             //下载jar
-            funcList.Add(async () => { await mirror.Version.DownloadJarAsync(versionId); });
-            //下载库文件
-            funcList.AddRange(await mirror.Library.DownloadLibrariesAsync(versionId));
-            await downloadFrm.DoWork(WindowDisappear.Hide, funcList.ToArray());
+            // funcList.Add(async () => { await mirror.Version.DownloadJarAsync(versionId); });
+            await downloadFrm.DoWork(WindowDisappear.Hide, async () => { await mirror.Version.DownloadJarAsync(versionId); });
+            // //下载库文件
+            // funcList.AddRange(await mirror.Library.DownloadLibrariesAsync(versionId));
+
+            #region 下载库文件
+
+            var librariesDownloadList = await mirror.Library.GetLibrariesDownloadList(versionId, true);
+
+            #endregion
 
             #region 下载资源文件
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using CMCL.Client.LoginPlugin;
@@ -22,7 +23,16 @@ namespace CMCL.Client.UserControl
         private void MainTabUc_OnLoaded(object sender, RoutedEventArgs e)
         {
             var currentVersion = AppConfig.GetAppConfig().CurrentVersion;
-            TbSelectedVersion.Text = string.Format(TbSelectedVersion.Text, currentVersion);
+            TbSelectedVersion.Text = $"Minecraft版本：{currentVersion}";
+        }
+
+        private void MainTabUc_OnIsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (UcMainTab.Visibility == Visibility.Visible)
+            {
+                var currentVersion = AppConfig.GetAppConfig().CurrentVersion;
+                TbSelectedVersion.Text = $"Minecraft版本：{currentVersion}";
+            }
         }
 
         /// <summary>
@@ -34,11 +44,11 @@ namespace CMCL.Client.UserControl
         {
             var config = AppConfig.GetAppConfig();
             var btn = (Button) sender;
+            var loadingFrm = LoadingFrm.GetInstance("", System.Windows.Window.GetWindow(this));
+            
             try
             {
                 #region 检查启动必要条件
-
-                await GameHelper.CleanNativesDir();
 
                 //账号密码
                 if (string.IsNullOrWhiteSpace(config.Account) || string.IsNullOrWhiteSpace(config.Password))
@@ -46,17 +56,29 @@ namespace CMCL.Client.UserControl
                     NotifyIcon.ShowBalloonTip("提醒", "请填写用户名或密码", NotifyIconInfoType.Info, "AppNotifyIcon");
                     return;
                 }
+                
+                //Java安装
+                if (string.IsNullOrWhiteSpace(config.CustomJavaPath) || !File.Exists(config.CustomJavaPath))
+                {
+                    throw new Exception("Java未安装或未设置Java路径");
+                }
+
+                //清理Natives文件夹
+                if (!await GameHelper.CleanNativesDir())
+                {
+                    throw new Exception("缓存清理失败");
+                }
 
                 #endregion
                 
                 //登录
-                var loadingFrm = LoadingFrm.GetInstance("正在登录...", System.Windows.Window.GetWindow(this));
                 loadingFrm.Show();
+                loadingFrm.LoadingControl.LoadingTip = "正在登录";
                 btn.IsEnabled = false;
                 var result = await MojangLogin.Login(config.Account, config.Password);
                 if (result.IsSuccess)
                 {
-                    loadingFrm.Close();
+                    loadingFrm.Hide();
                 }
             }
             catch (Exception exception)
@@ -67,6 +89,7 @@ namespace CMCL.Client.UserControl
             finally
             {
                 btn.IsEnabled = true;
+                loadingFrm.Hide();
             }
         }
     }

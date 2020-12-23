@@ -3,8 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             mc:Ignorable="d" Loaded="MainTabUc_OnLoaded"
-             d:DesignHeight="390" d:DesignWidth="800">
+             mc:Ignorable="d" Loaded="MainTabUc_OnLoaded" x:Name="UcMainTab"
+             d:DesignHeight="390" d:DesignWidth="800" IsVisibleChanged="MainTabUc_OnIsVisibleChanged">
     <Grid Background="White">
         <Grid.RowDefinitions>
             <RowDefinition Height="6*" />
