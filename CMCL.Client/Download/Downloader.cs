@@ -42,9 +42,6 @@ namespace CMCL.Client.Download
         /// <param name="savePath">保存路径</param>
         /// <param name="taskName">任务名</param>
         /// <returns></returns>
-        [SuppressMessage("ReSharper.DPA", "DPA0002: Excessive memory allocations in SOH",
-            MessageId = "type: System.Byte[]")]
-        [SuppressMessage("ReSharper.DPA", "DPA0002: Excessive memory allocations in SOH", MessageId = "type: System.Byte[]")]
         public static async ValueTask GetFileAsync(HttpClient httpClient, string url, string savePath, string taskName)
         {
             DownloadInfoHandler.CurrentTaskProgress = 0;

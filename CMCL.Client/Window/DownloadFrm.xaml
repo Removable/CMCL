@@ -5,14 +5,14 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:hc="https://handyorg.github.io/handycontrol"
         mc:Ignorable="d" WindowStyle="None" WindowStartupLocation="CenterOwner"
-        Title="DownloadFrm" Height="280" Width="220" Closed="DownloadFrm_OnClosed">
+        Title="DownloadFrm" Height="320" Width="220" Closed="DownloadFrm_OnClosed">
     <Grid>
         <hc:CircleProgressBar Value="{Binding CurrentTaskProgress}" Margin="50,37,50,108"
                               Style="{DynamicResource ProgressBarInfoCircle}" x:Name="DownloadProgressBar" />
         <TextBlock Text="{Binding CurrentTaskName}" x:Name="TbCurrentTaskName" Height="20" TextAlignment="Center" Margin="0,160,0,65" />
         <TextBlock Text="{Binding CurrentTaskGroup}" x:Name="TbCurrentTaskDetail" Height="20" TextAlignment="Center"
                    Margin="0,185,0,40" />
-        <TextBlock Text="关闭" TextAlignment="Center" FontSize="10" Foreground="LightGray" Cursor="Hand"
-                   Margin="100,259,100,10" MouseLeftButtonUp="UIElement_OnMouseLeftButtonUp" />
+        <TextBlock Text="关闭" TextAlignment="Center" FontSize="10" Cursor="Hand" Foreground="DarkGray"
+                   Margin="92,261,92,0" MouseLeftButtonUp="UIElement_OnMouseLeftButtonUp" Height="15" VerticalAlignment="Top" />
     </Grid>
 </Window>

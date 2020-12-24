@@ -71,6 +71,7 @@ namespace CMCL.Client.Window
         private void DownloadFrm_OnClosed(object sender, EventArgs e)
         {
             _downloadFrm = null;
+            GlobalStaticResource.GetDownloadCancellationToken().Cancel();
         }
 
         private void UIElement_OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)

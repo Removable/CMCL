@@ -112,45 +112,53 @@ namespace CMCL.Client.UserControl
             BtnRefresh.IsEnabled = false;
             Downloader.DownloadInfoHandler.TaskFinished = false;
 
-            var mirror = MirrorManager.GetCurrentMirror();
-
-            var downloadFrm = DownloadFrm.GetInstance(System.Windows.Window.GetWindow(this));
-            // downloadFrm.Owner = System.Windows.Window.GetWindow(this);
-            var versionId = selectVer["版本"].ToString();
-            //下载版本json和资源json
-            await downloadFrm.DoWork(WindowDisappear.None,
-                async () => { await mirror.Version.DownloadJsonAsync(versionId); },
-                async () => { await mirror.Asset.GetAssetIndexJson(versionId); });
-
-            //下载jar
-            await downloadFrm.DoWork(WindowDisappear.Hide,
-                async () => { await mirror.Version.DownloadJarAsync(versionId); });
-
-            #region 下载库文件
-
-            var librariesDownloadList = await mirror.Library.GetLibrariesDownloadList(versionId, true);
-            if (librariesDownloadList.Any())
+            try
             {
+                var mirror = MirrorManager.GetCurrentMirror();
+
+                var downloadFrm = DownloadFrm.GetInstance(System.Windows.Window.GetWindow(this));
+                // downloadFrm.Owner = System.Windows.Window.GetWindow(this);
+                var versionId = selectVer["版本"].ToString();
+                //下载版本json和资源json
+                await downloadFrm.DoWork(WindowDisappear.None,
+                    async () => { await mirror.Version.DownloadJsonAsync(versionId); },
+                    async () => { await mirror.Asset.GetAssetIndexJson(versionId); });
+
+                //下载jar
                 await downloadFrm.DoWork(WindowDisappear.Hide,
-                    mirror.Library.DownloadLibrariesAsync(librariesDownloadList));
+                    async () => { await mirror.Version.DownloadJarAsync(versionId); });
+
+                #region 下载库文件
+
+                var librariesDownloadList = await mirror.Library.GetLibrariesDownloadList(versionId, true);
+                if (librariesDownloadList.Any())
+                {
+                    await downloadFrm.DoWork(WindowDisappear.Hide,
+                        mirror.Library.DownloadLibrariesAsync(librariesDownloadList));
+                }
+
+                #endregion
+
+                #region 下载资源文件
+
+                var assetsToDownload = await mirror.Asset.GetAssetsDownloadList(versionId, true);
+                if (assetsToDownload.Any())
+                {
+                    await downloadFrm.DoWork(WindowDisappear.Close, mirror.Asset.DownloadAssets(assetsToDownload));
+                }
+
+                #endregion
             }
-
-            #endregion
-
-            #region 下载资源文件
-
-            var assetsToDownload = await mirror.Asset.GetAssetsDownloadList(versionId, true);
-            if (assetsToDownload.Any())
+            catch (Exception exception)
             {
-                await downloadFrm.DoWork(WindowDisappear.Close, mirror.Asset.DownloadAssets(assetsToDownload));
+                NotifyIcon.ShowBalloonTip("错误", "下载失败", NotifyIconInfoType.Error, "AppNotifyIcon");
             }
-
-            #endregion
-
-
-            BtnDownload.IsEnabled = true;
-            BtnRefresh.IsEnabled = true;
-            Downloader.DownloadInfoHandler.TaskFinished = true;
+            finally
+            {
+                BtnDownload.IsEnabled = true;
+                BtnRefresh.IsEnabled = true;
+                Downloader.DownloadInfoHandler.TaskFinished = true;
+            }
         }
     }
 }
