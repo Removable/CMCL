@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using System.Windows;
 using CMCL.Client.Download;
 using CMCL.Client.Util;
 
@@ -74,7 +75,8 @@ namespace CMCL.Client.Window
         public void Show(string tip = "正在加载")
         {
             LoadingControl.LoadingTip = tip;
-            base.Show();
+            if (Visibility != Visibility.Visible)
+                base.Show();
         }
 
         private void LoadingFrm_OnClosing(object sender, CancelEventArgs e)
