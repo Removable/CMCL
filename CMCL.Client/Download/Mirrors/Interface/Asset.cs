@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using CMCL.Client.Game;
 using CMCL.Client.GameVersion.JsonClasses;
 using CMCL.Client.Util;
+using CMCL.Client.Window;
 using ComponentUtil.Common.Data;
 
 namespace CMCL.Client.Download.Mirrors.Interface
@@ -105,6 +106,12 @@ namespace CMCL.Client.Download.Mirrors.Interface
         public virtual async ValueTask<List<(string savePath, string downloadUrl)>> GetAssetsDownloadList(
             string versionId, bool checkBeforeDownload = false)
         {
+            var loadingFrm = LoadingFrm.GetInstance("", System.Windows.Application.Current.MainWindow);
+            loadingFrm.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                loadingFrm.LoadingControl.LoadingTip = "正在校验资源文件...";
+                loadingFrm.Show();
+            }));
             var assetsIndex = await HandleAssetIndexJson(versionId);
             var basePath = Path.Combine(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "assets", "objects");
             var assetsToDownload = new List<(string savePath, string downloadUrl)>();
@@ -124,6 +131,10 @@ namespace CMCL.Client.Download.Mirrors.Interface
                 assetsToDownload.Add((savePath, url));
             }
 
+            loadingFrm.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                loadingFrm.Hide();
+            }));
             return assetsToDownload;
         }
 
