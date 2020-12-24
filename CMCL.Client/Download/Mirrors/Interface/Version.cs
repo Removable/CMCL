@@ -41,6 +41,9 @@ namespace CMCL.Client.Download.Mirrors.Interface
             await Downloader.GetFileAsync(GlobalStaticResource.HttpClientFactory.CreateClient(), url,
                 IOHelper.CombineAndCheckDirectory(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "versions",
                     versionId, $"{versionId}.json"), $"下载{versionId}.json");
+
+            //重新加载版本信息列表
+            await GameHelper.LoadVersionInfoList();
         }
 
         /// <summary>
@@ -50,7 +53,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
         /// <returns></returns>
         public virtual async ValueTask DownloadJarAsync(string versionId)
         {
-            var versionInfo = await GameHelper.GetVersionInfo(versionId).ConfigureAwait(false);
+            var versionInfo = GameHelper.GetVersionInfo(versionId);
 
             var filePath = IOHelper.CombineAndCheckDirectory(AppConfig.GetAppConfig().MinecraftDir, ".minecraft",
                 "versions", versionId,

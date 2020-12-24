@@ -30,7 +30,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
         /// <exception cref="FileSha1Error"></exception>
         public virtual async ValueTask GetAssetIndexJson(string versionId)
         {
-            var versionInfo = await GameHelper.GetVersionInfo(versionId).ConfigureAwait(false);
+            var versionInfo = GameHelper.GetVersionInfo(versionId);
             if (versionInfo == null) throw new Exception("找不到指定版本");
 
             //转换地址
@@ -68,7 +68,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
         /// <returns></returns>
         protected virtual async ValueTask<List<AssetsIndex.Asset>> HandleAssetIndexJson(string versionId)
         {
-            var versionInfo = await GameHelper.GetVersionInfo(versionId).ConfigureAwait(false);
+            var versionInfo = GameHelper.GetVersionInfo(versionId);
             if (versionInfo == null) throw new Exception("找不到指定版本");
 
             var savePath =

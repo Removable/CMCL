@@ -23,23 +23,14 @@ namespace CMCL.Client
 
         public IConfiguration Configuration { get; private set; }
 
-        protected override void OnStartup(StartupEventArgs e)
+        protected override async void OnStartup(StartupEventArgs e)
         {
-            // 初始化配置建造器
-            // var appSettingsPath = new Uri("AppData/appsettings.json", UriKind.Relative);
-            // var sourceInfo = Application.GetResourceStream(appSettingsPath);
-            // if (sourceInfo == null)
-            //     throw new Exception("找不到appsettings.json");
-            // var builder = new ConfigurationBuilder()
-            //     .SetBasePath(Directory.GetCurrentDirectory())
-            //     .AddJsonStream(sourceInfo.Stream);
-
-            // 获取配置建造器创建的对象
-            // Configuration = builder.Build();
-
             try
             {
-                AppConfig.InitConfig().ConfigureAwait(false);
+                await AppConfig.InitConfig().ConfigureAwait(false);
+                
+                //获取所有Version的json
+                await GameHelper.LoadVersionInfoList();
 
                 //配置全局服务容器
                 var serviceCollection = new ServiceCollection();

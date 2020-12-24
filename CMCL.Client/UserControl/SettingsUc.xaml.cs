@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using CMCL.Client.Download;
 using CMCL.Client.Util;
@@ -50,18 +51,12 @@ namespace CMCL.Client.UserControl
         /// </summary>
         private void LoadDownloadVersion(string selectedVersion = "")
         {
-            var versions = GameHelper.GetDownloadedVersions();
+            var versions = GameHelper.VersionInfoList.Select(i => i.Id).ToList();
             ComboSelectedVersion.ItemsSource = versions;
             //选中
             if (!string.IsNullOrWhiteSpace(selectedVersion))
             {
-                var index = 0;
-                foreach (var v in versions)
-                {
-                    if (v == selectedVersion) break;
-
-                    index++;
-                }
+                var index = versions.TakeWhile(v => v != AppConfig.GetAppConfig().CurrentVersion).Count();
 
                 ComboSelectedVersion.SelectedIndex = index;
             }

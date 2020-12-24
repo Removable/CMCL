@@ -21,7 +21,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
         /// <returns></returns>
         public virtual async ValueTask<Func<ValueTask>[]> DownloadLibrariesAsync(string versionId)
         {
-            var versionInfo = await GameHelper.GetVersionInfo(versionId).ConfigureAwait(false);
+            var versionInfo = GameHelper.GetVersionInfo(versionId);
             var libraries = versionInfo.Libraries.Where(i => i.ShouldDeployOnOs()).ToList();
 
             var funcArray = new Func<ValueTask>[libraries.Count];
@@ -78,7 +78,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
             {
                 loadingFrm.Show("校验库文件");
             }));
-            var versionInfo = await GameHelper.GetVersionInfo(versionId).ConfigureAwait(false);
+            var versionInfo = GameHelper.GetVersionInfo(versionId);
             var libraries = versionInfo.Libraries.Where(i => i.ShouldDeployOnOs()).ToList();
             var basePath = Path.Combine(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "libraries");
             var librariesToDownload = new List<(string savePath, string downloadUrl)>();
