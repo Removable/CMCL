@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using CMCL.Client.Game;
 using CMCL.Client.GameVersion.JsonClasses;
@@ -144,6 +145,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
         /// <returns></returns>
         public virtual Func<ValueTask>[] DownloadAssets(List<(string savePath, string downloadUrl)> assetsToDownload)
         {
+            //TODO 改造下载，完成多线程
             var funcArray = new Func<ValueTask>[assetsToDownload.Count];
 
             for (var i = 0; i < assetsToDownload.Count; i++)
@@ -158,6 +160,32 @@ namespace CMCL.Client.Download.Mirrors.Interface
             }
 
             return funcArray;
+        }
+
+        public virtual async ValueTask DownloadAssets(string versionId, bool checkBeforeDownload = false)
+        {
+            var semaphoreSlim = new SemaphoreSlim(AppConfig.GetAppConfig().MaxThreadCount);
+
+            var assetsToDownload = await GetAssetsDownloadList(versionId, checkBeforeDownload).ConfigureAwait(false);
+            var taskArray = assetsToDownload.Select(assetInfo => Task.Run(async () =>
+            {
+                try
+                {
+                    await semaphoreSlim.WaitAsync();
+                    await Downloader.GetFileAsync(GlobalStaticResource.HttpClientFactory.CreateClient(),
+                        assetInfo.downloadUrl, assetInfo.savePath, "下载Asset文件");
+                }
+                catch
+                {
+                    // ignored
+                }
+                finally
+                {
+                    semaphoreSlim.Release();
+                }
+            }));
+
+            await Task.WhenAll(taskArray);
         }
 
         /// <summary>
