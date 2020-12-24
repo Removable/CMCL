@@ -36,6 +36,6 @@
                 <TextBlock x:Name="LoadingText" TextAlignment="Center" Foreground="White" Text="加载中..." Margin="0,66,0,7"></TextBlock>
             </Grid>
         </Border>-->
-        <local:LoadingUc x:Name="LoadingBlock" LoadingTip="加载中..." Grid.Row="0" Visibility="Hidden" />
+        <local:LoadingUc x:Name="LoadingBlock" LoadingTip="加载中" Grid.Row="0" Visibility="Hidden" />
     </Grid>
 </UserControl>

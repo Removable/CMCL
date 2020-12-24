@@ -109,8 +109,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
             var loadingFrm = LoadingFrm.GetInstance("", System.Windows.Application.Current.MainWindow);
             loadingFrm.Dispatcher.BeginInvoke(new Action(() =>
             {
-                loadingFrm.LoadingControl.LoadingTip = "正在校验资源文件...";
-                loadingFrm.Show();
+                loadingFrm.Show("校验资源文件");
             }));
             var assetsIndex = await HandleAssetIndexJson(versionId);
             var basePath = Path.Combine(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "assets", "objects");

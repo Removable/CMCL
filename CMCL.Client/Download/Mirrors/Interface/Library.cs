@@ -76,8 +76,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
             var loadingFrm = LoadingFrm.GetInstance("", Application.Current.MainWindow);
             loadingFrm.Dispatcher.BeginInvoke(new Action(() =>
             {
-                loadingFrm.LoadingControl.LoadingTip = "正在校验库文件...";
-                loadingFrm.Show();
+                loadingFrm.Show("校验库文件");
             }));
             var versionInfo = await GameHelper.GetVersionInfo(versionId).ConfigureAwait(false);
             var libraries = versionInfo.Libraries.Where(i => i.ShouldDeployOnOs()).ToList();

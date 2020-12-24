@@ -32,7 +32,7 @@ namespace CMCL.Client.Window
                 frm.Owner = owner;
             }
 
-            frm.LoadingControl.LoadingTip = string.IsNullOrWhiteSpace(loadingText) ? "正在加载..." : loadingText;
+            frm.LoadingControl.LoadingTip = string.IsNullOrWhiteSpace(loadingText) ? "正在加载" : loadingText;
             return frm;
         }
 
@@ -69,6 +69,12 @@ namespace CMCL.Client.Window
                     Hide();
                     break;
             }
+        }
+        
+        public void Show(string tip = "正在加载")
+        {
+            LoadingControl.LoadingTip = tip;
+            base.Show();
         }
 
         private void LoadingFrm_OnClosing(object sender, CancelEventArgs e)

@@ -38,7 +38,7 @@ namespace CMCL.Client.UserControl
             BtnRefresh.IsEnabled = false;
             BtnDownload.IsEnabled = false;
             LoadingBlock.Visibility = Visibility.Visible;
-            LoadingBlock.LoadingTip = "加载中...";
+            LoadingBlock.LoadingTip = "加载中";
 
             var mirror = MirrorManager.GetCurrentMirror();
 

@@ -64,16 +64,17 @@ namespace CMCL.Client.UserControl
                 }
 
                 //清理Natives文件夹
+                loadingFrm.Show("正在清理缓存");
                 if (!await GameHelper.CleanNativesDir())
                 {
                     throw new Exception("缓存清理失败");
                 }
+                loadingFrm.Hide();
 
                 #endregion
                 
                 //登录
-                loadingFrm.Show();
-                loadingFrm.LoadingControl.LoadingTip = "正在登录";
+                loadingFrm.Show("正在登录");
                 btn.IsEnabled = false;
                 var result = await MojangLogin.Login(config.Account, config.Password);
                 if (result.IsSuccess)
