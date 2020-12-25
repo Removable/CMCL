@@ -55,44 +55,6 @@ namespace CMCL.Client.Util
         /// <returns></returns>
         public static VersionInfo GetVersionInfo(string gameVersionId)
         {
-            #region 暂时不用
-
-            // var jsonPath = IOHelper.CombineAndCheckDirectory(AppConfig.GetAppConfig().MinecraftDir, ".minecraft",
-            //     "versions", gameVersionId, $"{gameVersionId}.json");
-            // if (!File.Exists(jsonPath))
-            // {
-            //     await MirrorManager.GetCurrentMirror().Version.DownloadJsonAsync(gameVersionId);
-            // }
-            //
-            // //校验sha1，如果sha1不正确就重新下载一次
-            // var sha1 = await IOHelper.GetSha1HashFromFileAsync(jsonPath);
-            // var correctSha1 =
-            //     Regex.Match(
-            //         MirrorManager.GetCurrentMirror().Version.VersionManifest.Versions
-            //             .FirstOrDefault(i => i.Id == gameVersionId)?.Url ?? string.Empty, @"(?<=/)\w{40}(?=/)");
-            // if (!string.Equals(sha1, correctSha1.Value, StringComparison.OrdinalIgnoreCase))
-            // {
-            //     await MirrorManager.GetCurrentMirror().Version.DownloadJsonAsync(gameVersionId);
-            //     sha1 = await IOHelper.GetSha1HashFromFileAsync(jsonPath);
-            //     correctSha1 =
-            //         Regex.Match(
-            //             MirrorManager.GetCurrentMirror().Version.VersionManifest.Versions
-            //                 .FirstOrDefault(i => i.Id == gameVersionId)?.Url ?? string.Empty, @"(?<=/)\w{40}(?=/)");
-            //     if (!string.Equals(sha1, correctSha1.Value, StringComparison.OrdinalIgnoreCase))
-            //     {
-            //         throw new Exception("找不到版本信息文件");
-            //     }
-            // }
-            //
-            // var jsonStr = await File.ReadAllTextAsync(jsonPath);
-            // if (string.IsNullOrWhiteSpace(jsonStr)) throw new Exception("找不到版本信息文件");
-            // //替换下载地址
-            // var data = JsonConvert.DeserializeObject<VersionInfo>(jsonStr);
-            // if (data == null) throw new Exception("找不到版本信息文件");
-            // return data;
-
-            #endregion
-
             return VersionInfoList.FirstOrDefault(i => i.Id == gameVersionId);
         }
 

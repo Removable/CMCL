@@ -28,7 +28,7 @@ namespace CMCL.Client.Window
         public static LoadingFrm GetInstance(string loadingText, System.Windows.Window owner = null)
         {
             var frm = _loadingFrm ??= new LoadingFrm();
-            if (owner != null)
+            if (owner != null && owner != _loadingFrm.Owner)
             {
                 frm.Owner = owner;
             }

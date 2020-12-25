@@ -119,35 +119,19 @@ namespace CMCL.Client.UserControl
                 var downloadFrm = DownloadFrm.GetInstance(System.Windows.Window.GetWindow(this));
                 // downloadFrm.Owner = System.Windows.Window.GetWindow(this);
                 var versionId = selectVer["版本"].ToString();
-                //下载版本json和资源json
+                //下载版本json
                 await downloadFrm.DoWork(WindowDisappear.None,
-                    async () => { await mirror.Version.DownloadJsonAsync(versionId); },
-                    async () => { await mirror.Asset.GetAssetIndexJson(versionId); });
+                    async () => { await mirror.Version.DownloadJsonAsync(versionId); });
 
                 //下载jar
-                await downloadFrm.DoWork(WindowDisappear.Hide,
+                await downloadFrm.DoWork(WindowDisappear.Close,
                     async () => { await mirror.Version.DownloadJarAsync(versionId); });
 
-                #region 下载库文件
+                //下载库文件
+                await mirror.Library.DownloadLibrariesAsync(versionId, true);
 
-                var librariesDownloadList = await mirror.Library.GetLibrariesDownloadList(versionId, true);
-                if (librariesDownloadList.Any())
-                {
-                    await downloadFrm.DoWork(WindowDisappear.Hide,
-                        mirror.Library.DownloadLibrariesAsync(librariesDownloadList));
-                }
-
-                #endregion
-
-                #region 下载资源文件
-
-                var assetsToDownload = await mirror.Asset.GetAssetsDownloadList(versionId, true);
-                if (assetsToDownload.Any())
-                {
-                    await downloadFrm.DoWork(WindowDisappear.Close, mirror.Asset.DownloadAssets(assetsToDownload));
-                }
-
-                #endregion
+                //下载资源文件
+                await mirror.Asset.DownloadAssets(versionId, true);
             }
             catch (Exception exception)
             {

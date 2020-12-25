@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,6 +7,7 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using CMCL.Client.Game;
 using CMCL.Client.GameVersion.JsonClasses;
 using CMCL.Client.Util;
@@ -19,46 +21,31 @@ namespace CMCL.Client.Download.Mirrors.Interface
         protected GameVersionManifest VersionManifest;
         protected virtual string Server { get; } = "";
 
-        protected string AssetIndexJsonDir =
+        protected readonly string AssetIndexJsonDir =
             IOHelper.CombineAndCheckDirectory(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "assets", "indexes");
 
         /// <summary>
         /// 下载资源目录json文件
         /// </summary>
-        /// <param name="versionId"></param>
+        /// <param name="versionInfo"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
         /// <exception cref="FileSha1Error"></exception>
-        public virtual async ValueTask GetAssetIndexJson(string versionId)
+        protected virtual async ValueTask GetAssetIndexJson(VersionInfo versionInfo)
         {
-            var versionInfo = GameHelper.GetVersionInfo(versionId);
-            if (versionInfo == null) throw new Exception("找不到指定版本");
-
             //转换地址
             var url = TransUrl(versionInfo.AssetIndex.Url);
 
             var savePath =
                 IOHelper.CombineAndCheckDirectory(AssetIndexJsonDir, Path.GetFileName(versionInfo.AssetIndex.Url));
 
-            //不存在就下载
-            if (!File.Exists(savePath))
+            //不存在或sha1不一致则进行下载
+            if (!File.Exists(savePath) ||
+                !string.Equals(await IOHelper.GetSha1HashFromFileAsync(savePath).ConfigureAwait(false),
+                    versionInfo.AssetIndex.Sha1, StringComparison.OrdinalIgnoreCase))
             {
                 await Downloader.GetFileAsync(GlobalStaticResource.HttpClientFactory.CreateClient(), url, savePath, "")
                     .ConfigureAwait(false);
-            }
-
-            //校验sha1，如果sha1不正确就重新下载一次
-            var sha1 = await IOHelper.GetSha1HashFromFileAsync(savePath);
-            if (!string.Equals(sha1, versionInfo.AssetIndex.Sha1, StringComparison.OrdinalIgnoreCase))
-            {
-                await Downloader.GetFileAsync(GlobalStaticResource.HttpClientFactory.CreateClient(), url, savePath, "")
-                    .ConfigureAwait(false);
-                sha1 = await IOHelper.GetSha1HashFromFileAsync(savePath);
-                if (!string.Equals(sha1, versionInfo.AssetIndex.Sha1, StringComparison.OrdinalIgnoreCase))
-                {
-                    File.Delete(savePath);
-                    throw new FileSha1Error("资源文件下载错误，请重试");
-                }
             }
         }
 
@@ -72,14 +59,19 @@ namespace CMCL.Client.Download.Mirrors.Interface
             var versionInfo = GameHelper.GetVersionInfo(versionId);
             if (versionInfo == null) throw new Exception("找不到指定版本");
 
+            //确保资源json文件存在
+            await GetAssetIndexJson(versionInfo);
+
             var savePath =
                 IOHelper.CombineAndCheckDirectory(AssetIndexJsonDir, Path.GetFileName(versionInfo.AssetIndex.Url));
 
+            //匹配每一条Asset信息
             var pattern = "\"\\S+\":\\s?{\"hash\":\\s\"\\w{40}\", \"size\":\\s?\\d+}";
             var matches = Regex.Matches(await File.ReadAllTextAsync(savePath).ConfigureAwait(false), pattern);
 
-            // var pathPattern = "^\"\\S+\"(?=:\\s?{\"hash\":\\s\"\\w{40}\", \"size\":\\s?\\d+})";
+            //匹配Asset信息中的hash字段内容
             var hashPattern = "(?<=^\"\\S+\":\\s?{\"hash\":\\s\")\\w{40}(?=\", \"size\":\\s?\\d+})";
+            //匹配Asset信息中的size字段内容
             var sizePattern = "(?<=^\"\\S+\":\\s?{\"hash\":\\s\"\\w{40}\", \"size\":\\s?)\\d+(?=})";
 
             var assetList = new List<AssetsIndex.Asset>();
@@ -107,11 +99,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
         public virtual async ValueTask<List<(string savePath, string downloadUrl)>> GetAssetsDownloadList(
             string versionId, bool checkBeforeDownload = false)
         {
-            var loadingFrm = LoadingFrm.GetInstance("", System.Windows.Application.Current.MainWindow);
-            loadingFrm.Dispatcher.BeginInvoke(new Action(() =>
-            {
-                loadingFrm.Show("校验资源文件");
-            }));
+            //处理各项asset信息
             var assetsIndex = await HandleAssetIndexJson(versionId);
             var basePath = Path.Combine(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "assets", "objects");
             var assetsToDownload = new List<(string savePath, string downloadUrl)>();
@@ -123,7 +111,8 @@ namespace CMCL.Client.Download.Mirrors.Interface
                 var url = TransUrl(asset.DownloadUrl);
                 //校验sha1
                 if (checkBeforeDownload && File.Exists(savePath) && string.Equals(
-                    await IOHelper.GetSha1HashFromFileAsync(savePath), asset.Hash, StringComparison.OrdinalIgnoreCase))
+                    await IOHelper.GetSha1HashFromFileAsync(savePath), asset.Hash,
+                    StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
@@ -131,61 +120,72 @@ namespace CMCL.Client.Download.Mirrors.Interface
                 assetsToDownload.Add((savePath, url));
             }
 
-            loadingFrm.Dispatcher.BeginInvoke(new Action(() =>
-            {
-                loadingFrm.Hide();
-            }));
             return assetsToDownload;
         }
 
         /// <summary>
-        /// 下载资源文件
+        /// 下载Libraries
         /// </summary>
-        /// <param name="assetsToDownload">待下载的资源列表</param>
+        /// <param name="versionId">游戏版本</param>
+        /// <param name="checkBeforeDownload">下载前校验文件sha1，如正确则不重复下载</param>
         /// <returns></returns>
-        public virtual Func<ValueTask>[] DownloadAssets(List<(string savePath, string downloadUrl)> assetsToDownload)
-        {
-            //TODO 改造下载，完成多线程
-            var funcArray = new Func<ValueTask>[assetsToDownload.Count];
-
-            for (var i = 0; i < assetsToDownload.Count; i++)
-            {
-                var k = i;
-                var newFunc = new Func<ValueTask>(async () =>
-                {
-                    await Downloader.GetFileAsync(GlobalStaticResource.HttpClientFactory.CreateClient(),
-                        assetsToDownload[k].downloadUrl, assetsToDownload[k].savePath, "下载Asset文件");
-                });
-                funcArray[k] = newFunc;
-            }
-
-            return funcArray;
-        }
-
         public virtual async ValueTask DownloadAssets(string versionId, bool checkBeforeDownload = false)
         {
-            var semaphoreSlim = new SemaphoreSlim(AppConfig.GetAppConfig().MaxThreadCount);
+            var loadingFrm = LoadingFrm.GetInstance("校验资源文件", Application.Current.MainWindow);
 
-            var assetsToDownload = await GetAssetsDownloadList(versionId, checkBeforeDownload).ConfigureAwait(false);
-            var taskArray = assetsToDownload.Select(assetInfo => Task.Run(async () =>
+            try
             {
-                try
+                loadingFrm.Dispatcher.BeginInvoke(new Action(() => { loadingFrm.ShowDialog(); }));
+                //获取待下载列表
+                var librariesToDownload = await GetAssetsDownloadList(versionId, checkBeforeDownload);
+                var totalCount = librariesToDownload.Count;
+                if (totalCount <= 0)
                 {
-                    await semaphoreSlim.WaitAsync();
-                    await Downloader.GetFileAsync(GlobalStaticResource.HttpClientFactory.CreateClient(),
-                        assetInfo.downloadUrl, assetInfo.savePath, "下载Asset文件");
+                    loadingFrm.Dispatcher.BeginInvoke(new Action(() => { loadingFrm.Hide(); }));
+                    return;
                 }
-                catch
-                {
-                    // ignored
-                }
-                finally
-                {
-                    semaphoreSlim.Release();
-                }
-            }));
 
-            await Task.WhenAll(taskArray);
+                loadingFrm.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    loadingFrm.LoadingControl.LoadingTip = $"下载资源(0/{totalCount.ToString()})";
+                }));
+                var dic = new ConcurrentDictionary<string, int>();
+                var sem = new SemaphoreSlim(AppConfig.GetAppConfig().MaxThreadCount);
+                var finishedCount = 0;
+                var taskArray = librariesToDownload.Select(libraryInfo => Task.Run(async () =>
+                {
+                    try
+                    {
+                        await sem.WaitAsync();
+                        if (!dic.TryAdd(libraryInfo.downloadUrl, 0))
+                        {
+                            return;
+                        }
+
+                        finishedCount++;
+                        loadingFrm.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            loadingFrm.LoadingControl.LoadingTip =
+                                $"下载资源({finishedCount.ToString()}/{totalCount.ToString()})";
+                        }));
+                        await Downloader.GetFileAsync(GlobalStaticResource.HttpClientFactory.CreateClient(),
+                            libraryInfo.downloadUrl, libraryInfo.savePath, "");
+                    }
+                    finally
+                    {
+                        sem.Release();
+                    }
+                }));
+                await Task.WhenAll(taskArray);
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
+            finally
+            {
+                loadingFrm.Hide();
+            }
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -62,11 +63,11 @@ namespace CMCL.Client.Download.Mirrors.Interface
             //转换地址
             var url = TransUrl(versionInfo.Downloads.Client.Url);
 
-            await Downloader.GetFileAsync(GlobalStaticResource.HttpClientFactory.CreateClient(), url, filePath, "");
             //校验sha1
-            if (!string.Equals(await IOHelper.GetSha1HashFromFileAsync(filePath).ConfigureAwait(false),
-                versionInfo.Downloads.Client.Sha1, StringComparison.CurrentCultureIgnoreCase))
-                throw new FileSha1Error("文件校验错误，请重新下载");
+            if (!File.Exists(filePath) ||
+                !string.Equals(await IOHelper.GetSha1HashFromFileAsync(filePath).ConfigureAwait(false),
+                    versionInfo.Downloads.Client.Sha1, StringComparison.CurrentCultureIgnoreCase))
+                await Downloader.GetFileAsync(GlobalStaticResource.HttpClientFactory.CreateClient(), url, filePath, "");
         }
 
         /// <summary>
