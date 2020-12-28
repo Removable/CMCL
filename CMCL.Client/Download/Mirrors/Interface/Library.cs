@@ -98,7 +98,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
 
                 var basePath = Path.Combine(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "libraries");
 
-                var dic = new ConcurrentDictionary<string, string>();
+                var librariesToDownload = new ConcurrentDictionary<string, string>();
                 var semaphore = new SemaphoreSlim(AppConfig.GetAppConfig().MaxThreadCount);
                 var taskArray = libraries.Select(l => Task.Run(async () =>
                 {
@@ -114,7 +114,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
                             l.Downloads.Artifact.Sha1, StringComparison.OrdinalIgnoreCase))
                             return;
 
-                        dic.TryAdd(savePath, url);
+                        librariesToDownload.TryAdd(savePath, url);
                     }
                     catch (Exception e)
                     {
@@ -128,7 +128,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
                 }));
                 await Task.WhenAll(taskArray);
 
-                return dic.Select(d => (d.Key, dic[d.Key].ToString())).ToList();
+                return librariesToDownload.Select(i => (i.Key, librariesToDownload[i.Key].ToString())).ToList();
             }
             catch (Exception e)
             {

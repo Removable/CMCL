@@ -102,25 +102,38 @@ namespace CMCL.Client.Download.Mirrors.Interface
             //处理各项asset信息
             var assetsIndex = await HandleAssetIndexJson(versionId);
             var basePath = Path.Combine(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "assets", "objects");
-            var assetsToDownload = new List<(string savePath, string downloadUrl)>();
+            var assetsToDownload = new ConcurrentDictionary<string, string>();
 
-            foreach (var asset in assetsIndex)
+            var sem = new SemaphoreSlim(AppConfig.GetAppConfig().MaxThreadCount);
+            var taskArray = assetsIndex.Select(assetInfo => Task.Run(async () =>
             {
-                var savePath = IOHelper.CombineAndCheckDirectory(true, basePath, asset.SavePath);
+                var savePath = IOHelper.CombineAndCheckDirectory(true, basePath, assetInfo.SavePath);
                 //转换地址
-                var url = TransUrl(asset.DownloadUrl);
-                //校验sha1
-                if (checkBeforeDownload && File.Exists(savePath) && string.Equals(
-                    await IOHelper.GetSha1HashFromFileAsync(savePath), asset.Hash,
-                    StringComparison.OrdinalIgnoreCase))
+                var url = TransUrl(assetInfo.DownloadUrl);
+                try
                 {
-                    continue;
+                    //校验sha1
+                    await sem.WaitAsync();
+                    if (checkBeforeDownload && File.Exists(savePath) && string.Equals(
+                        await IOHelper.GetSha1HashFromFileAsync(savePath), assetInfo.Hash,
+                        StringComparison.OrdinalIgnoreCase))
+                    {
+                        return;
+                    }
+
+                    assetsToDownload.TryAdd(savePath, url);
                 }
+                finally
+                {
+                    sem.Release();
+                }
+            }));
 
-                assetsToDownload.Add((savePath, url));
-            }
+            Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"));
+            await Task.WhenAll(taskArray);
+            Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff"));
 
-            return assetsToDownload;
+            return assetsToDownload.Select(i => (i.Key, assetsToDownload[i.Key].ToString())).ToList();
         }
 
         /// <summary>
