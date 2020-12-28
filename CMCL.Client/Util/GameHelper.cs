@@ -46,7 +46,6 @@ namespace CMCL.Client.Util
                 }
             }
         }
-        
 
         /// <summary>
         ///     获取游戏版本json的信息

@@ -115,17 +115,10 @@ namespace CMCL.Client.UserControl
             try
             {
                 var mirror = MirrorManager.GetCurrentMirror();
-
-                var downloadFrm = DownloadFrm.GetInstance(System.Windows.Window.GetWindow(this));
-                // downloadFrm.Owner = System.Windows.Window.GetWindow(this);
                 var versionId = selectVer["版本"].ToString();
-                //下载版本json
-                await downloadFrm.DoWork(WindowDisappear.None,
-                    async () => { await mirror.Version.DownloadJsonAsync(versionId); });
 
-                //下载jar
-                await downloadFrm.DoWork(WindowDisappear.Close,
-                    async () => { await mirror.Version.DownloadJarAsync(versionId); });
+                //下载json和jar
+                await mirror.Version.DownloadJsonAndJarAsync(versionId);
 
                 //下载库文件
                 await mirror.Library.DownloadLibrariesAsync(versionId, true);

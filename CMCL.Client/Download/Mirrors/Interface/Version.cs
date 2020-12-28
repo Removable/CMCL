@@ -3,8 +3,10 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Windows;
 using CMCL.Client.Game;
 using CMCL.Client.Util;
+using CMCL.Client.Window;
 using Newtonsoft.Json;
 
 namespace CMCL.Client.Download.Mirrors.Interface
@@ -26,6 +28,40 @@ namespace CMCL.Client.Download.Mirrors.Interface
             return gameVersionManifest;
         }
 
+        /// <summary>
+        /// 下载版本json和jar，并显示下载进度
+        /// </summary>
+        /// <param name="versionId"></param>
+        /// <returns></returns>
+        public virtual async ValueTask DownloadJsonAndJarAsync(string versionId)
+        {
+            var downloadFrm = DownloadFrm.GetInstance(Application.Current.MainWindow);
+            downloadFrm.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                downloadFrm.DataContext = Downloader.DownloadInfoHandler;
+                downloadFrm.ShowDialog();
+            }));
+
+            try
+            {
+                await DownloadJsonAsync(versionId);
+
+                await DownloadJarAsync(versionId);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            finally
+            {
+                downloadFrm.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    downloadFrm.Close();
+                }));
+            }
+        }
+        
         /// <summary>
         ///     下载版本json
         /// </summary>

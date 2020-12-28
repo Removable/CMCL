@@ -27,10 +27,11 @@ namespace CMCL.Client.Window
         public static DownloadFrm GetInstance(System.Windows.Window owner = null)
         {
             var frm = _downloadFrm ??= new DownloadFrm();
-            if (owner != null)
+            if (owner != null && owner != _downloadFrm.Owner)
             {
                 frm.Owner = owner;
             }
+
             return frm;
         }
 
