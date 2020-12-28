@@ -92,31 +92,29 @@ namespace CMCL.Client.Download.Mirrors.Interface
             try
             {
                 var versionInfo = GameHelper.GetVersionInfo(versionId);
-                var libraries = versionInfo.Libraries.Where(i => i.ShouldDeployOnOs()).ToList();
+                var hashSet = new HashSet<string>();
+                var libraries = versionInfo.Libraries.Select(i => hashSet.Add(i.Downloads.Artifact.Sha1) ? i : null)
+                    .Where(i => i != null && i.ShouldDeployOnOs()).ToList();
+
                 var basePath = Path.Combine(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "libraries");
-                var librariesToDownload = new List<(string savePath, string downloadUrl)>();
 
-                var dic = new ConcurrentDictionary<string, int>();
+                var dic = new ConcurrentDictionary<string, string>();
                 var semaphore = new SemaphoreSlim(AppConfig.GetAppConfig().MaxThreadCount);
-                await Task.WhenAll(libraries.Select(l => Task.Run(async () =>
+                var taskArray = libraries.Select(l => Task.Run(async () =>
                 {
-                    await semaphore.WaitAsync();
-
                     try
                     {
                         var savePath = IOHelper.CombineAndCheckDirectory(true, basePath, l.Downloads.Artifact.Path);
                         //转换地址
                         var url = TransUrl(l.Downloads.Artifact.Url);
 
-                        if (!dic.TryAdd(url, 0))
-                            return;
-
+                        await semaphore.WaitAsync();
                         if (checkBeforeDownload && File.Exists(savePath) && string.Equals(
                             await IOHelper.GetSha1HashFromFileAsync(savePath).ConfigureAwait(false),
                             l.Downloads.Artifact.Sha1, StringComparison.OrdinalIgnoreCase))
                             return;
 
-                        librariesToDownload.Add((savePath, url));
+                        dic.TryAdd(savePath, url);
                     }
                     catch (Exception e)
                     {
@@ -127,9 +125,10 @@ namespace CMCL.Client.Download.Mirrors.Interface
                     {
                         semaphore.Release();
                     }
-                })));
+                }));
+                await Task.WhenAll(taskArray);
 
-                return librariesToDownload;
+                return dic.Select(d => (d.Key, dic[d.Key].ToString())).ToList();
             }
             catch (Exception e)
             {
