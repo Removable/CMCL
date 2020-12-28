@@ -54,9 +54,13 @@ namespace CMCL.Client.UserControl
             try
             {
                 #region 检查启动必要条件
+                //TODO 配置界面从空文件夹转到有游戏文件的文件夹时，版本下拉框应当重载
+
+                if (GameHelper.GetVersionInfo(config.CurrentVersion) == null)
+                    throw new Exception("选择的版本不存在，请重新下载");
 
                 if (string.IsNullOrWhiteSpace(config.CurrentVersion))
-                    throw new Exception("启动版本错误");
+                    throw new Exception("未选择启动版本");
 
                 //账号密码
                 if (string.IsNullOrWhiteSpace(config.Account) || string.IsNullOrWhiteSpace(config.Password))
@@ -91,7 +95,7 @@ namespace CMCL.Client.UserControl
                 {
                     throw new Exception("游戏文件缺失，请尝试重新下载");
                 }
-                
+
                 //解压natives文件
                 await MirrorManager.GetCurrentMirror().Library.UnzipNatives(config.CurrentVersion);
 
