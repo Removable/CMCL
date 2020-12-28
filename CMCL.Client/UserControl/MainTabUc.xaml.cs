@@ -9,6 +9,7 @@ using CMCL.Client.Util;
 using CMCL.Client.Window;
 using HandyControl.Controls;
 using HandyControl.Data;
+using Newtonsoft.Json;
 
 namespace CMCL.Client.UserControl
 {
@@ -47,6 +48,7 @@ namespace CMCL.Client.UserControl
             var config = AppConfig.GetAppConfig();
             var baseDir = Path.Combine(config.MinecraftDir, ".minecraft");
             var btn = (Button) sender;
+            this.Dispatcher.BeginInvoke(new Action(() => { btn.IsEnabled = false; }));
             var loadingFrm = LoadingFrm.GetInstance("", System.Windows.Window.GetWindow(this));
 
             try
@@ -70,19 +72,18 @@ namespace CMCL.Client.UserControl
                 }
 
                 //清理Natives文件夹
-                loadingFrm.Show("正在清理缓存");
+                loadingFrm.Dispatcher.BeginInvoke(new Action(() => { loadingFrm.Show("正在清理缓存"); }));
                 if (!await GameHelper.CleanNativesDir())
                 {
                     throw new Exception("缓存清理失败");
                 }
 
-                var a = await MirrorManager.GetCurrentMirror().Library
-                    .GetLibrariesDownloadList(config.CurrentVersion, true);
-
-                loadingFrm.Show("正在校验文件");
+                loadingFrm.Dispatcher.BeginInvoke(new Action(() => { loadingFrm.Show("正在校验文件"); }));
                 //校验各文件
-                if (!File.Exists(Path.Combine(baseDir, "versions", $"{config.CurrentVersion}.json")) || //json文件
-                    !File.Exists(Path.Combine(baseDir, "versions", $"{config.CurrentVersion}.jar")) || //jar文件
+                if (!File.Exists(Path.Combine(baseDir, "versions", config.CurrentVersion,
+                        $"{config.CurrentVersion}.json")) || //json文件
+                    !File.Exists(Path.Combine(baseDir, "versions", config.CurrentVersion,
+                        $"{config.CurrentVersion}.jar")) || //jar文件
                     (await MirrorManager.GetCurrentMirror().Library
                         .GetLibrariesDownloadList(config.CurrentVersion, true).ConfigureAwait(false)).Any() || //库文件
                     (await MirrorManager.GetCurrentMirror().Asset.GetAssetsDownloadList(config.CurrentVersion, true)
@@ -90,17 +91,16 @@ namespace CMCL.Client.UserControl
                 {
                     throw new Exception("游戏文件缺失，请尝试重新下载");
                 }
+                
+                //解压natives文件
+                await MirrorManager.GetCurrentMirror().Library.UnzipNatives(config.CurrentVersion);
 
                 #endregion
 
                 //登录
-                loadingFrm.Show("正在登录");
-                btn.IsEnabled = false;
+                loadingFrm.Dispatcher.BeginInvoke(new Action(() => { loadingFrm.Show("正在登录"); }));
                 var result = await MojangLogin.Login(config.Account, config.Password);
-                if (result.IsSuccess)
-                {
-                    loadingFrm.Hide();
-                }
+                Console.WriteLine(JsonConvert.SerializeObject(result));
             }
             catch (Exception exception)
             {
@@ -109,8 +109,8 @@ namespace CMCL.Client.UserControl
             }
             finally
             {
-                btn.IsEnabled = true;
-                loadingFrm.Hide();
+                this.Dispatcher.BeginInvoke(new Action(() => { btn.IsEnabled = true; }));
+                loadingFrm.Dispatcher.BeginInvoke(new Action(() => { loadingFrm.Hide(); }));
             }
         }
     }

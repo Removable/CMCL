@@ -148,5 +148,10 @@ namespace CMCL.Client.Download.Mirrors.Interface
 
             return originServers.Aggregate(originUrl, (current, originServer) => current.Replace(originServer, server));
         }
+
+        public async ValueTask UnzipNatives(string versionId)
+        {
+            var nativesList = GameHelper.GetVersionInfo(versionId).Libraries.Where(i => i.IsNative && i.ShouldDeployOnOs()).ToList();
+        }
     }
 }

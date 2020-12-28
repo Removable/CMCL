@@ -55,14 +55,13 @@ namespace CMCL.Client.GameVersion.JsonClasses
 
         public bool ShouldDeployOnOs(string os = "windows", string version = null)
         {
-            if (Rules == null) return true;
-            var disallow = _rule["disallow"];
-            var allow = _rule["allow"];
-            //有允许无禁止时，找有无符合条件的系统
-            if (!disallow.Any() && allow.Any())
-                return allow.Any(osInfo => osInfo.Name == os && (osInfo.Version == null || Regex.IsMatch(Environment.OSVersion.Version.ToString(), osInfo.Version)));
-            //无禁止或有禁止但无符合条件的系统
-            return !disallow.Any(osInfo => osInfo.Name == os && (osInfo.Version == null || Regex.IsMatch(Environment.OSVersion.Version.ToString(), osInfo.Version)));
+            switch (os.ToLower())
+            {
+                case "windows":
+                    return Natives != null && !string.IsNullOrWhiteSpace(Natives.Windows);
+                default:
+                    return false;
+            }
         }
 
         public async ValueTask<bool> IsValidLibrary(string libraryPath)
