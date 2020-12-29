@@ -114,5 +114,14 @@ namespace CMCL.Client.Util
                 return IOHelper.CombineAndCheckDirectory(Environment.CurrentDirectory, "Temp");
             return Path.Combine(Environment.CurrentDirectory, "Temp");
         }
+
+        public static async ValueTask ApplicationInit()
+        {
+            //初始化配置
+            await AppConfig.InitConfig().ConfigureAwait(false);
+                
+            //获取所有Version的json
+            await LoadVersionInfoList();
+        }
     }
 }

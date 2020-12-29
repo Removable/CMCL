@@ -27,10 +27,7 @@ namespace CMCL.Client
         {
             try
             {
-                await AppConfig.InitConfig().ConfigureAwait(false);
-                
-                //获取所有Version的json
-                await GameHelper.LoadVersionInfoList();
+                await GameHelper.ApplicationInit();
 
                 //配置全局服务容器
                 var serviceCollection = new ServiceCollection();

@@ -92,7 +92,9 @@ namespace CMCL.Client.UserControl
                 {
                     Account = TbAccount.Text,
                     Password = TbPassword.Password,
-                    CurrentVersion = ComboSelectedVersion.Text,
+                    CurrentVersion = string.IsNullOrWhiteSpace(ComboSelectedVersion.Text)
+                        ? AppConfig.GetAppConfig().CurrentVersion
+                        : ComboSelectedVersion.Text,
                     CustomJavaPath = TbJavaPath.Text,
                     MinecraftDir = TbMinecraftDir.Text,
                     UseDefaultGameDir = CbUseDefaultGameDir.IsChecked ?? false,
@@ -102,6 +104,9 @@ namespace CMCL.Client.UserControl
                 await AppConfig.SaveAppConfig(newConfig);
                 NotifyIcon.ShowBalloonTip("提示", "保存成功", NotifyIconInfoType.Info, "AppNotifyIcon");
                 IOHelper.CreateDirectoryIfNotExist(Path.Combine(newConfig.MinecraftDir, ".minecraft"));
+
+                await GameHelper.ApplicationInit();
+                InitSettingsControls();
             }
             catch (Exception exception)
             {
