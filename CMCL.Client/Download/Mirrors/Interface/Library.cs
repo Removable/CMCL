@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
@@ -92,9 +93,8 @@ namespace CMCL.Client.Download.Mirrors.Interface
             try
             {
                 var versionInfo = GameHelper.GetVersionInfo(versionId);
-                var hashSet = new HashSet<string>();
-                var libraries = versionInfo.Libraries.Select(i => hashSet.Add(i.Downloads.Artifact.Sha1) ? i : null)
-                    .Where(i => i != null && i.ShouldDeployOnOs()).ToList();
+                var libraries = versionInfo.Libraries.Where(i => i != null && i.ShouldDeployOnOs(Utils.GetOS()))
+                    .ToList();
 
                 var basePath = Path.Combine(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "libraries");
 
@@ -104,17 +104,32 @@ namespace CMCL.Client.Download.Mirrors.Interface
                 {
                     try
                     {
-                        var savePath = IOHelper.CombineAndCheckDirectory(true, basePath, l.Downloads.Artifact.Path);
-                        //转换地址
-                        var url = TransUrl(l.Downloads.Artifact.Url);
-
                         await semaphore.WaitAsync();
-                        if (checkBeforeDownload && File.Exists(savePath) && string.Equals(
-                            await IOHelper.GetSha1HashFromFileAsync(savePath).ConfigureAwait(false),
-                            l.Downloads.Artifact.Sha1, StringComparison.OrdinalIgnoreCase))
-                            return;
+                        if (!l.IsNative)
+                        {
+                            var savePath = IOHelper.CombineAndCheckDirectory(true, basePath, l.Downloads.Artifact.Path);
+                            //转换地址
+                            var url = TransUrl(l.Downloads.Artifact.Url);
+                            if (checkBeforeDownload && File.Exists(savePath) && string.Equals(
+                                await IOHelper.GetSha1HashFromFileAsync(savePath).ConfigureAwait(false),
+                                l.Downloads.Artifact.Sha1, StringComparison.OrdinalIgnoreCase))
+                                return;
 
-                        librariesToDownload.TryAdd(savePath, url);
+                            librariesToDownload.TryAdd(savePath, url);
+                        }
+                        else
+                        {
+                            var nativeInfo = l.GetNative(Utils.GetOS());
+                            var savePath = IOHelper.CombineAndCheckDirectory(true, basePath, nativeInfo.Path);
+                            //转换地址
+                            var url = TransUrl(nativeInfo.Url);
+                            if (checkBeforeDownload && File.Exists(savePath) && string.Equals(
+                                await IOHelper.GetSha1HashFromFileAsync(savePath).ConfigureAwait(false),
+                                nativeInfo.Sha1, StringComparison.OrdinalIgnoreCase))
+                                return;
+
+                            librariesToDownload.TryAdd(savePath, url);
+                        }
                     }
                     catch (Exception e)
                     {
@@ -151,7 +166,31 @@ namespace CMCL.Client.Download.Mirrors.Interface
 
         public async ValueTask UnzipNatives(string versionId)
         {
-            var nativesList = GameHelper.GetVersionInfo(versionId).Libraries.Where(i => i.IsNative && i.ShouldDeployOnOs()).ToList();
+            var nativesList = GameHelper.GetVersionInfo(versionId).Libraries
+                .Where(i => i.IsNative && i.ShouldDeployOnOs(Utils.GetOS())).ToList();
+
+            var nativesDir = GameHelper.GetNativesDir(versionId);
+
+            var taskArray = nativesList.Select(native => Task.Run(async () =>
+            {
+                var relativePath = native.GetNativePath();
+                var absolutePath = Path.Combine(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "libraries",
+                    relativePath);
+                if (!File.Exists(absolutePath))
+                    return;
+                await using var fileStream = File.OpenRead(absolutePath);
+                using var zip = new ZipArchive(fileStream);
+                foreach (var entry in zip.Entries)
+                {
+                    if (entry.FullName.Contains("META-INF/") || string.IsNullOrWhiteSpace(entry.Name)) continue;
+                    await using var stream = entry.Open();
+                    await using var f =
+                        File.Create(Path.Combine(nativesDir, entry.Name));
+                    await stream.CopyToAsync(f);
+                }
+            }));
+
+            await Task.WhenAll(taskArray);
         }
     }
 }

@@ -53,11 +53,11 @@ namespace CMCL.Client.GameVersion.JsonClasses
             return Downloads.Artifact != null;
         }
 
-        public bool ShouldDeployOnOs(string os = "windows", string version = null)
+        public bool ShouldDeployOnOs(SupportedOS os = SupportedOS.Windows, string version = null)
         {
-            switch (os.ToLower())
+            switch (os)
             {
-                case "windows":
+                case SupportedOS.Windows:
                     return Natives != null && !string.IsNullOrWhiteSpace(Natives.Windows);
                 default:
                     return false;
@@ -80,14 +80,15 @@ namespace CMCL.Client.GameVersion.JsonClasses
 
         public async ValueTask<bool> IsValidNative(string libraryPath)
         {
+            var os = Utils.GetOS();
             var path = IOHelper.CombineAndCheckDirectory(libraryPath, GetNativePath());
 
             var fileInfo = new FileInfo(path);
-            if (GetNative().Size == 0 || GetNative().Sha1 == null)
+            if (GetNative(os).Size == 0 || GetNative(os).Sha1 == null)
                 return fileInfo.Exists && fileInfo.Length > 0;
             return fileInfo.Exists
-                   && fileInfo.Length == GetNative().Size
-                   && await IOHelper.GetSha1HashFromFileAsync(path) == GetNative().Sha1;
+                   && fileInfo.Length == GetNative(os).Size
+                   && await IOHelper.GetSha1HashFromFileAsync(path) == GetNative(os).Sha1;
         }
 
         public string GetLibraryPath()
@@ -132,13 +133,22 @@ namespace CMCL.Client.GameVersion.JsonClasses
             return Downloads?.Artifact;
         }
 
-        public Download.ArtifactInfo GetNative()
+        public Download.ArtifactInfo GetNative(SupportedOS os)
         {
             Download.ArtifactInfo path = null;
             if (Downloads?.Classifiers != null)
-                path = (Environment.Is64BitOperatingSystem
-                    ? Downloads.Classifiers.Windowsx64
-                    : Downloads.Classifiers.Windowsx32) ?? Downloads.Classifiers.Windows;
+            {
+                path = os switch
+                {
+                    SupportedOS.Windows => (Environment.Is64BitOperatingSystem
+                        ? Downloads.Classifiers.Windowsx64
+                        : Downloads.Classifiers.Windowsx32) ?? Downloads.Classifiers.Windows,
+                    SupportedOS.Osx => Downloads.Classifiers.OSX,
+                    SupportedOS.Unix => Downloads.Classifiers.Linux,
+                    _ => Downloads.Classifiers.Windows
+                };
+            }
+
             if (path != null) return path;
             path = new Download.ArtifactInfo
             {

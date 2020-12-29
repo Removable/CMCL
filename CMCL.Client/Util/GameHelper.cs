@@ -66,6 +66,8 @@ namespace CMCL.Client.Util
             return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         }
 
+        public static string NativesDirName = $"natives-$versionId-{Guid.NewGuid():N}";
+
         /// <summary>
         /// 返回natives文件夹地址
         /// </summary>
@@ -73,7 +75,8 @@ namespace CMCL.Client.Util
         /// <returns></returns>
         public static string GetNativesDir(string versionId)
         {
-            return IOHelper.CombineAndCheckDirectory(GetCmclCacheDir(), $"natives-{versionId}-{Guid.NewGuid():N}");
+            return IOHelper.CombineAndCheckDirectory(false, GetCmclCacheDir(true),
+                NativesDirName.Replace("$versionId", versionId));
         }
 
         /// <summary>
@@ -119,7 +122,7 @@ namespace CMCL.Client.Util
         {
             //初始化配置
             await AppConfig.InitConfig().ConfigureAwait(false);
-                
+
             //获取所有Version的json
             await LoadVersionInfoList();
         }

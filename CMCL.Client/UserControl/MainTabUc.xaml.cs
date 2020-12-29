@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using CMCL.Client.Download.Mirrors;
@@ -54,7 +55,6 @@ namespace CMCL.Client.UserControl
             try
             {
                 #region 检查启动必要条件
-                //TODO 配置界面从空文件夹转到有游戏文件的文件夹时，版本下拉框应当重载
 
                 if (GameHelper.GetVersionInfo(config.CurrentVersion) == null)
                     throw new Exception("选择的版本不存在，请重新下载");
@@ -98,6 +98,10 @@ namespace CMCL.Client.UserControl
 
                 //解压natives文件
                 await MirrorManager.GetCurrentMirror().Library.UnzipNatives(config.CurrentVersion);
+                
+                //拼接启动参数
+                var argument = new StringBuilder();
+                
 
                 #endregion
 

@@ -76,6 +76,25 @@ namespace CMCL.Client.Util
                 return string.Empty;
             }
         }
+
+        /// <summary>
+        /// 获取当前操作系统
+        /// </summary>
+        /// <returns></returns>
+        public static SupportedOS GetOS()
+        {
+            switch (Environment.OSVersion.Platform)
+            {
+                case PlatformID.Win32NT:
+                    return SupportedOS.Windows;
+                case PlatformID.Unix:
+                    return SupportedOS.Unix;
+                case PlatformID.MacOSX:
+                    return SupportedOS.Osx;
+                default:
+                    return SupportedOS.Other;
+            }
+        }
     }
 
     /// <summary>
@@ -97,5 +116,16 @@ namespace CMCL.Client.Util
         /// 隐藏
         /// </summary>
         Hide,
+    }
+
+    /// <summary>
+    /// 受支持的操作系统
+    /// </summary>
+    public enum SupportedOS
+    {
+        Windows,
+        Unix,
+        Osx,
+        Other,
     }
 }

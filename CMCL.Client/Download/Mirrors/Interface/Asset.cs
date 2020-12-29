@@ -104,32 +104,31 @@ namespace CMCL.Client.Download.Mirrors.Interface
             var basePath = Path.Combine(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "assets", "objects");
             var assetsToDownload = new ConcurrentDictionary<string, string>();
 
-            var hashSet = new HashSet<string>();
             var sem = new SemaphoreSlim(AppConfig.GetAppConfig().MaxThreadCount);
-            var taskArray = assetsIndex.Select(i => hashSet.Add(i.Hash) ? i : null).Where(i => i != null).Select(
-                assetInfo => Task.Run(async () =>
+            var taskArray = assetsIndex.Select(assetInfo => Task.Run(async () =>
+            {
+                var savePath = IOHelper.CombineAndCheckDirectory(true, basePath, assetInfo.SavePath);
+                //转换地址
+                var url = TransUrl(assetInfo.DownloadUrl);
+                try
                 {
-                    var savePath = IOHelper.CombineAndCheckDirectory(true, basePath, assetInfo.SavePath);
-                    //转换地址
-                    var url = TransUrl(assetInfo.DownloadUrl);
-                    try
+                    if (!assetsToDownload.TryAdd(savePath, url))
+                        return;
+                    
+                    //校验sha1
+                    await sem.WaitAsync();
+                    if (checkBeforeDownload && File.Exists(savePath) && string.Equals(
+                        await IOHelper.GetSha1HashFromFileAsync(savePath), assetInfo.Hash,
+                        StringComparison.OrdinalIgnoreCase))
                     {
-                        //校验sha1
-                        await sem.WaitAsync();
-                        if (checkBeforeDownload && File.Exists(savePath) && string.Equals(
-                            await IOHelper.GetSha1HashFromFileAsync(savePath), assetInfo.Hash,
-                            StringComparison.OrdinalIgnoreCase))
-                        {
-                            return;
-                        }
-
-                        assetsToDownload.TryAdd(savePath, url);
+                        assetsToDownload.Remove(savePath, out var s);
                     }
-                    finally
-                    {
-                        sem.Release();
-                    }
-                }));
+                }
+                finally
+                {
+                    sem.Release();
+                }
+            }));
 
             await Task.WhenAll(taskArray);
 
