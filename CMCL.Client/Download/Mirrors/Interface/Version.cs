@@ -118,5 +118,15 @@ namespace CMCL.Client.Download.Mirrors.Interface
 
             return originServers.Aggregate(originUrl, (current, originServer) => current.Replace(originServer, server));
         }
+
+        public virtual string GetStartArgument(string versionId)
+        {
+            var versionInfo = GameHelper.GetVersionInfo(versionId);
+
+            foreach (var argument in versionInfo.Arguments.Jvm)
+            {
+                var str = argument.ToString();
+            }
+        }
     }
 }
