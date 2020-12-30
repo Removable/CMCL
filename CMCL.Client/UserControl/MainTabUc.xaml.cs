@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -110,6 +111,38 @@ namespace CMCL.Client.UserControl
                 //拼接启动参数
                 var versionInfo = GameHelper.GetVersionInfo(config.CurrentVersion);
                 var argument = await mirror.Version.GetStartArgument(versionInfo, loginResult);
+                var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo(config.CustomJavaPath, argument)
+                    {
+                        RedirectStandardError = true,
+                        RedirectStandardOutput = true,
+                        RedirectStandardInput = true,
+                        CreateNoWindow = true,
+                        UseShellExecute = false,
+                        WorkingDirectory = Path.Combine(config.MinecraftDir, ".minecraft"),
+                    },
+                    EnableRaisingEvents = true
+                };
+
+                process.Exited += (sender, args) =>
+                {
+                    Console.WriteLine(JsonConvert.SerializeObject(sender));
+                    Console.WriteLine(JsonConvert.SerializeObject(args));
+                };
+                process.OutputDataReceived += (sender, args) =>
+                {
+                    Console.WriteLine(JsonConvert.SerializeObject(sender));
+                    Console.WriteLine(JsonConvert.SerializeObject(args));
+                };
+                process.ErrorDataReceived += (sender, args) =>
+                {
+                    Console.WriteLine(JsonConvert.SerializeObject(sender));
+                    Console.WriteLine(JsonConvert.SerializeObject(args));
+                };
+                process.Start();
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
             }
             catch (Exception exception)
             {

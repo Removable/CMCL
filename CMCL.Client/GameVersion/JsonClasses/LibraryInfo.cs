@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CMCL.Client.Util;
+using ComponentUtil.Common.Data;
 using Newtonsoft.Json;
 
 namespace CMCL.Client.GameVersion.JsonClasses
@@ -55,13 +56,14 @@ namespace CMCL.Client.GameVersion.JsonClasses
 
         public bool ShouldDeployOnOs(SupportedOS os = SupportedOS.Windows, string version = null)
         {
-            switch (os)
-            {
-                case SupportedOS.Windows:
-                    return Natives != null && !string.IsNullOrWhiteSpace(Natives.Windows);
-                default:
-                    return false;
-            }
+            if (Rules == null) return true;
+            var disallow = _rule["disallow"];
+            var allow = _rule["allow"];
+            //有允许无禁止时，找有无符合条件的系统
+            if (!disallow.Any() && allow.Any())
+                return allow.Any(osInfo => osInfo.Name == os.GetDescription() && (osInfo.Version == null || Regex.IsMatch(Environment.OSVersion.Version.ToString(), osInfo.Version)));
+            //无禁止或有禁止但无符合条件的系统
+            return !disallow.Any(osInfo => osInfo.Name == os.GetDescription() && (osInfo.Version == null || Regex.IsMatch(Environment.OSVersion.Version.ToString(), osInfo.Version)));
         }
 
         public async ValueTask<bool> IsValidLibrary(string libraryPath)

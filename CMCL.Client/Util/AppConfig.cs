@@ -149,5 +149,10 @@ namespace CMCL.Client.Util
                 return Download.DownloadSource.MCBBS;
             }
         }
+
+        /// <summary>
+        /// 最大分配内存大小(M)
+        /// </summary>
+        public int Xmx { get; set; } = 4096;
     }
 }

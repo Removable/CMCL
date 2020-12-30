@@ -125,7 +125,8 @@ namespace CMCL.Client.Download.Mirrors.Interface
         public virtual async ValueTask<string> GetStartArgument(VersionInfo versionInfo, LoginResult loginInfo)
         {
             var config = AppConfig.GetAppConfig();
-            var argResult = new StringBuilder(config.CustomJavaPath);
+            // var argResult = new StringBuilder($"\"{config.CustomJavaPath}\"");
+            var argResult = new StringBuilder();
 
             foreach (var argStr in versionInfo.Arguments.Jvm)
             {
@@ -139,9 +140,13 @@ namespace CMCL.Client.Download.Mirrors.Interface
                     {
                         if (rule.Action.Equals("allow"))
                         {
-                            if ((string.IsNullOrWhiteSpace(rule.OS.Name) || rule.OS.Name.Equals(Utils.GetOS().GetDescription(), StringComparison.OrdinalIgnoreCase)) 
-                                && (string.IsNullOrWhiteSpace(rule.OS.Arch) || rule.OS.Arch.Equals(RuntimeInformation.OSArchitecture.ToString(), StringComparison.OrdinalIgnoreCase)) 
-                                && (string.IsNullOrWhiteSpace(rule.OS.Version) || Regex.IsMatch(Environment.OSVersion.Version.ToString(), rule.OS.Version)))
+                            if ((string.IsNullOrWhiteSpace(rule.OS.Name) ||
+                                 rule.OS.Name.Equals(Utils.GetOS().GetDescription(),
+                                     StringComparison.OrdinalIgnoreCase))
+                                && (string.IsNullOrWhiteSpace(rule.OS.Arch) || rule.OS.Arch.Equals(
+                                    RuntimeInformation.OSArchitecture.ToString(), StringComparison.OrdinalIgnoreCase))
+                                && (string.IsNullOrWhiteSpace(rule.OS.Version) ||
+                                    Regex.IsMatch(Environment.OSVersion.Version.ToString(), rule.OS.Version)))
                             {
                                 if (valueStr.StartsWith("["))
                                 {
@@ -161,9 +166,14 @@ namespace CMCL.Client.Download.Mirrors.Interface
 
                         if (rule.Action.Equals("disallow"))
                         {
-                            if ((string.IsNullOrWhiteSpace(rule.OS.Name) || !rule.OS.Name.Equals(Utils.GetOS().GetDescription(), StringComparison.OrdinalIgnoreCase)) 
-                                && (string.IsNullOrWhiteSpace(rule.OS.Arch) || !rule.OS.Arch.Equals(RuntimeInformation.OSArchitecture.ToString(), StringComparison.OrdinalIgnoreCase)) 
-                                && (string.IsNullOrWhiteSpace(rule.OS.Version) || !Regex.IsMatch(Environment.OSVersion.Version.ToString(), rule.OS.Version)))
+                            if ((string.IsNullOrWhiteSpace(rule.OS.Name) ||
+                                 !rule.OS.Name.Equals(Utils.GetOS().GetDescription(),
+                                     StringComparison.OrdinalIgnoreCase))
+                                && (string.IsNullOrWhiteSpace(rule.OS.Arch) ||
+                                    !rule.OS.Arch.Equals(RuntimeInformation.OSArchitecture.ToString(),
+                                        StringComparison.OrdinalIgnoreCase))
+                                && (string.IsNullOrWhiteSpace(rule.OS.Version) ||
+                                    !Regex.IsMatch(Environment.OSVersion.Version.ToString(), rule.OS.Version)))
                             {
                                 if (valueStr.StartsWith("["))
                                 {
@@ -188,8 +198,21 @@ namespace CMCL.Client.Download.Mirrors.Interface
                 }
             }
 
-            argResult.Append($" {versionInfo.MainClass}");
+            foreach (var argStr in versionInfo.Arguments.Game)
+            {
+                if (argStr!.ToString()!.Contains("\"rules\":"))
+                {
+                    continue;
+                }
+                else
+                {
+                    argResult.Append($" \"{await ReplaceArg(argStr.ToString())}\"");
+                }
+            }
 
+            argResult.Append(
+                $" -Xmx{config.Xmx.ToString()}M -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M");
+            
             return argResult.ToString();
 
             async Task<string> ReplaceArg(string argStr)
@@ -215,7 +238,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
                     case "${version_type}":
                         return versionInfo.Type;
                     case "-Djava.library.path=${natives_directory}":
-                        return argStr.Replace("${natives_directory}", GameHelper.GetNativesDir(versionInfo.Id));
+                        return $"\"{argStr.Replace("${natives_directory}", GameHelper.GetNativesDir(versionInfo.Id))}\"";
                     case "-Dminecraft.launcher.brand=${launcher_name}":
                         return argStr.Replace("${launcher_name}", "CMCL");
                     case "-Dminecraft.launcher.version=${launcher_version}":
@@ -225,7 +248,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
                     {
                         var sb = new StringBuilder();
                         var libraries = await MirrorManager.GetCurrentMirror().Library
-                            .GetLibrariesDownloadList(versionInfo.Id, false, true).ConfigureAwait(false);
+                            .GetLibrariesDownloadList(versionInfo.Id, false, false).ConfigureAwait(false);
                         var delimiter = Utils.GetOS() switch
                         {
                             SupportedOS.Windows => ";",
@@ -239,10 +262,10 @@ namespace CMCL.Client.Download.Mirrors.Interface
 
                         sb.Append(Path.Combine(config.MinecraftDir, ".minecraft", "versions", versionInfo.Id,
                             $"{versionInfo.Id}.jar"));
-                        return sb.ToString();
+                        return $"\"{sb.ToString()}\" {versionInfo.MainClass}";
                     }
                     default:
-                        return string.Empty;
+                        return argStr;
                 }
             }
         }
