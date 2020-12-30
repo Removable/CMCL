@@ -56,4 +56,22 @@ namespace CMCL.Client.GameVersion.JsonClasses
             [JsonProperty("jvm")] public object[] Jvm;
         }
     }
+
+    public class ArgumentsEntity
+    {
+        [JsonProperty("rules")] public ArgumentRule[] Rules;
+        [JsonProperty("value")] public object Value;
+    }
+    public class ArgumentRule
+    {
+        [JsonProperty("action")] public string Action;
+        [JsonProperty("os")] public ArgumentOS OS;
+    }
+
+    public class ArgumentOS
+    {
+        [JsonProperty("name")] public string Name;
+        [JsonProperty("version")] public string Version;
+        [JsonProperty("arch")] public string Arch;
+    }
 }

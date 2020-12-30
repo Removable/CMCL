@@ -83,32 +83,33 @@ namespace CMCL.Client.UserControl
                 }
 
                 loadingFrm.Dispatcher.BeginInvoke(new Action(() => { loadingFrm.Show("正在校验文件"); }));
+                var mirror = MirrorManager.GetCurrentMirror();
                 //校验各文件
                 if (!File.Exists(Path.Combine(baseDir, "versions", config.CurrentVersion,
                         $"{config.CurrentVersion}.json")) || //json文件
                     !File.Exists(Path.Combine(baseDir, "versions", config.CurrentVersion,
                         $"{config.CurrentVersion}.jar")) || //jar文件
-                    (await MirrorManager.GetCurrentMirror().Library
+                    (await mirror.Library
                         .GetLibrariesDownloadList(config.CurrentVersion, true).ConfigureAwait(false)).Any() || //库文件
-                    (await MirrorManager.GetCurrentMirror().Asset.GetAssetsDownloadList(config.CurrentVersion, true)
+                    (await mirror.Asset.GetAssetsDownloadList(config.CurrentVersion, true)
                         .ConfigureAwait(false)).Any()) //资源文件
                 {
                     throw new Exception("游戏文件缺失，请尝试重新下载");
                 }
 
                 //解压natives文件
-                await MirrorManager.GetCurrentMirror().Library.UnzipNatives(config.CurrentVersion);
-                
-                //拼接启动参数
-                var argument = new StringBuilder();
-                
+                await mirror.Library.UnzipNatives(config.CurrentVersion);
 
                 #endregion
 
                 //登录
                 loadingFrm.Dispatcher.BeginInvoke(new Action(() => { loadingFrm.Show("正在登录"); }));
-                var result = await MojangLogin.Login(config.Account, config.Password);
-                Console.WriteLine(JsonConvert.SerializeObject(result));
+                var loginResult = await MojangLogin.Login(config.Account, config.Password);
+                Console.WriteLine(JsonConvert.SerializeObject(loginResult));
+
+                //拼接启动参数
+                var versionInfo = GameHelper.GetVersionInfo(config.CurrentVersion);
+                var argument = await mirror.Version.GetStartArgument(versionInfo, loginResult);
             }
             catch (Exception exception)
             {

@@ -53,7 +53,7 @@ namespace CMCL.Client.Util
             else
                 CreateDirectoryIfNotExist(newPath);
 
-            return newPath.Replace(@"\", @"/");
+            return newPath.Replace(@"/", @"\");
         }
 
         /// <summary>

@@ -86,9 +86,10 @@ namespace CMCL.Client.Download.Mirrors.Interface
         /// </summary>
         /// <param name="versionId">版本</param>
         /// <param name="checkBeforeDownload">下载前校验文件sha1，如正确则不重复下载</param>
+        /// <param name="containsNative">是否包含native库文件</param>
         /// <returns></returns>
         public virtual async ValueTask<List<(string savePath, string downloadUrl)>> GetLibrariesDownloadList(
-            string versionId, bool checkBeforeDownload = false)
+            string versionId, bool checkBeforeDownload = false, bool containsNative = true)
         {
             try
             {
@@ -117,7 +118,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
 
                             librariesToDownload.TryAdd(savePath, url);
                         }
-                        else
+                        else if (containsNative)
                         {
                             var nativeInfo = l.GetNative(Utils.GetOS());
                             var savePath = IOHelper.CombineAndCheckDirectory(true, basePath, nativeInfo.Path);
@@ -164,6 +165,11 @@ namespace CMCL.Client.Download.Mirrors.Interface
             return originServers.Aggregate(originUrl, (current, originServer) => current.Replace(originServer, server));
         }
 
+        /// <summary>
+        /// 解压native库文件
+        /// </summary>
+        /// <param name="versionId"></param>
+        /// <returns></returns>
         public async ValueTask UnzipNatives(string versionId)
         {
             var nativesList = GameHelper.GetVersionInfo(versionId).Libraries

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using Microsoft.Win32;
 
@@ -123,9 +124,13 @@ namespace CMCL.Client.Util
     /// </summary>
     public enum SupportedOS
     {
+        [Description("windows")]
         Windows,
+        [Description("linux")]
         Unix,
+        [Description("osx")]
         Osx,
+        [Description("other")]
         Other,
     }
 }

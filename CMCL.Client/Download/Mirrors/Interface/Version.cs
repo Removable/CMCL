@@ -2,11 +2,17 @@
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using CMCL.Client.Game;
+using CMCL.Client.GameVersion.JsonClasses;
+using CMCL.Client.LoginPlugin;
 using CMCL.Client.Util;
 using CMCL.Client.Window;
+using ComponentUtil.Common.Data;
 using Newtonsoft.Json;
 
 namespace CMCL.Client.Download.Mirrors.Interface
@@ -55,13 +61,10 @@ namespace CMCL.Client.Download.Mirrors.Interface
             }
             finally
             {
-                downloadFrm.Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    downloadFrm.Close();
-                }));
+                downloadFrm.Dispatcher.BeginInvoke(new Action(() => { downloadFrm.Close(); }));
             }
         }
-        
+
         /// <summary>
         ///     下载版本json
         /// </summary>
@@ -119,13 +122,128 @@ namespace CMCL.Client.Download.Mirrors.Interface
             return originServers.Aggregate(originUrl, (current, originServer) => current.Replace(originServer, server));
         }
 
-        public virtual string GetStartArgument(string versionId)
+        public virtual async ValueTask<string> GetStartArgument(VersionInfo versionInfo, LoginResult loginInfo)
         {
-            var versionInfo = GameHelper.GetVersionInfo(versionId);
+            var config = AppConfig.GetAppConfig();
+            var argResult = new StringBuilder(config.CustomJavaPath);
 
-            foreach (var argument in versionInfo.Arguments.Jvm)
+            foreach (var argStr in versionInfo.Arguments.Jvm)
             {
-                var str = argument.ToString();
+                if (argStr!.ToString()!.Contains("\"rules\":"))
+                {
+                    var argument = JsonConvert.DeserializeObject<ArgumentsEntity>(argStr.ToString() ?? string.Empty);
+                    if (argument?.Rules == null || !argument.Rules.Any()) continue;
+                    var valueStr = argument.Value?.ToString();
+                    if (string.IsNullOrWhiteSpace(valueStr)) continue;
+                    foreach (var rule in argument.Rules)
+                    {
+                        if (rule.Action.Equals("allow"))
+                        {
+                            if ((string.IsNullOrWhiteSpace(rule.OS.Name) || rule.OS.Name.Equals(Utils.GetOS().GetDescription(), StringComparison.OrdinalIgnoreCase)) 
+                                && (string.IsNullOrWhiteSpace(rule.OS.Arch) || rule.OS.Arch.Equals(RuntimeInformation.OSArchitecture.ToString(), StringComparison.OrdinalIgnoreCase)) 
+                                && (string.IsNullOrWhiteSpace(rule.OS.Version) || Regex.IsMatch(Environment.OSVersion.Version.ToString(), rule.OS.Version)))
+                            {
+                                if (valueStr.StartsWith("["))
+                                {
+                                    var args = Regex.Matches(valueStr, "\\\".+\\\"");
+                                    foreach (Match m in args)
+                                    {
+                                        var s = m.Value.Contains(" ") ? m.Value : m.Value.Trim('\"');
+                                        argResult.Append($" {s}");
+                                    }
+                                }
+                                else
+                                {
+                                    argResult.Append($" {argument.Value}");
+                                }
+                            }
+                        }
+
+                        if (rule.Action.Equals("disallow"))
+                        {
+                            if ((string.IsNullOrWhiteSpace(rule.OS.Name) || !rule.OS.Name.Equals(Utils.GetOS().GetDescription(), StringComparison.OrdinalIgnoreCase)) 
+                                && (string.IsNullOrWhiteSpace(rule.OS.Arch) || !rule.OS.Arch.Equals(RuntimeInformation.OSArchitecture.ToString(), StringComparison.OrdinalIgnoreCase)) 
+                                && (string.IsNullOrWhiteSpace(rule.OS.Version) || !Regex.IsMatch(Environment.OSVersion.Version.ToString(), rule.OS.Version)))
+                            {
+                                if (valueStr.StartsWith("["))
+                                {
+                                    var args = Regex.Matches(valueStr, "\\\"\\S+\\\"");
+                                    foreach (Match m in args)
+                                    {
+                                        var s = m.Value.Contains(" ") ? m.Value : m.Value.Trim('\"');
+                                        argResult.Append($" {s}");
+                                    }
+                                }
+                                else
+                                {
+                                    argResult.Append($" {argument.Value}");
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    argResult.Append($" {await ReplaceArg(argStr.ToString())}");
+                }
+            }
+
+            argResult.Append($" {versionInfo.MainClass}");
+
+            return argResult.ToString();
+
+            async Task<string> ReplaceArg(string argStr)
+            {
+                switch (argStr)
+                {
+                    case "${auth_player_name}":
+                        return loginInfo.Username;
+                    case "${version_name}":
+                        return versionInfo.Id;
+                    case "${game_directory}":
+                        return Path.Combine(config.MinecraftDir, ".minecraft");
+                    case "${assets_root}":
+                        return Path.Combine(config.MinecraftDir, ".minecraft", "assets");
+                    case "${assets_index_name}":
+                        return versionInfo.Assets;
+                    case "${auth_uuid}":
+                        return loginInfo.AuthUuid;
+                    case "${auth_access_token}":
+                        return loginInfo.AuthAccessToken;
+                    case "${user_type}":
+                        return "Legacy";
+                    case "${version_type}":
+                        return versionInfo.Type;
+                    case "-Djava.library.path=${natives_directory}":
+                        return argStr.Replace("${natives_directory}", GameHelper.GetNativesDir(versionInfo.Id));
+                    case "-Dminecraft.launcher.brand=${launcher_name}":
+                        return argStr.Replace("${launcher_name}", "CMCL");
+                    case "-Dminecraft.launcher.version=${launcher_version}":
+                        return argStr.Replace("${launcher_version}",
+                            System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString());
+                    case "${classpath}":
+                    {
+                        var sb = new StringBuilder();
+                        var libraries = await MirrorManager.GetCurrentMirror().Library
+                            .GetLibrariesDownloadList(versionInfo.Id, false, true).ConfigureAwait(false);
+                        var delimiter = Utils.GetOS() switch
+                        {
+                            SupportedOS.Windows => ";",
+                            _ => ":"
+                        };
+                        foreach (var libraryInfo in libraries)
+                        {
+                            sb.Append(libraryInfo.savePath);
+                            sb.Append(delimiter);
+                        }
+
+                        sb.Append(Path.Combine(config.MinecraftDir, ".minecraft", "versions", versionInfo.Id,
+                            $"{versionInfo.Id}.jar"));
+                        return sb.ToString();
+                    }
+                    default:
+                        return string.Empty;
+                }
             }
         }
     }
