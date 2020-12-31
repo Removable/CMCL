@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 using Microsoft.Win32;
 
 namespace CMCL.Client.Util
@@ -79,7 +78,7 @@ namespace CMCL.Client.Util
         }
 
         /// <summary>
-        /// 获取当前操作系统
+        ///     获取当前操作系统
         /// </summary>
         /// <returns></returns>
         public static SupportedOS GetOS()
@@ -99,38 +98,34 @@ namespace CMCL.Client.Util
     }
 
     /// <summary>
-    /// 窗口消失的处理方法
+    ///     窗口消失的处理方法
     /// </summary>
     public enum WindowDisappear
     {
         /// <summary>
-        /// 无处理
+        ///     无处理
         /// </summary>
         None,
 
         /// <summary>
-        /// 关闭
+        ///     关闭
         /// </summary>
         Close,
 
         /// <summary>
-        /// 隐藏
+        ///     隐藏
         /// </summary>
-        Hide,
+        Hide
     }
 
     /// <summary>
-    /// 受支持的操作系统
+    ///     受支持的操作系统
     /// </summary>
     public enum SupportedOS
     {
-        [Description("windows")]
-        Windows,
-        [Description("linux")]
-        Unix,
-        [Description("osx")]
-        Osx,
-        [Description("other")]
-        Other,
+        [Description("windows")] Windows,
+        [Description("linux")] Unix,
+        [Description("osx")] Osx,
+        [Description("other")] Other
     }
 }

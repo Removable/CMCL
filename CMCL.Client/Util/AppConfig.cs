@@ -130,7 +130,7 @@ namespace CMCL.Client.Util
         public string DownloadSource { get; set; } = "MCBBS源";
 
         /// <summary>
-        /// 最大线程数（下载、校验文件等）
+        ///     最大线程数（下载、校验文件等）
         /// </summary>
         public int MaxThreadCount { get; set; } = 4;
 
@@ -151,7 +151,7 @@ namespace CMCL.Client.Util
         }
 
         /// <summary>
-        /// 最大分配内存大小(M)
+        ///     最大分配内存大小(M)
         /// </summary>
         public int Xmx { get; set; } = 4096;
     }

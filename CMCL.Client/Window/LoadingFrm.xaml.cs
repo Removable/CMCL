@@ -28,10 +28,7 @@ namespace CMCL.Client.Window
         public static LoadingFrm GetInstance(string loadingText, System.Windows.Window owner = null)
         {
             var frm = _loadingFrm ??= new LoadingFrm();
-            if (owner != null && owner != _loadingFrm.Owner)
-            {
-                frm.Owner = owner;
-            }
+            if (owner != null && owner != _loadingFrm.Owner) frm.Owner = owner;
 
             frm.LoadingControl.LoadingTip = string.IsNullOrWhiteSpace(loadingText) ? "正在加载" : loadingText;
             return frm;
@@ -71,7 +68,7 @@ namespace CMCL.Client.Window
                     break;
             }
         }
-        
+
         public void Show(string tip = "正在加载")
         {
             LoadingControl.LoadingTip = tip;

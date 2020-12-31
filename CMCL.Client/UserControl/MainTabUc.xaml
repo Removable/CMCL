@@ -16,6 +16,6 @@
                    Cursor="Hand" FontSize="16" Style="{StaticResource TextBlockDefaultPrimary}" VerticalAlignment="Top"
                    Width="780" Grid.Row="0" />
         <Button Style="{StaticResource ButtonPrimary}" Content="开始游戏" Margin="0,40,0,0" Grid.Row="1"
-                VerticalAlignment="Top" Height="50" Width="150" Click="StartGameBtnClick" IsEnabled="True"/>
+                VerticalAlignment="Top" Height="50" Width="150" Click="StartGameBtnClick" IsEnabled="True" />
     </Grid>
 </UserControl>

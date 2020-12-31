@@ -1,7 +1,3 @@
-using System;
-using System.IO;
-using CMCL.Client.Util;
-
 namespace CMCL.Client.Download.Mirrors.Interface
 {
     public abstract class Mirror

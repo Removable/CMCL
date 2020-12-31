@@ -25,7 +25,7 @@ namespace CMCL.Client.Util
         }
 
         /// <summary>
-        /// 拼接地址，地址中的文件夹若不存在则创建
+        ///     拼接地址，地址中的文件夹若不存在则创建
         /// </summary>
         /// <param name="path"></param>
         public static string CombineAndCheckDirectory(params string[] path)
@@ -41,7 +41,7 @@ namespace CMCL.Client.Util
         }
 
         /// <summary>
-        /// 拼接地址，地址中的文件夹若不存在则创建
+        ///     拼接地址，地址中的文件夹若不存在则创建
         /// </summary>
         /// <param name="isFile">是否为文件</param>
         /// <param name="path"></param>

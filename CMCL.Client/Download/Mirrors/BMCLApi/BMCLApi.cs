@@ -1,5 +1,4 @@
 ﻿using CMCL.Client.Download.Mirrors.Interface;
-using CMCL.Client.Download.Mirrors.MCBBS;
 
 namespace CMCL.Client.Download.Mirrors.BMCLApi
 {

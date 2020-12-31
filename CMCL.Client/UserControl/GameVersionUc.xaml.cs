@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
@@ -9,7 +7,6 @@ using CMCL.Client.Download;
 using CMCL.Client.Download.Mirrors;
 using CMCL.Client.Game;
 using CMCL.Client.Util;
-using CMCL.Client.Window;
 using HandyControl.Controls;
 using HandyControl.Data;
 
@@ -128,6 +125,7 @@ namespace CMCL.Client.UserControl
             }
             catch (Exception exception)
             {
+                await LogHelper.WriteLogAsync(exception);
                 NotifyIcon.ShowBalloonTip("错误", "下载失败", NotifyIconInfoType.Error, "AppNotifyIcon");
             }
             finally

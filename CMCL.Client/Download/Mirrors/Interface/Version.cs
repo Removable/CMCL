@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -35,7 +36,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
         }
 
         /// <summary>
-        /// 下载版本json和jar，并显示下载进度
+        ///     下载版本json和jar，并显示下载进度
         /// </summary>
         /// <param name="versionId"></param>
         /// <returns></returns>
@@ -129,7 +130,6 @@ namespace CMCL.Client.Download.Mirrors.Interface
             var argResult = new StringBuilder();
 
             foreach (var argStr in versionInfo.Arguments.Jvm)
-            {
                 if (argStr!.ToString()!.Contains("\"rules\":"))
                 {
                     var argument = JsonConvert.DeserializeObject<ArgumentsEntity>(argStr.ToString() ?? string.Empty);
@@ -139,7 +139,6 @@ namespace CMCL.Client.Download.Mirrors.Interface
                     foreach (var rule in argument.Rules)
                     {
                         if (rule.Action.Equals("allow"))
-                        {
                             if ((string.IsNullOrWhiteSpace(rule.OS.Name) ||
                                  rule.OS.Name.Equals(Utils.GetOS().GetDescription(),
                                      StringComparison.OrdinalIgnoreCase))
@@ -162,10 +161,8 @@ namespace CMCL.Client.Download.Mirrors.Interface
                                     argResult.Append($" {argument.Value}");
                                 }
                             }
-                        }
 
                         if (rule.Action.Equals("disallow"))
-                        {
                             if ((string.IsNullOrWhiteSpace(rule.OS.Name) ||
                                  !rule.OS.Name.Equals(Utils.GetOS().GetDescription(),
                                      StringComparison.OrdinalIgnoreCase))
@@ -189,30 +186,22 @@ namespace CMCL.Client.Download.Mirrors.Interface
                                     argResult.Append($" {argument.Value}");
                                 }
                             }
-                        }
                     }
                 }
                 else
                 {
                     argResult.Append($" {await ReplaceArg(argStr.ToString())}");
                 }
-            }
 
             foreach (var argStr in versionInfo.Arguments.Game)
-            {
                 if (argStr!.ToString()!.Contains("\"rules\":"))
-                {
                     continue;
-                }
                 else
-                {
                     argResult.Append($" \"{await ReplaceArg(argStr.ToString())}\"");
-                }
-            }
 
             argResult.Append(
                 $" -Xmx{config.Xmx.ToString()}M -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M");
-            
+
             return argResult.ToString();
 
             async Task<string> ReplaceArg(string argStr)
@@ -238,12 +227,13 @@ namespace CMCL.Client.Download.Mirrors.Interface
                     case "${version_type}":
                         return versionInfo.Type;
                     case "-Djava.library.path=${natives_directory}":
-                        return $"\"{argStr.Replace("${natives_directory}", GameHelper.GetNativesDir(versionInfo.Id))}\"";
+                        return
+                            $"\"{argStr.Replace("${natives_directory}", GameHelper.GetNativesDir(versionInfo.Id))}\"";
                     case "-Dminecraft.launcher.brand=${launcher_name}":
                         return argStr.Replace("${launcher_name}", "CMCL");
                     case "-Dminecraft.launcher.version=${launcher_version}":
                         return argStr.Replace("${launcher_version}",
-                            System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString());
+                            Assembly.GetExecutingAssembly().GetName().Version?.ToString());
                     case "${classpath}":
                     {
                         var sb = new StringBuilder();
@@ -262,7 +252,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
 
                         sb.Append(Path.Combine(config.MinecraftDir, ".minecraft", "versions", versionInfo.Id,
                             $"{versionInfo.Id}.jar"));
-                        return $"\"{sb.ToString()}\" {versionInfo.MainClass}";
+                        return $"\"{sb}\" {versionInfo.MainClass}";
                     }
                     default:
                         return argStr;

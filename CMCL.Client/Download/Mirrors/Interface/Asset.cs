@@ -18,14 +18,14 @@ namespace CMCL.Client.Download.Mirrors.Interface
 {
     public abstract class Asset
     {
-        protected GameVersionManifest VersionManifest;
-        protected virtual string Server { get; } = "";
-
         protected readonly string AssetIndexJsonDir =
             IOHelper.CombineAndCheckDirectory(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "assets", "indexes");
 
+        protected GameVersionManifest VersionManifest;
+        protected virtual string Server { get; } = "";
+
         /// <summary>
-        /// 下载资源目录json文件
+        ///     下载资源目录json文件
         /// </summary>
         /// <param name="versionInfo"></param>
         /// <returns></returns>
@@ -43,15 +43,13 @@ namespace CMCL.Client.Download.Mirrors.Interface
             if (!File.Exists(savePath) ||
                 !string.Equals(await IOHelper.GetSha1HashFromFileAsync(savePath).ConfigureAwait(false),
                     versionInfo.AssetIndex.Sha1, StringComparison.OrdinalIgnoreCase))
-            {
                 await Downloader.GetFileAsync(GlobalStaticResource.HttpClientFactory.CreateClient(), url, savePath, "")
                     .ConfigureAwait(false);
-            }
         }
 
         /// <summary>
-        /// 处理资源目录json文件，获取各项资源下载地址、sha1等信息
-        /// <param name="versionId"></param>
+        ///     处理资源目录json文件，获取各项资源下载地址、sha1等信息
+        ///     <param name="versionId"></param>
         /// </summary>
         /// <returns></returns>
         protected virtual async ValueTask<List<AssetsIndex.Asset>> HandleAssetIndexJson(string versionId)
@@ -83,7 +81,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
                 assetList.Add(new AssetsIndex.Asset
                 {
                     Hash = hashMatch.Value,
-                    Size = sizeMatch.Value.ToInt(0),
+                    Size = sizeMatch.Value.ToInt(0)
                 });
             }
 
@@ -91,7 +89,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
         }
 
         /// <summary>
-        /// 获取待下载资源文件的列表
+        ///     获取待下载资源文件的列表
         /// </summary>
         /// <param name="versionId">版本</param>
         /// <param name="checkBeforeDownload">下载前校验文件sha1，如正确则不重复下载</param>
@@ -114,15 +112,13 @@ namespace CMCL.Client.Download.Mirrors.Interface
                 {
                     if (!assetsToDownload.TryAdd(savePath, url))
                         return;
-                    
+
                     //校验sha1
                     await sem.WaitAsync();
                     if (checkBeforeDownload && File.Exists(savePath) && string.Equals(
                         await IOHelper.GetSha1HashFromFileAsync(savePath), assetInfo.Hash,
                         StringComparison.OrdinalIgnoreCase))
-                    {
                         assetsToDownload.Remove(savePath, out var s);
-                    }
                 }
                 finally
                 {
@@ -136,7 +132,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
         }
 
         /// <summary>
-        /// 下载Libraries
+        ///     下载Libraries
         /// </summary>
         /// <param name="versionId">游戏版本</param>
         /// <param name="checkBeforeDownload">下载前校验文件sha1，如正确则不重复下载</param>
@@ -169,10 +165,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
                     try
                     {
                         await sem.WaitAsync();
-                        if (!dic.TryAdd(libraryInfo.downloadUrl, 0))
-                        {
-                            return;
-                        }
+                        if (!dic.TryAdd(libraryInfo.downloadUrl, 0)) return;
 
                         finishedCount++;
                         loadingFrm.Dispatcher.BeginInvoke(new Action(() =>
@@ -190,10 +183,6 @@ namespace CMCL.Client.Download.Mirrors.Interface
                 }));
                 await Task.WhenAll(taskArray);
             }
-            catch (Exception e)
-            {
-                throw;
-            }
             finally
             {
                 loadingFrm.Hide();
@@ -201,7 +190,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
         }
 
         /// <summary>
-        /// 转换下载地址
+        ///     转换下载地址
         /// </summary>
         /// <param name="originUrl"></param>
         /// <returns></returns>

@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using CMCL.Client.Download.Mirrors;
 using CMCL.Client.GameVersion.JsonClasses;
 using Newtonsoft.Json;
 
@@ -13,12 +11,14 @@ namespace CMCL.Client.Util
     public static class GameHelper
     {
         /// <summary>
-        /// 版本文件信息集合
+        ///     版本文件信息集合
         /// </summary>
         public static List<VersionInfo> VersionInfoList = new();
 
+        public static string NativesDirName = $"natives-$versionId-{Guid.NewGuid():N}";
+
         /// <summary>
-        /// 加载版本文件信息
+        ///     加载版本文件信息
         /// </summary>
         /// <returns></returns>
         public static async Task LoadVersionInfoList()
@@ -41,7 +41,6 @@ namespace CMCL.Client.Util
                     }
                     catch
                     {
-                        continue;
                     }
                 }
             }
@@ -66,21 +65,19 @@ namespace CMCL.Client.Util
             return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         }
 
-        public static string NativesDirName = $"natives-$versionId-{Guid.NewGuid():N}";
-
         /// <summary>
-        /// 返回natives文件夹地址
+        ///     返回natives文件夹地址
         /// </summary>
         /// <param name="versionId"></param>
         /// <returns></returns>
         public static string GetNativesDir(string versionId)
         {
-            return IOHelper.CombineAndCheckDirectory(false, GetCmclCacheDir(true),
+            return IOHelper.CombineAndCheckDirectory(false, GetCmclCacheDir(),
                 NativesDirName.Replace("$versionId", versionId));
         }
 
         /// <summary>
-        /// 清理natives文件夹
+        ///     清理natives文件夹
         /// </summary>
         /// <returns></returns>
         public static async Task<bool> CleanNativesDir()
@@ -90,11 +87,8 @@ namespace CMCL.Client.Util
                 var baseDir = new DirectoryInfo(GetCmclCacheDir());
                 if (baseDir.Exists)
                 {
-                    var nativesDir = baseDir.GetDirectories($"natives-*");
-                    foreach (var di in nativesDir)
-                    {
-                        di.Delete(true);
-                    }
+                    var nativesDir = baseDir.GetDirectories("natives-*");
+                    foreach (var di in nativesDir) di.Delete(true);
                 }
 
                 return true;
@@ -107,7 +101,7 @@ namespace CMCL.Client.Util
         }
 
         /// <summary>
-        /// 返回本启动器缓存文件夹位置
+        ///     返回本启动器缓存文件夹位置
         /// </summary>
         /// <param name="checkExist">不存在时是否创建</param>
         /// <returns></returns>

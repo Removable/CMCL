@@ -8,7 +8,6 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using CMCL.Client.Game;
 using CMCL.Client.Util;
 using CMCL.Client.Window;
 
@@ -17,7 +16,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
     public abstract class Library
     {
         /// <summary>
-        /// 下载Libraries
+        ///     下载Libraries
         /// </summary>
         /// <param name="versionId">游戏版本</param>
         /// <param name="checkBeforeDownload">下载前校验文件sha1，如正确则不重复下载</param>
@@ -50,10 +49,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
                     try
                     {
                         await sem.WaitAsync();
-                        if (!dic.TryAdd(libraryInfo.downloadUrl, 0))
-                        {
-                            return;
-                        }
+                        if (!dic.TryAdd(libraryInfo.downloadUrl, 0)) return;
 
                         finishedCount++;
                         loadingFrm.Dispatcher.BeginInvoke(new Action(() =>
@@ -71,10 +67,6 @@ namespace CMCL.Client.Download.Mirrors.Interface
                 }));
                 await Task.WhenAll(taskArray);
             }
-            catch (Exception e)
-            {
-                throw;
-            }
             finally
             {
                 loadingFrm.Hide();
@@ -82,7 +74,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
         }
 
         /// <summary>
-        /// 获取待下载资源文件的列表
+        ///     获取待下载资源文件的列表
         /// </summary>
         /// <param name="versionId">版本</param>
         /// <param name="checkBeforeDownload">下载前校验文件sha1，如正确则不重复下载</param>
@@ -91,69 +83,62 @@ namespace CMCL.Client.Download.Mirrors.Interface
         public virtual async ValueTask<List<(string savePath, string downloadUrl)>> GetLibrariesDownloadList(
             string versionId, bool checkBeforeDownload = false, bool containsNative = true)
         {
-            try
+            var versionInfo = GameHelper.GetVersionInfo(versionId);
+            var libraries = versionInfo.Libraries.Where(i => i != null && i.ShouldDeployOnOs(Utils.GetOS()))
+                .ToList();
+
+            var basePath = Path.Combine(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "libraries");
+
+            var librariesToDownload = new ConcurrentDictionary<string, string>();
+            var semaphore = new SemaphoreSlim(AppConfig.GetAppConfig().MaxThreadCount);
+            var taskArray = libraries.Select(l => Task.Run(async () =>
             {
-                var versionInfo = GameHelper.GetVersionInfo(versionId);
-                var libraries = versionInfo.Libraries.Where(i => i != null && i.ShouldDeployOnOs(Utils.GetOS()))
-                    .ToList();
-
-                var basePath = Path.Combine(AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "libraries");
-
-                var librariesToDownload = new ConcurrentDictionary<string, string>();
-                var semaphore = new SemaphoreSlim(AppConfig.GetAppConfig().MaxThreadCount);
-                var taskArray = libraries.Select(l => Task.Run(async () =>
+                try
                 {
-                    try
+                    await semaphore.WaitAsync();
+                    if (!l.IsNative)
                     {
-                        await semaphore.WaitAsync();
-                        if (!l.IsNative)
-                        {
-                            var savePath = IOHelper.CombineAndCheckDirectory(true, basePath, l.Downloads.Artifact.Path);
-                            //转换地址
-                            var url = TransUrl(l.Downloads.Artifact.Url);
-                            if (checkBeforeDownload && File.Exists(savePath) && string.Equals(
-                                await IOHelper.GetSha1HashFromFileAsync(savePath).ConfigureAwait(false),
-                                l.Downloads.Artifact.Sha1, StringComparison.OrdinalIgnoreCase))
-                                return;
+                        var savePath = IOHelper.CombineAndCheckDirectory(true, basePath, l.Downloads.Artifact.Path);
+                        //转换地址
+                        var url = TransUrl(l.Downloads.Artifact.Url);
+                        if (checkBeforeDownload && File.Exists(savePath) && string.Equals(
+                            await IOHelper.GetSha1HashFromFileAsync(savePath).ConfigureAwait(false),
+                            l.Downloads.Artifact.Sha1, StringComparison.OrdinalIgnoreCase))
+                            return;
 
-                            librariesToDownload.TryAdd(savePath, url);
-                        }
-                        else if (containsNative)
-                        {
-                            var nativeInfo = l.GetNative(Utils.GetOS());
-                            var savePath = IOHelper.CombineAndCheckDirectory(true, basePath, nativeInfo.Path);
-                            //转换地址
-                            var url = TransUrl(nativeInfo.Url);
-                            if (checkBeforeDownload && File.Exists(savePath) && string.Equals(
-                                await IOHelper.GetSha1HashFromFileAsync(savePath).ConfigureAwait(false),
-                                nativeInfo.Sha1, StringComparison.OrdinalIgnoreCase))
-                                return;
-
-                            librariesToDownload.TryAdd(savePath, url);
-                        }
+                        librariesToDownload.TryAdd(savePath, url);
                     }
-                    catch (Exception e)
+                    else if (containsNative)
                     {
-                        await LogHelper.WriteLogAsync(e);
-                        throw new Exception("校验库文件失败");
-                    }
-                    finally
-                    {
-                        semaphore.Release();
-                    }
-                }));
-                await Task.WhenAll(taskArray);
+                        var nativeInfo = l.GetNative(Utils.GetOS());
+                        var savePath = IOHelper.CombineAndCheckDirectory(true, basePath, nativeInfo.Path);
+                        //转换地址
+                        var url = TransUrl(nativeInfo.Url);
+                        if (checkBeforeDownload && File.Exists(savePath) && string.Equals(
+                            await IOHelper.GetSha1HashFromFileAsync(savePath).ConfigureAwait(false),
+                            nativeInfo.Sha1, StringComparison.OrdinalIgnoreCase))
+                            return;
 
-                return librariesToDownload.Select(i => (i.Key, librariesToDownload[i.Key].ToString())).ToList();
-            }
-            catch (Exception e)
-            {
-                throw;
-            }
+                        librariesToDownload.TryAdd(savePath, url);
+                    }
+                }
+                catch (Exception e)
+                {
+                    await LogHelper.WriteLogAsync(e);
+                    throw new Exception("校验库文件失败");
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
+            }));
+            await Task.WhenAll(taskArray);
+
+            return librariesToDownload.Select(i => (i.Key, librariesToDownload[i.Key].ToString())).ToList();
         }
 
         /// <summary>
-        /// 转换下载地址
+        ///     转换下载地址
         /// </summary>
         /// <param name="originUrl"></param>
         /// <returns></returns>
@@ -166,7 +151,7 @@ namespace CMCL.Client.Download.Mirrors.Interface
         }
 
         /// <summary>
-        /// 解压native库文件
+        ///     解压native库文件
         /// </summary>
         /// <param name="versionId"></param>
         /// <returns></returns>

@@ -61,9 +61,11 @@ namespace CMCL.Client.GameVersion.JsonClasses
             var allow = _rule["allow"];
             //有允许无禁止时，找有无符合条件的系统
             if (!disallow.Any() && allow.Any())
-                return allow.Any(osInfo => osInfo.Name == os.GetDescription() && (osInfo.Version == null || Regex.IsMatch(Environment.OSVersion.Version.ToString(), osInfo.Version)));
+                return allow.Any(osInfo => osInfo.Name == os.GetDescription() && (osInfo.Version == null ||
+                    Regex.IsMatch(Environment.OSVersion.Version.ToString(), osInfo.Version)));
             //无禁止或有禁止但无符合条件的系统
-            return !disallow.Any(osInfo => osInfo.Name == os.GetDescription() && (osInfo.Version == null || Regex.IsMatch(Environment.OSVersion.Version.ToString(), osInfo.Version)));
+            return !disallow.Any(osInfo => osInfo.Name == os.GetDescription() && (osInfo.Version == null ||
+                Regex.IsMatch(Environment.OSVersion.Version.ToString(), osInfo.Version)));
         }
 
         public async ValueTask<bool> IsValidLibrary(string libraryPath)
@@ -139,7 +141,6 @@ namespace CMCL.Client.GameVersion.JsonClasses
         {
             Download.ArtifactInfo path = null;
             if (Downloads?.Classifiers != null)
-            {
                 path = os switch
                 {
                     SupportedOS.Windows => (Environment.Is64BitOperatingSystem
@@ -149,7 +150,6 @@ namespace CMCL.Client.GameVersion.JsonClasses
                     SupportedOS.Unix => Downloads.Classifiers.Linux,
                     _ => Downloads.Classifiers.Windows
                 };
-            }
 
             if (path != null) return path;
             path = new Download.ArtifactInfo
@@ -206,9 +206,9 @@ namespace CMCL.Client.GameVersion.JsonClasses
 
             public class OSInfo
             {
+                [JsonProperty("arch")] public string Arch;
                 [JsonProperty("name")] public string Name;
                 [JsonProperty("version")] public string Version;
-                [JsonProperty("arch")] public string Arch;
             }
         }
 

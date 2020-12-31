@@ -1,12 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using CMCL.Client.Util;
 using Microsoft.Extensions.Configuration;
@@ -15,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace CMCL.Client
 {
     /// <summary>
-    /// Interaction logic for App.xaml
+    ///     Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application
     {
@@ -54,12 +46,6 @@ namespace CMCL.Client
 
             // 向全局容器中注册一个视图
             services.AddTransient(typeof(MainWindow));
-
-            // 在全局容器中配置 AppSettings
-            // services.Configure<AppSettings>(Configuration.GetSection(nameof(AppSettings)));
-
-            // 在全局容器中注册自定义服务
-            // services.AddScoped<ISampleService, SampleService>();
         }
     }
 }

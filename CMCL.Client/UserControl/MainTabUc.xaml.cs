@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using CMCL.Client.Download.Mirrors;
@@ -50,7 +49,7 @@ namespace CMCL.Client.UserControl
             var config = AppConfig.GetAppConfig();
             var baseDir = Path.Combine(config.MinecraftDir, ".minecraft");
             var btn = (Button) sender;
-            this.Dispatcher.BeginInvoke(new Action(() => { btn.IsEnabled = false; }));
+            Dispatcher.BeginInvoke(new Action(() => { btn.IsEnabled = false; }));
             var loadingFrm = LoadingFrm.GetInstance("", System.Windows.Window.GetWindow(this));
 
             try
@@ -72,16 +71,11 @@ namespace CMCL.Client.UserControl
 
                 //Java安装
                 if (string.IsNullOrWhiteSpace(config.CustomJavaPath) || !File.Exists(config.CustomJavaPath))
-                {
                     throw new Exception("Java未安装或未设置Java路径");
-                }
 
                 //清理Natives文件夹
                 loadingFrm.Dispatcher.BeginInvoke(new Action(() => { loadingFrm.Show("正在清理缓存"); }));
-                if (!await GameHelper.CleanNativesDir())
-                {
-                    throw new Exception("缓存清理失败");
-                }
+                if (!await GameHelper.CleanNativesDir()) throw new Exception("缓存清理失败");
 
                 loadingFrm.Dispatcher.BeginInvoke(new Action(() => { loadingFrm.Show("正在校验文件"); }));
                 var mirror = MirrorManager.GetCurrentMirror();
@@ -94,9 +88,7 @@ namespace CMCL.Client.UserControl
                         .GetLibrariesDownloadList(config.CurrentVersion, true).ConfigureAwait(false)).Any() || //库文件
                     (await mirror.Asset.GetAssetsDownloadList(config.CurrentVersion, true)
                         .ConfigureAwait(false)).Any()) //资源文件
-                {
                     throw new Exception("游戏文件缺失，请尝试重新下载");
-                }
 
                 //解压natives文件
                 await mirror.Library.UnzipNatives(config.CurrentVersion);
@@ -120,7 +112,7 @@ namespace CMCL.Client.UserControl
                         RedirectStandardInput = true,
                         CreateNoWindow = true,
                         UseShellExecute = false,
-                        WorkingDirectory = Path.Combine(config.MinecraftDir, ".minecraft"),
+                        WorkingDirectory = Path.Combine(config.MinecraftDir, ".minecraft")
                     },
                     EnableRaisingEvents = true
                 };
@@ -151,7 +143,7 @@ namespace CMCL.Client.UserControl
             }
             finally
             {
-                this.Dispatcher.BeginInvoke(new Action(() => { btn.IsEnabled = true; }));
+                Dispatcher.BeginInvoke(new Action(() => { btn.IsEnabled = true; }));
                 loadingFrm.Dispatcher.BeginInvoke(new Action(() => { loadingFrm.Hide(); }));
             }
         }

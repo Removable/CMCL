@@ -5,7 +5,7 @@ namespace CMCL.Client.Download.Mirrors.MCBBS
     public class Library : Interface.Library
     {
         /// <summary>
-        /// 转换下载地址
+        ///     转换下载地址
         /// </summary>
         /// <param name="originUrl"></param>
         /// <returns></returns>

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Runtime.Serialization;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace CMCL.Client.GameVersion.JsonClasses
 {

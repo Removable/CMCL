@@ -1,16 +1,17 @@
 ﻿using System.ComponentModel;
-using CMCL.Client.UserControl;
-using CMCL.Client.Util;
 using System.Net.Http;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Markup;
+using CMCL.Client.UserControl;
+using CMCL.Client.Util;
 
 namespace CMCL.Client
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    ///     Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : HandyControl.Controls.Window, System.Windows.Markup.IComponentConnector
+    public partial class MainWindow : HandyControl.Controls.Window, IComponentConnector
     {
         private readonly IHttpClientFactory _httpClientFactory;
 
@@ -22,7 +23,7 @@ namespace CMCL.Client
         }
 
         /// <summary>
-        /// 窗体载入后
+        ///     窗体载入后
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
