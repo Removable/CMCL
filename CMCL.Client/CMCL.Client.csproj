@@ -12,6 +12,9 @@
     <StartupObject>CMCL.Client.App</StartupObject>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <NeutralLanguage>zh-Hans</NeutralLanguage>
+    <Authors>Removable</Authors>
+    <Product>CMCL</Product>
+    <PackageId>com.imguan.cmcl</PackageId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
