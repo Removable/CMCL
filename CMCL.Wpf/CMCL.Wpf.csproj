@@ -1,0 +1,48 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net5.0-windows</TargetFramework>
+        <UseWPF>true</UseWPF>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\CMCL.Core\CMCL.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="HandyControl" Version="3.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
+      <PackageReference Include="Ookii.Dialogs.Wpf" Version="3.1.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Resource Include="Resources\Images\Component_128.ico" />
+      <Resource Include="Resources\Images\Component_128.png" />
+      <Resource Include="Resources\Images\Component_32.png">
+        <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      </Resource>
+      <Resource Include="Resources\Images\Component_64.png" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <SplashScreen Include="Resources\Images\splash.png" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="UserControl\SettingsUc.xaml.cs">
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="UserControl\SettingsUc.xaml.cs">
+        <SubType>Code</SubType>
+        <DependentUpon>SettingsUc.xaml</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Page Update="UserControl\SettingsUc.xaml">
+        <SubType>Designer</SubType>
+      </Page>
+    </ItemGroup>
+
+</Project>
