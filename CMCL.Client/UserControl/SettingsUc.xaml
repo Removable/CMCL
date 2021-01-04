@@ -38,6 +38,6 @@
         <ComboBox x:Name="ComboSelectedDownloadSource" hc:InfoElement.Placeholder="请选择下载源" hc:TitleElement.Title="下载源"
                   Style="{StaticResource ComboBoxExtend}" Grid.Column="0" Margin="40,243,570,81" />
         <hc:TextBox x:Name="TbJavaMemory" hc:TitleElement.Title="Java内存(M)" hc:TitleElement.TitlePlacement="Top"
-            Grid.Row="0" Grid.Column="0" Margin="300,243,310,90" />
+            Grid.Row="0" Grid.Column="0" Margin="300,243,310,0" Height="57" VerticalAlignment="Top" />
     </Grid>
 </UserControl>

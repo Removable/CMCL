@@ -44,6 +44,7 @@ namespace CMCL.Client.UserControl
                 CbUseDefaultGameDir.IsChecked = true;
             else
                 CbUseCustomGameDir.IsChecked = true;
+            TbJavaMemory.Text = appConfig.JavaMemory.ToString();
         }
 
         /// <summary>
@@ -98,7 +99,8 @@ namespace CMCL.Client.UserControl
                     CustomJavaPath = TbJavaPath.Text,
                     MinecraftDir = TbMinecraftDir.Text,
                     UseDefaultGameDir = CbUseDefaultGameDir.IsChecked ?? false,
-                    DownloadSource = ComboSelectedDownloadSource.Text
+                    DownloadSource = ComboSelectedDownloadSource.Text,
+                    JavaMemory = TbJavaMemory.Text.ToInt(2048),
                 };
 
                 await AppConfig.SaveAppConfig(newConfig);

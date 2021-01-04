@@ -153,6 +153,6 @@ namespace CMCL.Client.Util
         /// <summary>
         ///     最大分配内存大小(M)
         /// </summary>
-        public int Xmx { get; set; } = 4096;
+        public int JavaMemory { get; set; } = 4096;
     }
 }

@@ -46,6 +46,7 @@ namespace CMCL.Client.UserControl
         /// <param name="e"></param>
         private async void StartGameBtnClick(object sender, RoutedEventArgs e)
         {
+            var startResult = false;
             var config = AppConfig.GetAppConfig();
             var baseDir = Path.Combine(config.MinecraftDir, ".minecraft");
             var btn = (Button) sender;
@@ -119,22 +120,24 @@ namespace CMCL.Client.UserControl
 
                 process.Exited += (sender, args) =>
                 {
-                    Console.WriteLine(JsonConvert.SerializeObject(sender));
-                    Console.WriteLine(JsonConvert.SerializeObject(args));
+                    Dispatcher.BeginInvoke(new Action(() => { btn.IsEnabled = true; }));
+                    Dispatcher.BeginInvoke(new Action(() => { btn.Content = "开始游戏"; }));
                 };
                 process.OutputDataReceived += (sender, args) =>
                 {
-                    Console.WriteLine(JsonConvert.SerializeObject(sender));
-                    Console.WriteLine(JsonConvert.SerializeObject(args));
+                    // Console.WriteLine(JsonConvert.SerializeObject(sender));
+                    // Console.WriteLine(JsonConvert.SerializeObject(args));
                 };
                 process.ErrorDataReceived += (sender, args) =>
                 {
-                    Console.WriteLine(JsonConvert.SerializeObject(sender));
-                    Console.WriteLine(JsonConvert.SerializeObject(args));
+                    // Console.WriteLine(JsonConvert.SerializeObject(sender));
+                    // Console.WriteLine(JsonConvert.SerializeObject(args));
                 };
-                process.Start();
+                startResult = process.Start();
+                
                 process.BeginOutputReadLine();
                 process.BeginErrorReadLine();
+                Dispatcher.BeginInvoke(new Action(() => { btn.Content = "正在运行"; }));
             }
             catch (Exception exception)
             {
@@ -143,7 +146,10 @@ namespace CMCL.Client.UserControl
             }
             finally
             {
-                Dispatcher.BeginInvoke(new Action(() => { btn.IsEnabled = true; }));
+                if (!startResult)
+                {
+                    Dispatcher.BeginInvoke(new Action(() => { btn.IsEnabled = true; }));
+                }
                 loadingFrm.Dispatcher.BeginInvoke(new Action(() => { loadingFrm.Hide(); }));
             }
         }
