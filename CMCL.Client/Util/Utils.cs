@@ -83,17 +83,13 @@ namespace CMCL.Client.Util
         /// <returns></returns>
         public static SupportedOS GetOS()
         {
-            switch (Environment.OSVersion.Platform)
-            {
-                case PlatformID.Win32NT:
-                    return SupportedOS.Windows;
-                case PlatformID.Unix:
-                    return SupportedOS.Unix;
-                case PlatformID.MacOSX:
-                    return SupportedOS.Osx;
-                default:
-                    return SupportedOS.Other;
-            }
+            if (OperatingSystem.IsWindows())
+                return SupportedOS.Windows;
+            if (OperatingSystem.IsLinux())
+                return SupportedOS.Linux;
+            if (OperatingSystem.IsMacOS())
+                return SupportedOS.Osx;
+            return SupportedOS.Other;
         }
     }
 
@@ -124,7 +120,7 @@ namespace CMCL.Client.Util
     public enum SupportedOS
     {
         [Description("windows")] Windows,
-        [Description("linux")] Unix,
+        [Description("linux")] Linux,
         [Description("osx")] Osx,
         [Description("other")] Other
     }
