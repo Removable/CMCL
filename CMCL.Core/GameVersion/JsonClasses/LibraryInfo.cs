@@ -48,12 +48,6 @@ namespace CMCL.Core.GameVersion.JsonClasses
             }
         }
 
-        public bool HasLibrary()
-        {
-            if (Downloads == null) return true;
-            return Downloads.Artifact != null;
-        }
-
         public bool ShouldDeployOnOs(SupportedOS os = SupportedOS.Windows, string version = null)
         {
             if (Rules == null) return true;
@@ -66,33 +60,6 @@ namespace CMCL.Core.GameVersion.JsonClasses
             //无禁止或有禁止但无符合条件的系统
             return !disallow.Any(osInfo => osInfo.Name == os.GetDescription() && (osInfo.Version == null ||
                 Regex.IsMatch(Environment.OSVersion.Version.ToString(), osInfo.Version)));
-        }
-
-        public async ValueTask<bool> IsValidLibrary(string libraryPath)
-        {
-            var path = IOHelper.CombineAndCheckDirectory(libraryPath, GetLibraryPath());
-
-            var fileInfo = new FileInfo(path);
-            var library = GetLibrary();
-            if (library == null) return fileInfo.Exists;
-            if (GetLibrary().Size == 0 || GetLibrary().Sha1 == null)
-                return fileInfo.Exists;
-            return fileInfo.Exists
-                   && fileInfo.Length == GetLibrary().Size
-                   && await IOHelper.GetSha1HashFromFileAsync(path) == GetLibrary().Sha1;
-        }
-
-        public async ValueTask<bool> IsValidNative(string libraryPath)
-        {
-            var os = Utils.GetOS();
-            var path = IOHelper.CombineAndCheckDirectory(libraryPath, GetNativePath());
-
-            var fileInfo = new FileInfo(path);
-            if (GetNative(os).Size == 0 || GetNative(os).Sha1 == null)
-                return fileInfo.Exists && fileInfo.Length > 0;
-            return fileInfo.Exists
-                   && fileInfo.Length == GetNative(os).Size
-                   && await IOHelper.GetSha1HashFromFileAsync(path) == GetNative(os).Sha1;
         }
 
         public string GetLibraryPath()
@@ -132,11 +99,6 @@ namespace CMCL.Core.GameVersion.JsonClasses
             return libp.ToString();
         }
 
-        public Download.ArtifactInfo GetLibrary()
-        {
-            return Downloads?.Artifact;
-        }
-
         public Download.ArtifactInfo GetNative(SupportedOS os)
         {
             Download.ArtifactInfo path = null;
@@ -157,15 +119,6 @@ namespace CMCL.Core.GameVersion.JsonClasses
                 Path = GetNativePath()
             };
             return path;
-        }
-
-        private Download.ArtifactInfo GetArtifact()
-        {
-            if (IsNative && Downloads.Classifiers.Windows == null)
-                return Environment.Is64BitOperatingSystem
-                    ? Downloads.Classifiers.Windowsx64
-                    : Downloads.Classifiers.Windowsx32;
-            return Downloads.Classifiers?.Windows ?? Downloads.Artifact;
         }
 
         public class ExtractRule
