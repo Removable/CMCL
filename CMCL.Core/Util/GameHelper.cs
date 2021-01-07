@@ -95,7 +95,7 @@ namespace CMCL.Core.Util
             }
             catch (Exception e)
             {
-                await LogHelper.WriteLogAsync(e);
+                await LogHelper.LogExceptionAsync(e);
                 return false;
             }
         }

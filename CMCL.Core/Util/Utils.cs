@@ -109,7 +109,7 @@ namespace CMCL.Core.Util
                 case PlatformID.Win32NT:
                     return SupportedOS.Windows;
                 case PlatformID.Unix:
-                    return SupportedOS.Unix;
+                    return SupportedOS.Linux;
                 case PlatformID.MacOSX:
                     return SupportedOS.Osx;
                 default:
@@ -145,7 +145,7 @@ namespace CMCL.Core.Util
     public enum SupportedOS
     {
         [Description("windows")] Windows,
-        [Description("linux")] Unix,
+        [Description("linux")] Linux,
         [Description("osx")] Osx,
         [Description("other")] Other
     }

@@ -31,36 +31,5 @@ namespace CMCL.Core.Util
         }
 
         #endregion
-
-        public static LoadingFrmPropertyChangedHandler LoadingFrmDataContext = new();
-    }
-
-    /// <summary>
-    /// LoadingFrm数据绑定上下文
-    /// </summary>
-    public sealed class LoadingFrmPropertyChangedHandler : INotifyPropertyChanged
-    {
-        private string _currentLoadingTip;
-        
-        /// <summary>
-        ///     当前LoadingFrm显示的提示语
-        /// </summary>
-        public string CurrentLoadingTip
-        {
-            get => _currentLoadingTip;
-            set
-            {
-                _currentLoadingTip = value;
-                OnPropertyChanged(nameof(CurrentLoadingTip));
-            }
-        }
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        [NotifyPropertyChangedInvocator]
-        private void OnPropertyChanged([CallerMemberName] string propertyName = null!)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
     }
 }

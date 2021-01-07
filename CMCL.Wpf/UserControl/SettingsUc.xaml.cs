@@ -112,7 +112,7 @@ namespace CMCL.Wpf.UserControl
             }
             catch (Exception exception)
             {
-                await LogHelper.WriteLogAsync(exception);
+                await LogHelper.LogExceptionAsync(exception);
                 NotifyIcon.ShowBalloonTip("错误", "保存失败", NotifyIconInfoType.Error, "AppNotifyIcon");
             }
         }

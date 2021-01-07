@@ -32,7 +32,7 @@ namespace CMCL.Wpf
             }
             catch (Exception exception)
             {
-                LogHelper.WriteLog(exception);
+                LogHelper.LogException(exception);
                 throw;
             }
         }

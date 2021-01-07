@@ -27,12 +27,10 @@ namespace CMCL.Wpf.Window
         /// <param name="dataContext">数据上下文</param>
         /// <param name="owner">Owner</param>
         /// <returns></returns>
-        public static LoadingFrm GetInstance(object dataContext, System.Windows.Window owner = null)
+        public static LoadingFrm GetInstance(System.Windows.Window owner = null)
         {
             var frm = _loadingFrm ??= new LoadingFrm();
             if (owner != null && owner != _loadingFrm.Owner) frm.Owner = owner;
-
-            frm.DataContext = dataContext;
             return frm;
         }
 

@@ -37,7 +37,7 @@ namespace CMCL.Core.Util
             }
             catch (Exception e)
             {
-                await LogHelper.WriteLogAsync(e).ConfigureAwait(false);
+                await LogHelper.LogExceptionAsync(e).ConfigureAwait(false);
             }
         }
 
@@ -71,7 +71,7 @@ namespace CMCL.Core.Util
             }
             catch (Exception e)
             {
-                await LogHelper.WriteLogAsync(e).ConfigureAwait(false);
+                await LogHelper.LogExceptionAsync(e).ConfigureAwait(false);
                 throw;
             }
         }

@@ -34,7 +34,8 @@ namespace CMCL.Core.Download.Mirrors.Interface
                     if (!dic.TryAdd(libraryInfo.downloadUrl, 0)) return;
 
                     finishedCount++;
-                    GlobalStaticResource.LoadingFrmDataContext.CurrentLoadingTip = $"下载库({finishedCount.ToString()}/{totalCount.ToString()})";
+                    _onDownloadProgressCountChanged($"下载库({finishedCount.ToString()}/{totalCount.ToString()})",
+                        totalCount, finishedCount);
                     await Downloader.GetFileAsync(GlobalStaticResource.HttpClientFactory.CreateClient(),
                         libraryInfo.downloadUrl, libraryInfo.savePath, "").ConfigureAwait(false);
                 }
@@ -97,7 +98,7 @@ namespace CMCL.Core.Download.Mirrors.Interface
                 }
                 catch (Exception e)
                 {
-                    await LogHelper.WriteLogAsync(e);
+                    await LogHelper.LogExceptionAsync(e);
                     throw new Exception("校验库文件失败");
                 }
                 finally
@@ -155,6 +156,17 @@ namespace CMCL.Core.Download.Mirrors.Interface
             }));
 
             await Task.WhenAll(taskArray);
+        }
+        
+        private OnDownloadProgressCountChanged _onDownloadProgressCountChanged;
+
+        /// <summary>
+        /// 当调用Mojang登录接口时触发事件
+        /// </summary>
+        public event OnDownloadProgressCountChanged OnDownloadProgressCountChanged
+        {
+            add => _onDownloadProgressCountChanged += value;
+            remove => _onDownloadProgressCountChanged -= value;
         }
     }
 }

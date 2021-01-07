@@ -35,11 +35,8 @@ namespace CMCL.Wpf.UserControl
         {
             BtnRefresh.IsEnabled = false;
             BtnDownload.IsEnabled = false;
-            var loadingFrm = LoadingFrm.GetInstance("加载中", Application.Current.MainWindow);
-            loadingFrm.Dispatcher.BeginInvoke(new Action(() =>
-            {
-                loadingFrm.ShowDialog();
-            }));
+            var loadingFrm = LoadingFrm.GetInstance(Application.Current.MainWindow);
+            loadingFrm.Dispatcher.BeginInvoke(new Action(() => { loadingFrm.ShowDialog(); }));
 
             var mirror = MirrorManager.GetCurrentMirror();
 
@@ -75,10 +72,7 @@ namespace CMCL.Wpf.UserControl
             BtnRefresh.IsEnabled = true;
             BtnRefresh.Content = "刷新列表";
             BtnDownload.IsEnabled = true;
-            loadingFrm.Dispatcher.BeginInvoke(new Action(() =>
-            {
-                loadingFrm.Close();
-            }));
+            loadingFrm.Dispatcher.BeginInvoke(new Action(() => { loadingFrm.Close(); }));
         }
 
         /// <summary>
@@ -94,7 +88,7 @@ namespace CMCL.Wpf.UserControl
             }
             catch (Exception exception)
             {
-                await LogHelper.WriteLogAsync(exception).ConfigureAwait(false);
+                await LogHelper.LogExceptionAsync(exception).ConfigureAwait(false);
                 NotifyIcon.ShowBalloonTip("错误", "加载版本列表错误", NotifyIconInfoType.Error, "AppNotifyIcon");
             }
         }
@@ -141,13 +135,13 @@ namespace CMCL.Wpf.UserControl
 
                 #endregion
 
-                var loadingFrm = LoadingFrm.GetInstance(GlobalStaticResource.LoadingFrmDataContext, Application.Current.MainWindow);
+                var loadingFrm = LoadingFrm.GetInstance(Application.Current.MainWindow);
 
                 #region 下载库文件
 
                 loadingFrm.Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    GlobalStaticResource.LoadingFrmDataContext.CurrentLoadingTip = "校验库文件";
+                    loadingFrm.TbLodingTip.Text = "校验库文件";
                     loadingFrm.ShowDialog();
                 }));
                 try
@@ -159,8 +153,14 @@ namespace CMCL.Wpf.UserControl
                     }
                     else
                     {
-                        GlobalStaticResource.LoadingFrmDataContext.CurrentLoadingTip =
-                            $"下载库(0/{librariesDownloadList.Count.ToString()})";
+                        loadingFrm.TbLodingTip.Text = $"下载库(0/{librariesDownloadList.Count.ToString()})";
+                        mirror.Library.OnDownloadProgressCountChanged += (msg, tCount, fCount) =>
+                        {
+                            Dispatcher.BeginInvoke(new Action(() =>
+                            {
+                                loadingFrm.TbLodingTip.Text = $"下载库({fCount.ToString()}/{tCount.ToString()})";
+                            }));
+                        };
                         await mirror.Library.DownloadLibrariesAsync(librariesDownloadList);
                     }
                 }
@@ -172,10 +172,10 @@ namespace CMCL.Wpf.UserControl
                 #endregion
 
                 #region 下载资源文件
-                
+
                 loadingFrm.Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    GlobalStaticResource.LoadingFrmDataContext.CurrentLoadingTip = "校验资源文件";
+                    loadingFrm.TbLodingTip.Text = "校验资源文件";
                     loadingFrm.ShowDialog();
                 }));
                 try
@@ -187,8 +187,13 @@ namespace CMCL.Wpf.UserControl
                     }
                     else
                     {
-                        GlobalStaticResource.LoadingFrmDataContext.CurrentLoadingTip =
-                            $"下载资源(0/{assetsDownloadList.Count.ToString()})";
+                        mirror.Asset.OnDownloadProgressCountChanged += (msg, tCount, fCount) =>
+                        {
+                            Dispatcher.BeginInvoke(new Action(() =>
+                            {
+                                loadingFrm.TbLodingTip.Text = $"下载资源({fCount.ToString()}/{tCount.ToString()})";
+                            }));
+                        };
                         await mirror.Asset.DownloadAssets(assetsDownloadList);
                     }
                 }
@@ -198,12 +203,12 @@ namespace CMCL.Wpf.UserControl
                 }
 
                 #endregion
-                
+
                 NotifyIcon.ShowBalloonTip("提示", "下载完成", NotifyIconInfoType.Info, "AppNotifyIcon");
             }
             catch (Exception exception)
             {
-                await LogHelper.WriteLogAsync(exception);
+                await LogHelper.LogExceptionAsync(exception);
                 NotifyIcon.ShowBalloonTip("错误", "下载失败", NotifyIconInfoType.Error, "AppNotifyIcon");
             }
             finally

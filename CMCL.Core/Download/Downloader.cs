@@ -106,7 +106,7 @@ namespace CMCL.Core.Download
             }
             catch (Exception ex)
             {
-                await LogHelper.WriteLogAsync(ex);
+                await LogHelper.LogExceptionAsync(ex);
                 response.Dispose();
                 throw new Exception("下载失败");
             }
@@ -158,7 +158,7 @@ namespace CMCL.Core.Download
             }
             catch (Exception ex)
             {
-                await LogHelper.WriteLogAsync(ex);
+                await LogHelper.LogExceptionAsync(ex);
                 if (tryCount <= 3)
                     return await GetFinalResponse(httpClient, thisUri, tryCount + 1).ConfigureAwait(false);
                 throw;

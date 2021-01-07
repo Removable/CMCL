@@ -62,7 +62,7 @@ namespace CMCL.Core.LoginPlugin
             {
                 loginResult.IsSuccess = false;
                 loginResult.Message = exception.Message;
-                await LogHelper.WriteLogAsync(exception).ConfigureAwait(false);
+                await LogHelper.LogExceptionAsync(exception).ConfigureAwait(false);
                 throw;
             }
         }

@@ -12,7 +12,7 @@
                 CornerRadius="10">
             <Grid>
                 <hc:LoadingCircle Style="{StaticResource LoadingCircleLight}" Margin="34,10,35,40" />
-                <TextBlock TextAlignment="Center" Foreground="White" Text="{Binding CurrentLoadingTip}"
+                <TextBlock x:Name="TbLodingTip" TextAlignment="Center" Foreground="White" Text="加载中"
                            Margin="0,66,0,0" />
             </Grid>
         </Border>

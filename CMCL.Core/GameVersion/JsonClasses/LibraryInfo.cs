@@ -109,7 +109,7 @@ namespace CMCL.Core.GameVersion.JsonClasses
                         ? Downloads.Classifiers.Windowsx64
                         : Downloads.Classifiers.Windowsx32) ?? Downloads.Classifiers.Windows,
                     SupportedOS.Osx => Downloads.Classifiers.OSX,
-                    SupportedOS.Unix => Downloads.Classifiers.Linux,
+                    SupportedOS.Linux => Downloads.Classifiers.Linux,
                     _ => Downloads.Classifiers.Windows
                 };
 

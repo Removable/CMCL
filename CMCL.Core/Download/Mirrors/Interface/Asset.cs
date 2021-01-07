@@ -150,7 +150,8 @@ namespace CMCL.Core.Download.Mirrors.Interface
                     if (!dic.TryAdd(libraryInfo.downloadUrl, 0)) return;
 
                     finishedCount++;
-                    GlobalStaticResource.LoadingFrmDataContext.CurrentLoadingTip = $"下载资源({finishedCount.ToString()}/{totalCount.ToString()})";
+                    _onDownloadProgressCountChanged($"下载资源({finishedCount.ToString()}/{totalCount.ToString()})",
+                        totalCount, finishedCount);
 
                     await Downloader.GetFileAsync(GlobalStaticResource.HttpClientFactory.CreateClient(),
                         libraryInfo.downloadUrl, libraryInfo.savePath, "");
@@ -179,6 +180,17 @@ namespace CMCL.Core.Download.Mirrors.Interface
             }
 
             return $"{Server}/{originUrl}";
+        }
+        
+        private OnDownloadProgressCountChanged _onDownloadProgressCountChanged;
+
+        /// <summary>
+        /// 当调用Mojang登录接口时触发事件
+        /// </summary>
+        public event OnDownloadProgressCountChanged OnDownloadProgressCountChanged
+        {
+            add => _onDownloadProgressCountChanged += value;
+            remove => _onDownloadProgressCountChanged -= value;
         }
     }
 }
