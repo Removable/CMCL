@@ -35,7 +35,7 @@ namespace CMCL.LauncherCore
                 }
 
                 //清理natives文件缓存
-                _onCleanNativesDir(this, "正在清理缓存", versionInfo);
+                _onCleanNativesDir?.Invoke(this, "正在清理缓存", versionInfo);
                 if (!await GameHelper.CleanNativesDir())
                 {
                     _onLaunchError(this, new Exception("清理缓存失败"));
@@ -45,7 +45,7 @@ namespace CMCL.LauncherCore
                 //校验所需文件
                 var mirror = MirrorManager.GetCurrentMirror();
                 var baseDir = Path.Combine(_config.MinecraftDir, ".minecraft");
-                _onCheckLibrariesAndAssets(this, "正在校验文件", versionInfo);
+                _onCheckLibrariesAndAssets?.Invoke(this, "正在校验文件", versionInfo);
                 if (!File.Exists(Path.Combine(baseDir, "versions", _config.CurrentVersion,
                         $"{_config.CurrentVersion}.json")) || //json文件
                     !File.Exists(Path.Combine(baseDir, "versions", _config.CurrentVersion,

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Windows;
 
 namespace CMCL.Wpf.Window
 {
@@ -27,6 +28,12 @@ namespace CMCL.Wpf.Window
             var frm = _loadingFrm ??= new LoadingFrm();
             if (owner != null && owner != _loadingFrm.Owner) frm.Owner = owner;
             return frm;
+        }
+
+        public void ShowDialogCustom()
+        {
+            if (Visibility != Visibility.Visible)
+                ShowDialog();
         }
 
         private void LoadingFrm_OnClosing(object sender, CancelEventArgs e)

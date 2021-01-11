@@ -20,7 +20,7 @@ namespace CMCL.LauncherCore.Utilities
     public class LogHelper
     {
         private static readonly string LogDirectory =
-            Utils.CombineAndCheckDirectory(true, Environment.CurrentDirectory, "logs");
+            Utils.CombineAndCheckDirectory(false, Environment.CurrentDirectory, "logs");
 
         private static string GetLogContent(Exception exception, LogLevel logLevel)
         {
