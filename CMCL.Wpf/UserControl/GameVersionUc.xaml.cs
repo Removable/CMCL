@@ -3,10 +3,10 @@ using System.Data;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
-using CMCL.Core.Download;
-using CMCL.Core.Download.Mirrors;
-using CMCL.Core.GameVersion;
-using CMCL.Core.Util;
+using CMCL.LauncherCore.Download;
+using CMCL.LauncherCore.Download.Mirrors;
+using CMCL.LauncherCore.GameEntities;
+using CMCL.LauncherCore.Utilities;
 using CMCL.Wpf.Window;
 using HandyControl.Controls;
 using HandyControl.Data;
@@ -19,7 +19,7 @@ namespace CMCL.Wpf.UserControl
     public partial class GameVersionUc : System.Windows.Controls.UserControl
     {
         private readonly IHttpClientFactory _httpClientFactory;
-        private GameVersionManifest _gameVersionManifest;
+        private VersionManifest _gameVersionManifest;
 
         public GameVersionUc(IHttpClientFactory httpClientFactory)
         {
@@ -40,8 +40,7 @@ namespace CMCL.Wpf.UserControl
 
             var mirror = MirrorManager.GetCurrentMirror();
 
-            _gameVersionManifest =
-                await mirror.Version.LoadGameVersionList(GlobalStaticResource.HttpClientFactory.CreateClient());
+            _gameVersionManifest = await mirror.Version.LoadGameVersionList(_httpClientFactory.CreateClient());
 
             // _gameVersionManifest = await VersionDownloader.LoadGameVersionList(_httpClientFactory.CreateClient())
             //     .ConfigureAwait(true);
@@ -108,7 +107,6 @@ namespace CMCL.Wpf.UserControl
 
             BtnDownload.IsEnabled = false;
             BtnRefresh.IsEnabled = false;
-            Downloader.DownloadInfoHandler.TaskFinished = false;
 
             try
             {
@@ -120,11 +118,25 @@ namespace CMCL.Wpf.UserControl
                 var downloadFrm = DownloadFrm.GetInstance(Application.Current.MainWindow);
                 downloadFrm.Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    downloadFrm.DataContext = Downloader.DownloadInfoHandler;
                     downloadFrm.ShowDialog();
                 }));
                 try
                 {
+                    //注册事件
+                    mirror.Version.BeforeDownloadStart += (taskName, total, finished) =>
+                    {
+                        downloadFrm.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            downloadFrm.DownloadProgressBar.Value = 0;
+                            downloadFrm.TbCurrentTaskName.Text = taskName;
+                            downloadFrm.TbCurrentTaskDetail.Text = "";
+                        }));
+                    };
+                    mirror.Version.OnDownloadProgressChanged += (msg, progress) =>
+                    {
+                        downloadFrm.DownloadProgressBar.Value = progress;
+                    };
+                    
                     await mirror.Version.DownloadJsonAsync(versionId);
                     await mirror.Version.DownloadJarAsync(versionId);
                 }
@@ -154,11 +166,11 @@ namespace CMCL.Wpf.UserControl
                     else
                     {
                         loadingFrm.TbLodingTip.Text = $"下载库(0/{librariesDownloadList.Count.ToString()})";
-                        mirror.Library.OnDownloadProgressCountChanged += (msg, tCount, fCount) =>
+                        mirror.Library.OnDownloadFinish += (msg, tCount, fCount) =>
                         {
                             Dispatcher.BeginInvoke(new Action(() =>
                             {
-                                loadingFrm.TbLodingTip.Text = $"下载库({fCount.ToString()}/{tCount.ToString()})";
+                                loadingFrm.TbLodingTip.Text = $"{msg}({fCount.ToString()}/{tCount.ToString()})";
                             }));
                         };
                         await mirror.Library.DownloadLibrariesAsync(librariesDownloadList);
@@ -187,11 +199,11 @@ namespace CMCL.Wpf.UserControl
                     }
                     else
                     {
-                        mirror.Asset.OnDownloadProgressCountChanged += (msg, tCount, fCount) =>
+                        mirror.Asset.OnDownloadFinish += (msg, tCount, fCount) =>
                         {
                             Dispatcher.BeginInvoke(new Action(() =>
                             {
-                                loadingFrm.TbLodingTip.Text = $"下载资源({fCount.ToString()}/{tCount.ToString()})";
+                                loadingFrm.TbLodingTip.Text = $"{msg}({fCount.ToString()}/{tCount.ToString()})";
                             }));
                         };
                         await mirror.Asset.DownloadAssets(assetsDownloadList);
@@ -215,7 +227,6 @@ namespace CMCL.Wpf.UserControl
             {
                 BtnDownload.IsEnabled = true;
                 BtnRefresh.IsEnabled = true;
-                Downloader.DownloadInfoHandler.TaskFinished = true;
             }
         }
     }

@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Threading.Tasks;
 using System.Windows.Input;
-using CMCL.Core.Download;
-using CMCL.Core.Util;
+using CMCL.LauncherCore.Utilities;
 
 namespace CMCL.Wpf.Window
 {
@@ -32,44 +30,10 @@ namespace CMCL.Wpf.Window
             return frm;
         }
 
-        /// <summary>
-        ///     打开窗口=>执行任务=>关闭窗口
-        /// </summary>
-        /// <param name="disappearType">任务执行结束后是如何处理窗口</param>
-        /// <param name="funcs">要执行的任务数组</param>
-        public async Task DoWork(WindowDisappear disappearType, params Func<ValueTask>[] funcs)
-        {
-            DataContext = Downloader.DownloadInfoHandler;
-            var currentTaskIndex = 0;
-            Show();
-
-            foreach (var func in funcs)
-            {
-                currentTaskIndex++;
-                var index = currentTaskIndex;
-                Downloader.DownloadInfoHandler.CurrentTaskGroup = $"({index.ToString()}/{funcs.Length.ToString()})";
-                if (func == null) continue;
-                await func();
-            }
-
-            switch (disappearType)
-            {
-                default:
-                case WindowDisappear.None:
-                    break;
-                case WindowDisappear.Close:
-                    Close();
-                    break;
-                case WindowDisappear.Hide:
-                    Hide();
-                    break;
-            }
-        }
-
         private void DownloadFrm_OnClosed(object sender, EventArgs e)
         {
             _downloadFrm = null;
-            GlobalStaticResource.GetDownloadCancellationToken().Cancel();
+            GameHelper.GetDownloadCancellationToken().Cancel();
         }
 
         private void UIElement_OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)

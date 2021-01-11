@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Windows;
-using CMCL.Core.Util;
+using CMCL.LauncherCore.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 

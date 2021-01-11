@@ -2,8 +2,8 @@
 using System.IO;
 using System.Linq;
 using System.Windows;
-using CMCL.Core.Download;
-using CMCL.Core.Util;
+using CMCL.LauncherCore.GameEntities;
+using CMCL.LauncherCore.Utilities;
 using ComponentUtil.Common.Data;
 using HandyControl.Controls;
 using HandyControl.Data;
@@ -39,7 +39,7 @@ namespace CMCL.Wpf.UserControl
             LoadDownloadVersion(appConfig.CurrentVersion);
             TbJavaPath.Text = appConfig.CustomJavaPath;
             TbMinecraftDir.Text = appConfig.MinecraftDir;
-            ComboSelectedDownloadSource.Text = appConfig.DownloadSource;
+            ComboSelectedDownloadSource.Text = appConfig.DownloadSource.GetDescription();
             if (appConfig.UseDefaultGameDir)
                 CbUseDefaultGameDir.IsChecked = true;
             else
@@ -99,13 +99,14 @@ namespace CMCL.Wpf.UserControl
                     CustomJavaPath = TbJavaPath.Text,
                     MinecraftDir = TbMinecraftDir.Text,
                     UseDefaultGameDir = CbUseDefaultGameDir.IsChecked ?? false,
-                    DownloadSource = ComboSelectedDownloadSource.Text,
+                    DownloadSource = EnumHelper.GetAllItemsAndDescriptions<DownloadSource>()
+                        .FirstOrDefault(i => i.description == ComboSelectedDownloadSource.Text).enumItem,
                     JavaMemory = TbJavaMemory.Text.ToInt(2048)
                 };
 
                 await AppConfig.SaveAppConfig(newConfig);
                 NotifyIcon.ShowBalloonTip("提示", "保存成功", NotifyIconInfoType.Info, "AppNotifyIcon");
-                IOHelper.CreateDirectoryIfNotExist(Path.Combine(newConfig.MinecraftDir, ".minecraft"));
+                Utils.CombineAndCheckDirectory(false, Path.Combine(newConfig.MinecraftDir, ".minecraft"));
 
                 await GameHelper.ApplicationInit();
                 InitSettingsControls();

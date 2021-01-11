@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Markup;
-using CMCL.Core.Util;
+using CMCL.LauncherCore.Utilities;
 using CMCL.Wpf.UserControl;
 
 namespace CMCL.Wpf
@@ -19,7 +19,7 @@ namespace CMCL.Wpf
         {
             InitializeComponent();
             _httpClientFactory = httpClientFactory;
-            GlobalStaticResource.HttpClientFactory = _httpClientFactory;
+            Utils.HttpClientFactory = _httpClientFactory;
         }
 
         /// <summary>
