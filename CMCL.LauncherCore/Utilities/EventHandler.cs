@@ -1,5 +1,6 @@
 ﻿using System;
 using CMCL.LauncherCore.GameEntities.JsonClasses;
+using CMCL.LauncherCore.Launch;
 
 namespace CMCL.LauncherCore.Utilities
 {

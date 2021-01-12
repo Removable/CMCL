@@ -6,7 +6,7 @@ using CMCL.LauncherCore.GameEntities.LoginInfo;
 using CMCL.LauncherCore.Utilities;
 using Newtonsoft.Json;
 
-namespace CMCL.LauncherCore
+namespace CMCL.LauncherCore.Launch
 {
     public class MojangLogin
     {

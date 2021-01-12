@@ -1,11 +1,10 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CMCL.LauncherCore.GameEntities;
-using ComponentUtil.Common.Data;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace CMCL.LauncherCore.Utilities
 {
@@ -127,28 +126,13 @@ namespace CMCL.LauncherCore.Utilities
         /// <summary>
         ///     下载源
         /// </summary>
+        [JsonConverter(typeof(StringEnumConverter))]
         public DownloadSource DownloadSource { get; set; } = DownloadSource.MCBBS;
 
         /// <summary>
         ///     最大线程数（下载、校验文件等）
         /// </summary>
         public int MaxThreadCount { get; set; } = 4;
-
-        /// <summary>
-        ///     下载源（枚举）
-        /// </summary>
-        [JsonIgnore]
-        public DownloadSource DownloadSourceEnum
-        {
-            get
-            {
-                var enumItems = EnumHelper.GetAllItemsAndDescriptions<DownloadSource>();
-                foreach (var (enumItem, description) in enumItems.Where(valueTuple =>
-                    valueTuple.enumItem == DownloadSource)) return enumItem;
-
-                return DownloadSource.MCBBS;
-            }
-        }
 
         /// <summary>
         ///     最大分配内存大小(M)

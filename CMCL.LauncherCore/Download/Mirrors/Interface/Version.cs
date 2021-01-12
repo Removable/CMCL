@@ -50,7 +50,8 @@ namespace CMCL.LauncherCore.Download.Mirrors.Interface
             var url = TransUrl(version.Url);
 
             var progress = new Progress<double>();
-            progress.ProgressChanged += (sender, value) => { _onDownloadProgressChanged("", value); };
+            progress.ProgressChanged += (sender, value) => { _onDownloadProgressChanged?.Invoke("", value); };
+            _beforeDownloadStart?.Invoke($"{versionId}.json", 1, 0);
             await Downloader.GetFileAsync(Utils.HttpClientFactory.CreateClient(), url,
                 Utils.CombineAndCheckDirectory(true, AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "versions",
                     versionId, $"{versionId}.json"), progress);
@@ -80,7 +81,8 @@ namespace CMCL.LauncherCore.Download.Mirrors.Interface
                     versionInfo.Downloads.Client.Sha1, StringComparison.CurrentCultureIgnoreCase))
             {
                 var progress = new Progress<double>();
-                progress.ProgressChanged += (sender, value) => { _onDownloadProgressChanged("", value); };
+                progress.ProgressChanged += (sender, value) => { _onDownloadProgressChanged?.Invoke("", value); };
+                _beforeDownloadStart?.Invoke($"{versionId}.jar", 1, 0);
                 await Downloader.GetFileAsync(Utils.HttpClientFactory.CreateClient(), url, filePath, progress);
             }
         }

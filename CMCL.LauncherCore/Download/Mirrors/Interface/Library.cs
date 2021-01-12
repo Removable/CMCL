@@ -38,14 +38,14 @@ namespace CMCL.Core.Download.Mirrors.Interface
                     await sem.WaitAsync();
                     if (!dic.TryAdd(libraryInfo.downloadUrl, 0)) return;
 
-                    _beforeDownloadStart("下载库", totalCount, finishedCount);
+                    _beforeDownloadStart?.Invoke("下载库", totalCount, finishedCount);
                     await Downloader
                         .GetFileAsync(Utils.HttpClientFactory.CreateClient(), libraryInfo.downloadUrl,
                             libraryInfo.savePath, null)
                         .ConfigureAwait(false);
 
                     finishedCount++;
-                    _onDownloadFinish("下载库", totalCount, finishedCount);
+                    _onDownloadFinish?.Invoke("下载库", totalCount, finishedCount);
                 }
                 finally
                 {

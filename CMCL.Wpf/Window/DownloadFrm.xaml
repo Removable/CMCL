@@ -7,7 +7,8 @@
         mc:Ignorable="d" WindowStyle="None" WindowStartupLocation="CenterOwner"
         Title="DownloadFrm" Height="320" Width="220" Closed="DownloadFrm_OnClosed">
     <Grid>
-        <hc:CircleProgressBar Margin="50,37,50,108" Style="{DynamicResource ProgressBarInfoCircle}" x:Name="DownloadProgressBar" />
+        <hc:CircleProgressBar Margin="50,37,50,108" Style="{DynamicResource ProgressBarInfoCircle}"
+                              x:Name="DownloadProgressBar" />
         <TextBlock x:Name="TbCurrentTaskName" Height="20" TextAlignment="Center"
                    Margin="0,160,0,65" />
         <TextBlock x:Name="TbCurrentTaskDetail" Height="20" TextAlignment="Center"

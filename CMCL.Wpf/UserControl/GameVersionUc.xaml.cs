@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
 using CMCL.LauncherCore.Download;
-using CMCL.LauncherCore.Download.Mirrors;
 using CMCL.LauncherCore.GameEntities;
 using CMCL.LauncherCore.Utilities;
 using CMCL.Wpf.Window;
@@ -36,14 +35,12 @@ namespace CMCL.Wpf.UserControl
             BtnRefresh.IsEnabled = false;
             BtnDownload.IsEnabled = false;
             var loadingFrm = LoadingFrm.GetInstance(Application.Current.MainWindow);
-            loadingFrm.Dispatcher.BeginInvoke(new Action(() => { loadingFrm.ShowDialog(); }));
+            Dispatcher.BeginInvoke(new Action(() => { loadingFrm.ShowDialog(); }));
 
             var mirror = MirrorManager.GetCurrentMirror();
 
             _gameVersionManifest = await mirror.Version.LoadGameVersionList(_httpClientFactory.CreateClient());
 
-            // _gameVersionManifest = await VersionDownloader.LoadGameVersionList(_httpClientFactory.CreateClient())
-            //     .ConfigureAwait(true);
             var dataTable = new DataTable();
             dataTable.Columns.Add("版本");
             dataTable.Columns.Add("发布时间");
@@ -71,7 +68,7 @@ namespace CMCL.Wpf.UserControl
             BtnRefresh.IsEnabled = true;
             BtnRefresh.Content = "刷新列表";
             BtnDownload.IsEnabled = true;
-            loadingFrm.Dispatcher.BeginInvoke(new Action(() => { loadingFrm.Close(); }));
+            Dispatcher.BeginInvoke(new Action(() => { loadingFrm.Close(); }));
         }
 
         /// <summary>
@@ -116,33 +113,30 @@ namespace CMCL.Wpf.UserControl
                 #region 下载json和jar
 
                 var downloadFrm = DownloadFrm.GetInstance(Application.Current.MainWindow);
-                downloadFrm.Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    downloadFrm.ShowDialog();
-                }));
+                Dispatcher.BeginInvoke(new Action(() => { downloadFrm.ShowDialog(); }));
                 try
                 {
                     //注册事件
-                    mirror.Version.BeforeDownloadStart += (taskName, total, finished) =>
+                    mirror.Version.BeforeDownloadStart += (taskName, _, _) =>
                     {
-                        downloadFrm.Dispatcher.BeginInvoke(new Action(() =>
+                        Dispatcher.BeginInvoke(new Action(() =>
                         {
                             downloadFrm.DownloadProgressBar.Value = 0;
-                            downloadFrm.TbCurrentTaskName.Text = taskName;
-                            downloadFrm.TbCurrentTaskDetail.Text = "";
+                            downloadFrm.TbCurrentTaskName.Text = "正在下载";
+                            downloadFrm.TbCurrentTaskDetail.Text = taskName;
                         }));
                     };
-                    mirror.Version.OnDownloadProgressChanged += (msg, progress) =>
+                    mirror.Version.OnDownloadProgressChanged += (_, progress) =>
                     {
                         downloadFrm.DownloadProgressBar.Value = progress;
                     };
-                    
+
                     await mirror.Version.DownloadJsonAsync(versionId);
                     await mirror.Version.DownloadJarAsync(versionId);
                 }
                 finally
                 {
-                    downloadFrm.Dispatcher.BeginInvoke(new Action(() => { downloadFrm.Close(); }));
+                    Dispatcher.BeginInvoke(new Action(() => { downloadFrm.Close(); }));
                 }
 
                 #endregion
@@ -151,7 +145,7 @@ namespace CMCL.Wpf.UserControl
 
                 #region 下载库文件
 
-                loadingFrm.Dispatcher.BeginInvoke(new Action(() =>
+                Dispatcher.BeginInvoke(new Action(() =>
                 {
                     loadingFrm.TbLodingTip.Text = "校验库文件";
                     loadingFrm.ShowDialog();
@@ -161,7 +155,7 @@ namespace CMCL.Wpf.UserControl
                     var librariesDownloadList = await mirror.Library.GetLibrariesDownloadList(versionId, true);
                     if (librariesDownloadList.Count <= 0)
                     {
-                        loadingFrm.Dispatcher.BeginInvoke(new Action(() => { loadingFrm.Hide(); }));
+                        Dispatcher.BeginInvoke(new Action(() => { loadingFrm.Hide(); }));
                     }
                     else
                     {
@@ -178,14 +172,14 @@ namespace CMCL.Wpf.UserControl
                 }
                 finally
                 {
-                    loadingFrm.Dispatcher.BeginInvoke(new Action(() => { loadingFrm.Hide(); }));
+                    Dispatcher.BeginInvoke(new Action(() => { loadingFrm.Hide(); }));
                 }
 
                 #endregion
 
                 #region 下载资源文件
 
-                loadingFrm.Dispatcher.BeginInvoke(new Action(() =>
+                Dispatcher.BeginInvoke(new Action(() =>
                 {
                     loadingFrm.TbLodingTip.Text = "校验资源文件";
                     loadingFrm.ShowDialog();
@@ -195,7 +189,7 @@ namespace CMCL.Wpf.UserControl
                     var assetsDownloadList = await mirror.Asset.GetAssetsDownloadList(versionId, true);
                     if (assetsDownloadList.Count <= 0)
                     {
-                        loadingFrm.Dispatcher.BeginInvoke(new Action(() => { loadingFrm.Hide(); }));
+                        Dispatcher.BeginInvoke(new Action(() => { loadingFrm.Hide(); }));
                     }
                     else
                     {
@@ -211,7 +205,7 @@ namespace CMCL.Wpf.UserControl
                 }
                 finally
                 {
-                    loadingFrm.Dispatcher.BeginInvoke(new Action(() => { loadingFrm.Close(); }));
+                    Dispatcher.BeginInvoke(new Action(() => { loadingFrm.Close(); }));
                 }
 
                 #endregion

@@ -57,8 +57,7 @@ namespace CMCL.LauncherCore.Download
             {
                 //读取流并写到文件
                 await using Stream stream =
-                        await response.Content
-                            .ReadAsStreamAsync(GameHelper.GetDownloadCancellationToken().Token)
+                        await response.Content.ReadAsStreamAsync(GameHelper.GetDownloadCancellationToken().Token)
                             .ConfigureAwait(false),
                     fileStream = new FileStream(savePath, FileMode.Create, FileAccess.Write, FileShare.None, 4096,
                         true);

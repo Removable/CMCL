@@ -74,7 +74,7 @@ namespace CMCL.LauncherCore.Utilities
 
                     foreach (var s in array)
                         if (s.Contains("javapath"))
-                            return CombineAndCheckDirectory(true, s, "javaw.exe");
+                            return Path.Combine(s, "javaw.exe");
 
                     return string.Empty;
                 }
@@ -163,13 +163,13 @@ namespace CMCL.LauncherCore.Utilities
         /// <param name="path"></param>
         public static string CombineAndCheckDirectory(bool isFile, params string[] path)
         {
-            var newPath = Path.Combine(path);
+            var newPath = Path.Combine(path).Replace(@"/", @"\");
             if (isFile)
                 CreateDirectoryIfNotExist(newPath.Substring(0, newPath.LastIndexOf(@"\", StringComparison.Ordinal)));
             else
                 CreateDirectoryIfNotExist(newPath);
 
-            return newPath.Replace(@"/", @"\");
+            return newPath;
         }
 
         /// <summary>

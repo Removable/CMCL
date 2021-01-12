@@ -152,13 +152,13 @@ namespace CMCL.LauncherCore.Download.Mirrors.Interface
                     await sem.WaitAsync();
                     if (!dic.TryAdd(libraryInfo.downloadUrl, 0)) return;
 
-                    _beforeDownloadStart("下载资源", totalCount, finishedCount);
+                    _beforeDownloadStart?.Invoke("下载资源", totalCount, finishedCount);
 
                     await Downloader.GetFileAsync(Utils.HttpClientFactory.CreateClient(), libraryInfo.downloadUrl,
                         libraryInfo.savePath, null);
 
                     finishedCount++;
-                    _onDownloadFinish("下载资源", totalCount, finishedCount);
+                    _onDownloadFinish?.Invoke("下载资源", totalCount, finishedCount);
                 }
                 finally
                 {

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using CMCL.LauncherCore.Launch;
+using Newtonsoft.Json;
 
 namespace CMCL.LauncherCore.GameEntities.LoginInfo
 {

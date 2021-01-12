@@ -4,10 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using CMCL.LauncherCore.Download.Mirrors;
+using CMCL.LauncherCore.Download;
 using CMCL.LauncherCore.Utilities;
 
-namespace CMCL.LauncherCore
+namespace CMCL.LauncherCore.Launch
 {
     public sealed class Launcher
     {
@@ -25,12 +25,12 @@ namespace CMCL.LauncherCore
             var versionInfo = GameHelper.GetVersionInfo(_config.CurrentVersion);
             try
             {
-                _beforeGameLaunch(this, "正在启动", versionInfo);
+                _beforeGameLaunch?.Invoke(this, "正在启动", versionInfo);
 
                 //检查配置
                 if (!ConfigCheck(out var msg))
                 {
-                    _onLaunchError(this, new Exception(msg));
+                    _onLaunchError?.Invoke(this, new Exception(msg));
                     return false;
                 }
 
@@ -38,7 +38,7 @@ namespace CMCL.LauncherCore
                 _onCleanNativesDir?.Invoke(this, "正在清理缓存", versionInfo);
                 if (!await GameHelper.CleanNativesDir())
                 {
-                    _onLaunchError(this, new Exception("清理缓存失败"));
+                    _onLaunchError?.Invoke(this, new Exception("清理缓存失败"));
                     return false;
                 }
 
@@ -55,20 +55,20 @@ namespace CMCL.LauncherCore
                     (await mirror.Asset.GetAssetsDownloadList(_config.CurrentVersion, true).ConfigureAwait(false))
                     .Any()) //资源文件
                 {
-                    _onLaunchError(this, new Exception("游戏文件缺失，请尝试重新下载"));
+                    _onLaunchError?.Invoke(this, new Exception("游戏文件缺失，请尝试重新下载"));
                     return false;
                 }
 
                 //解压natives文件
-                _onUnzipNatives(this, "正在解压资源", versionInfo);
+                _onUnzipNatives?.Invoke(this, "正在解压资源", versionInfo);
                 await mirror.Library.UnzipNatives(_config.CurrentVersion);
 
                 //登录
-                _onMojangLogin(this, "正在登录");
+                _onMojangLogin?.Invoke(this, "正在登录");
                 var loginResult = await MojangLogin.Login(_config.Account, _config.Password);
                 if (!loginResult.IsSuccess)
                 {
-                    _onLaunchError(this, new Exception($"登录失败：{loginResult.Message}"));
+                    _onLaunchError?.Invoke(this, new Exception($"登录失败：{loginResult.Message}"));
                     return false;
                 }
 
@@ -93,7 +93,7 @@ namespace CMCL.LauncherCore
                 process.ErrorDataReceived += (sender, args) => GameErrorDataReceivedEvent(sender, args.Data);
                 //启动
                 process.Start();
-                _onGameStart(this, versionInfo);
+                _onGameStart?.Invoke(this, versionInfo);
 
                 process.BeginOutputReadLine();
                 process.BeginErrorReadLine();
@@ -103,7 +103,7 @@ namespace CMCL.LauncherCore
             catch (Exception e)
             {
                 await LogHelper.LogExceptionAsync(e);
-                _onLaunchError(this, e);
+                _onLaunchError?.Invoke(this, e);
                 return false;
             }
         }
@@ -148,17 +148,17 @@ namespace CMCL.LauncherCore
 
         private void GameExitEvent(object sender, int exitCode)
         {
-            _onGameExit(sender, GameHelper.GetVersionInfo(_config.CurrentVersion), exitCode);
+            _onGameExit?.Invoke(sender, GameHelper.GetVersionInfo(_config.CurrentVersion), exitCode);
         }
 
         private void GameOutputDataReceivedEvent(object sender, string data)
         {
-            _onGameOutputReceived(sender, data);
+            _onGameOutputReceived?.Invoke(sender, data);
         }
 
         private void GameErrorDataReceivedEvent(object sender, string data)
         {
-            _onGameErrorReceived(sender, data);
+            _onGameErrorReceived?.Invoke(sender, data);
         }
 
         //以下为各类事件属性

@@ -13,7 +13,7 @@ namespace CMCL.LauncherCore.Download.Mirrors.BMCLApi
             Asset = new Asset();
         }
 
-        public override string MirrorName { get; } = "BMCLApi源";
+        public override string MirrorName { get; } = "BMCLApi";
         public override DownloadSource MirrorEnum { get; } = DownloadSource.BMCLApi;
         public override Version Version { get; }
         public override Library Library { get; }

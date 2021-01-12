@@ -18,7 +18,7 @@ namespace CMCL.Wpf.Window
         }
 
         /// <summary>
-        /// 单例：获取窗口
+        ///     单例：获取窗口
         /// </summary>
         /// <param name="dataContext">数据上下文</param>
         /// <param name="owner">Owner</param>

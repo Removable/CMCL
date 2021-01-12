@@ -12,7 +12,7 @@ namespace CMCL.LauncherCore.Download.Mirrors.MCBBS
             Asset = new Asset();
         }
 
-        public override string MirrorName { get; } = "MCBBS源";
+        public override string MirrorName { get; } = "MCBBS";
 
         public override DownloadSource MirrorEnum { get; } = DownloadSource.MCBBS;
         public override Interface.Version Version { get; }
