@@ -13,13 +13,10 @@ namespace CMCL.Wpf
     /// </summary>
     public partial class MainWindow : HandyControl.Controls.Window, IComponentConnector
     {
-        private readonly IHttpClientFactory _httpClientFactory;
 
-        public MainWindow(IHttpClientFactory httpClientFactory)
+        public MainWindow()
         {
             InitializeComponent();
-            _httpClientFactory = httpClientFactory;
-            Utils.HttpClientFactory = _httpClientFactory;
         }
 
         /// <summary>
@@ -40,7 +37,7 @@ namespace CMCL.Wpf
                 var selectedItem = (TabItem) tabControl.SelectedItem;
                 if (selectedItem.Name == "VersionTabItem" && selectedItem.Content == null)
                 {
-                    var gameVersionUc = new GameVersionUc(_httpClientFactory);
+                    var gameVersionUc = new GameVersionUc();
                     selectedItem.Content = gameVersionUc;
                 }
                 else if (selectedItem.Name == "SettingsItem" && selectedItem.Content == null)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -96,47 +97,56 @@ namespace CMCL.LauncherCore.Utilities
         /// <summary>
         ///     账号
         /// </summary>
+        [Description("账号")]
         public string Account { get; set; } = string.Empty;
 
         /// <summary>
         ///     密码
         /// </summary>
+        [Description("密码")]
         public string Password { get; set; } = string.Empty;
 
         /// <summary>
         ///     选中的启动游戏版本
         /// </summary>
+        [Description("启动版本")]
         public string CurrentVersion { get; set; } = string.Empty;
 
         /// <summary>
         ///     自定义的java路径
         /// </summary>
+        [Description("java路径")]
         public string CustomJavaPath { get; set; } = Utils.GetJavaDir();
 
         /// <summary>
         ///     使用默认游戏安装路径
         /// </summary>
+        [Description("使用官方路径")]
         public bool UseDefaultGameDir { get; set; } = true;
 
         /// <summary>
         ///     .minecraft文件夹位置
         /// </summary>
+        [Description("mc文件夹位置")]
         public string MinecraftDir { get; set; } = GameHelper.GetDefaultMinecraftDir();
 
         /// <summary>
         ///     下载源
         /// </summary>
         [JsonConverter(typeof(StringEnumConverter))]
+        [Description("下载源")]
         public DownloadSource DownloadSource { get; set; } = DownloadSource.MCBBS;
 
         /// <summary>
         ///     最大线程数（下载、校验文件等）
         /// </summary>
+        [Description("最大线程数")]
         public int MaxThreadCount { get; set; } = 4;
 
         /// <summary>
         ///     最大分配内存大小(M)
         /// </summary>
+        [Description("最大分配内存大小(M)")]
         public int JavaMemory { get; set; } = 4096;
     }
 }

@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using CMCL.LauncherCore.GameEntities.JsonClasses;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 
 namespace CMCL.LauncherCore.Utilities
@@ -137,6 +139,9 @@ namespace CMCL.LauncherCore.Utilities
 
             //获取所有Version的json
             await LoadVersionInfoList();
+            
+            var serviceProvider = new ServiceCollection().AddHttpClient().BuildServiceProvider();
+            Utils.HttpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
         }
 
         #endregion

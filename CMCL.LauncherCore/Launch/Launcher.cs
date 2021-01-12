@@ -22,17 +22,16 @@ namespace CMCL.LauncherCore.Launch
 
         public async ValueTask<bool> Start()
         {
+            //检查配置
+            if (!ConfigCheck(out var msg))
+            {
+                _onLaunchError?.Invoke(this, new Exception(msg));
+                return false;
+            }
             var versionInfo = GameHelper.GetVersionInfo(_config.CurrentVersion);
             try
             {
                 _beforeGameLaunch?.Invoke(this, "正在启动", versionInfo);
-
-                //检查配置
-                if (!ConfigCheck(out var msg))
-                {
-                    _onLaunchError?.Invoke(this, new Exception(msg));
-                    return false;
-                }
 
                 //清理natives文件缓存
                 _onCleanNativesDir?.Invoke(this, "正在清理缓存", versionInfo);
@@ -115,6 +114,11 @@ namespace CMCL.LauncherCore.Launch
         /// <returns></returns>
         private bool ConfigCheck(out string msg)
         {
+            if (_config == null)
+            {
+                msg = "配置未加载";
+                return false;
+            }
             if (GameHelper.GetVersionInfo(_config.CurrentVersion) == null)
             {
                 msg = "选择的版本不存在，请重新下载";

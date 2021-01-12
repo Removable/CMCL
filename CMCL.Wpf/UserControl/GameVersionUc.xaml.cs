@@ -17,13 +17,11 @@ namespace CMCL.Wpf.UserControl
     /// </summary>
     public partial class GameVersionUc : System.Windows.Controls.UserControl
     {
-        private readonly IHttpClientFactory _httpClientFactory;
         private VersionManifest _gameVersionManifest;
 
-        public GameVersionUc(IHttpClientFactory httpClientFactory)
+        public GameVersionUc()
         {
             InitializeComponent();
-            _httpClientFactory = httpClientFactory;
         }
 
         private void GameVersionUc_OnLoaded(object sender, RoutedEventArgs e)
@@ -39,7 +37,7 @@ namespace CMCL.Wpf.UserControl
 
             var mirror = MirrorManager.GetCurrentMirror();
 
-            _gameVersionManifest = await mirror.Version.LoadGameVersionList(_httpClientFactory.CreateClient());
+            _gameVersionManifest = await mirror.Version.LoadGameVersionList(Utils.HttpClientFactory.CreateClient());
 
             var dataTable = new DataTable();
             dataTable.Columns.Add("版本");
