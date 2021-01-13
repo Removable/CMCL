@@ -133,29 +133,29 @@ namespace CMCL.LauncherCore.Download.Mirrors.Interface
         }
 
         /// <summary>
-        ///     下载Libraries
+        ///     下载Assets
         /// </summary>
-        /// <param name="librariesToDownload">待下载列表</param>
+        /// <param name="assetsToDownload">待下载列表</param>
         /// <returns></returns>
-        public virtual async ValueTask DownloadAssets(List<(string savePath, string downloadUrl)> librariesToDownload)
+        public virtual async ValueTask DownloadAssets(List<(string savePath, string downloadUrl)> assetsToDownload)
         {
-            var totalCount = librariesToDownload.Count;
+            var totalCount = assetsToDownload.Count;
             if (totalCount <= 0) return;
 
             var dic = new ConcurrentDictionary<string, int>();
             var sem = new SemaphoreSlim(AppConfig.GetAppConfig().MaxThreadCount);
             var finishedCount = 0;
-            var taskArray = librariesToDownload.Select(libraryInfo => Task.Run(async () =>
+            var taskArray = assetsToDownload.Select(assetInfo => Task.Run(async () =>
             {
                 try
                 {
                     await sem.WaitAsync();
-                    if (!dic.TryAdd(libraryInfo.downloadUrl, 0)) return;
+                    if (!dic.TryAdd(assetInfo.downloadUrl, 0)) return;
 
                     _beforeDownloadStart?.Invoke("下载资源", totalCount, finishedCount);
 
-                    await Downloader.GetFileAsync(Utils.HttpClientFactory.CreateClient(), libraryInfo.downloadUrl,
-                        libraryInfo.savePath, null);
+                    await Downloader.GetFileAsync(Utils.HttpClientFactory.CreateClient(), assetInfo.downloadUrl,
+                        assetInfo.savePath, null);
 
                     finishedCount++;
                     _onDownloadFinish?.Invoke("下载资源", totalCount, finishedCount);
@@ -173,7 +173,7 @@ namespace CMCL.LauncherCore.Download.Mirrors.Interface
         /// </summary>
         /// <param name="originUrl"></param>
         /// <returns></returns>
-        protected string TransUrl(string originUrl)
+        protected virtual string TransUrl(string originUrl)
         {
             if (originUrl.StartsWith("http"))
             {

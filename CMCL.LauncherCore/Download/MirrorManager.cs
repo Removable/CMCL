@@ -3,6 +3,7 @@ using System.Linq;
 using CMCL.Core.Download.Mirrors.Interface;
 using CMCL.LauncherCore.Download.Mirrors.BMCLApi;
 using CMCL.LauncherCore.Download.Mirrors.MCBBS;
+using CMCL.LauncherCore.Download.Mirrors.Official;
 using CMCL.LauncherCore.GameEntities;
 using CMCL.LauncherCore.Utilities;
 
@@ -13,7 +14,8 @@ namespace CMCL.LauncherCore.Download
         private static readonly List<Mirror> Mirrors = new()
         {
             new MCBBS(),
-            new BMCLApi()
+            new BMCLApi(),
+            new OfficialSource(),
         };
 
         /// <summary>

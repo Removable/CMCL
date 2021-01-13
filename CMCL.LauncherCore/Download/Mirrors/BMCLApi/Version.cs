@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace CMCL.Core.Download.Mirrors.BMCLApi
+namespace CMCL.LauncherCore.Download.Mirrors.BMCLApi
 {
     public class Version : LauncherCore.Download.Mirrors.Interface.Version
     {

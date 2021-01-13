@@ -1,4 +1,4 @@
-﻿namespace CMCL.Core.Download.Mirrors.BMCLApi
+﻿namespace CMCL.LauncherCore.Download.Mirrors.BMCLApi
 {
     public class Asset : LauncherCore.Download.Mirrors.Interface.Asset
     {

@@ -30,11 +30,6 @@ namespace CMCL.Wpf.UserControl
 
         private async ValueTask LoadGameVersionList()
         {
-            BtnRefresh.IsEnabled = false;
-            BtnDownload.IsEnabled = false;
-            var loadingFrm = LoadingFrm.GetInstance(Application.Current.MainWindow);
-            Dispatcher.BeginInvoke(new Action(() => { loadingFrm.ShowDialog(); }));
-
             var mirror = MirrorManager.GetCurrentMirror();
 
             _gameVersionManifest = await mirror.Version.LoadGameVersionList(Utils.HttpClientFactory.CreateClient());
@@ -62,11 +57,6 @@ namespace CMCL.Wpf.UserControl
             }
 
             VersionListView.ItemsSource = dataTable.DefaultView;
-
-            BtnRefresh.IsEnabled = true;
-            BtnRefresh.Content = "刷新列表";
-            BtnDownload.IsEnabled = true;
-            Dispatcher.BeginInvoke(new Action(() => { loadingFrm.Close(); }));
         }
 
         /// <summary>
@@ -76,6 +66,10 @@ namespace CMCL.Wpf.UserControl
         /// <param name="e"></param>
         private async void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
+            BtnRefresh.IsEnabled = false;
+            BtnDownload.IsEnabled = false;
+            var loadingFrm = LoadingFrm.GetInstance(Application.Current.MainWindow);
+            Dispatcher.BeginInvoke(new Action(() => { loadingFrm.ShowDialog(); }));
             try
             {
                 await LoadGameVersionList().ConfigureAwait(false);
@@ -84,6 +78,17 @@ namespace CMCL.Wpf.UserControl
             {
                 await LogHelper.LogExceptionAsync(exception).ConfigureAwait(false);
                 NotifyIcon.ShowBalloonTip("错误", "加载版本列表错误", NotifyIconInfoType.Error, "AppNotifyIcon");
+            }
+            finally
+            {
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    loadingFrm.Close();
+                    BtnRefresh.IsEnabled = true;
+                    BtnRefresh.Content = "刷新列表";
+                    if (VersionListView.Items.Count > 0)
+                        BtnDownload.IsEnabled = true;
+                }));
             }
         }
 

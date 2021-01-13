@@ -1,8 +1,8 @@
 ﻿using System.Linq;
 
-namespace CMCL.Core.Download.Mirrors.BMCLApi
+namespace CMCL.LauncherCore.Download.Mirrors.BMCLApi
 {
-    public class Library : Interface.Library
+    public class Library : Core.Download.Mirrors.Interface.Library
     {
         /// <summary>
         ///     转换下载地址
