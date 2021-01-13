@@ -95,6 +95,7 @@ namespace CMCL.Wpf.UserControl
                     startBtn.Content = "正在运行";
                     if (loadingFrm.IsVisible) loadingFrm.Close();
                 }));
+                NotifyIcon.ShowBalloonTip("提示", "游戏已启动", NotifyIconInfoType.Info, "AppNotifyIcon");
             };
             launcher.OnGameOutputReceived += (_, data) =>
             {
@@ -123,9 +124,6 @@ namespace CMCL.Wpf.UserControl
             {
                 //开始启动
                 var isLaunched = await launcher.Start();
-
-                Dispatcher.BeginInvoke(new Action(() => { startBtn.Content = "正在运行"; }));
-                NotifyIcon.ShowBalloonTip("提示", "游戏已启动", NotifyIconInfoType.Info, "AppNotifyIcon");
             }
             catch (Exception exception)
             {
