@@ -2,7 +2,7 @@
 
 namespace CMCL.LauncherCore.Download.Mirrors.MCBBS
 {
-    public class Library : Core.Download.Mirrors.Interface.Library
+    public class Library : Interface.Library
     {
         /// <summary>
         ///     转换下载地址

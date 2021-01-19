@@ -1,4 +1,4 @@
-﻿using CMCL.Core.Download.Mirrors.Interface;
+﻿using CMCL.LauncherCore.Download.Mirrors.Interface;
 using CMCL.LauncherCore.GameEntities;
 
 namespace CMCL.LauncherCore.Download.Mirrors.MCBBS
@@ -16,7 +16,7 @@ namespace CMCL.LauncherCore.Download.Mirrors.MCBBS
 
         public override DownloadSource MirrorEnum { get; } = DownloadSource.MCBBS;
         public override Interface.Version Version { get; }
-        public override Core.Download.Mirrors.Interface.Library Library { get; }
+        public override Interface.Library Library { get; }
         public override Interface.Asset Asset { get; }
     }
 }

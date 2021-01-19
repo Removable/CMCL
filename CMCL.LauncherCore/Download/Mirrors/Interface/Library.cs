@@ -7,10 +7,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using CMCL.LauncherCore.Download;
 using CMCL.LauncherCore.Utilities;
 
-namespace CMCL.Core.Download.Mirrors.Interface
+namespace CMCL.LauncherCore.Download.Mirrors.Interface
 {
     public abstract class Library
     {

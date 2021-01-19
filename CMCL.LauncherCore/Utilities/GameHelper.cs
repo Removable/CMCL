@@ -67,6 +67,42 @@ namespace CMCL.LauncherCore.Utilities
                     }
                 }
             }
+
+            foreach (var versionInfo in VersionInfoList)
+            {
+                //如有此键，则为forge的版本json
+                if (!string.IsNullOrWhiteSpace(versionInfo.InheritsFrom))
+                {
+                    var inheritVersion = VersionInfoList.FirstOrDefault(i => i.Id == versionInfo.InheritsFrom);
+                    if (inheritVersion == null)
+                    {
+                        VersionInfoList.Remove(versionInfo);
+                    }
+                    else
+                    {
+                        //forge的参数优先于原版
+                        if (inheritVersion.Arguments.Game != null)
+                        {
+                            versionInfo.Arguments.Game ??= Array.Empty<object>();
+                            versionInfo.Arguments.Game =
+                                versionInfo.Arguments.Game.Concat(inheritVersion.Arguments.Game).ToArray();
+                        }
+
+                        if (inheritVersion.Arguments.Jvm != null)
+                        {
+                            versionInfo.Arguments.Jvm ??= Array.Empty<object>();
+                            versionInfo.Arguments.Jvm =
+                                versionInfo.Arguments.Jvm.Concat(inheritVersion.Arguments.Jvm).ToArray();
+                        }
+
+                        if (inheritVersion.Libraries != null)
+                        {
+                            versionInfo.Libraries ??= Array.Empty<LibraryInfo>();
+                            versionInfo.Libraries = versionInfo.Libraries.Concat(inheritVersion.Libraries).ToArray();
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -139,7 +175,7 @@ namespace CMCL.LauncherCore.Utilities
 
             //获取所有Version的json
             await LoadVersionInfoList();
-            
+
             var serviceProvider = new ServiceCollection().AddHttpClient().BuildServiceProvider();
             Utils.HttpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
         }

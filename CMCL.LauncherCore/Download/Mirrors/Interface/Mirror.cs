@@ -1,7 +1,6 @@
-using CMCL.LauncherCore.Download.Mirrors.Interface;
 using CMCL.LauncherCore.GameEntities;
 
-namespace CMCL.Core.Download.Mirrors.Interface
+namespace CMCL.LauncherCore.Download.Mirrors.Interface
 {
     public abstract class Mirror
     {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using CMCL.Core.Download.Mirrors.Interface;
 using CMCL.LauncherCore.Download.Mirrors.BMCLApi;
+using CMCL.LauncherCore.Download.Mirrors.Interface;
 using CMCL.LauncherCore.Download.Mirrors.MCBBS;
 using CMCL.LauncherCore.Download.Mirrors.Official;
 using CMCL.LauncherCore.GameEntities;
