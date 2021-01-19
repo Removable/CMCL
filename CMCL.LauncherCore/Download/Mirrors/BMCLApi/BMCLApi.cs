@@ -11,6 +11,7 @@ namespace CMCL.LauncherCore.Download.Mirrors.BMCLApi
             Version = new Version();
             Asset = new Asset();
             Library = new Library();
+            Forge = new Forge();
         }
 
         public override string MirrorName { get; } = "BMCLApi";
@@ -18,5 +19,6 @@ namespace CMCL.LauncherCore.Download.Mirrors.BMCLApi
         public override Version Version { get; }
         public override Interface.Library Library { get; }
         public override Asset Asset { get; }
+        public override Interface.Forge Forge { get; }
     }
 }

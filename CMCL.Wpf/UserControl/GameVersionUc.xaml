@@ -17,17 +17,42 @@
                 <GridView>
                     <GridViewColumn Width="100" Header="版本" DisplayMemberBinding="{Binding Path=版本}" />
                     <GridViewColumn Width="180" Header="发布时间" DisplayMemberBinding="{Binding Path=发布时间}" />
-                    <GridViewColumn Header="类型" DisplayMemberBinding="{Binding Path=类型}" />
+                    <GridViewColumn Width="150" Header="类型" DisplayMemberBinding="{Binding Path=类型}" />
+                    <GridViewColumn Width="200" Header="Forge" DisplayMemberBinding="{Binding Path=Forge}" />
                 </GridView>
             </ListView.View>
         </ListView>
-        <hc:ButtonGroup Grid.Row="1" Height="45">
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" x:Name="BtnRefresh" Content="获取列表" Height="45" Cursor="Hand"
+                    HorizontalAlignment="Stretch" Margin="0,0,0,0" hc:BorderElement.CornerRadius="0"
+                    Click="ButtonBase_OnClick" />
+            <hc:SplitButton Grid.Column="1" x:Name="BtnDownload" Content="选择下载类型" Height="45" hc:BorderElement.CornerRadius="0"
+                            IsEnabled="False" HorizontalAlignment="Stretch" Margin="0,0,0,0" HitMode="Hover">
+                <hc:SplitButton.DropDownContent>
+                    <StackPanel x:Name="SpDownloadTypes" Cursor="Hand">
+                        <MenuItem Header="下载原版" Click="BtnDownload_OnClick"></MenuItem>
+                    </StackPanel>
+                </hc:SplitButton.DropDownContent>
+            </hc:SplitButton>
+        </Grid>
+        <!--<hc:ButtonGroup Grid.Row="1" Height="45">
             <Button x:Name="BtnRefresh" Style="{StaticResource ButtonCustom}" Content="获取列表" Height="45"
                     VerticalAlignment="Stretch" Margin="0,0,0,0" hc:BorderElement.CornerRadius="0"
                     Click="ButtonBase_OnClick" />
-            <Button x:Name="BtnDownload" Style="{StaticResource ButtonCustom}" Content="下载" Height="45"
+            <Button x:Name="BtnDownload" Style="{StaticResource ButtonCustom}" Content="下载原版" Height="45"
                     VerticalAlignment="Stretch" Margin="0,0,0,0" hc:BorderElement.CornerRadius="0"
                     Click="BtnDownload_OnClick" IsEnabled="False" />
-        </hc:ButtonGroup>
+            <hc:SplitButton x:Name="BtnForgeDownload" Height="45" Margin="0,0,0,0" VerticalAlignment="Stretch" hc:BorderElement.CornerRadius="0" IsEnabled="False">
+                <hc:SplitButton.DropDownContent>
+                    <StackPanel>
+                        <MenuItem Header="111"></MenuItem>
+                    </StackPanel>
+                </hc:SplitButton.DropDownContent>
+            </hc:SplitButton>
+        </hc:ButtonGroup>-->
     </Grid>
 </UserControl>

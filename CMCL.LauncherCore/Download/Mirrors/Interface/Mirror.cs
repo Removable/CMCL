@@ -28,5 +28,10 @@ namespace CMCL.LauncherCore.Download.Mirrors.Interface
         ///     资源
         /// </summary>
         public abstract Asset Asset { get; }
+
+        /// <summary>
+        /// Forge
+        /// </summary>
+        public abstract Forge Forge { get; }
     }
 }

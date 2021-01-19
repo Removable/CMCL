@@ -10,6 +10,7 @@ namespace CMCL.LauncherCore.Download.Mirrors.MCBBS
             Version = new Version();
             Library = new Library();
             Asset = new Asset();
+            Forge = new Forge();
         }
 
         public override string MirrorName { get; } = "MCBBS";
@@ -18,5 +19,6 @@ namespace CMCL.LauncherCore.Download.Mirrors.MCBBS
         public override Interface.Version Version { get; }
         public override Interface.Library Library { get; }
         public override Interface.Asset Asset { get; }
+        public override Interface.Forge Forge { get; }
     }
 }

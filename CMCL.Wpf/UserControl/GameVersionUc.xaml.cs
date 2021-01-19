@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Data;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
 using CMCL.LauncherCore.Download;
 using CMCL.LauncherCore.GameEntities;
+using CMCL.LauncherCore.GameEntities.JsonClasses;
 using CMCL.LauncherCore.Utilities;
 using CMCL.Wpf.Window;
 using HandyControl.Controls;
@@ -17,7 +19,8 @@ namespace CMCL.Wpf.UserControl
     /// </summary>
     public partial class GameVersionUc : System.Windows.Controls.UserControl
     {
-        private VersionManifest _gameVersionManifest;
+        private static VersionManifest _gameVersionManifest;
+        private static ForgeVersion[] _forgePromos;
 
         public GameVersionUc()
         {
@@ -33,14 +36,19 @@ namespace CMCL.Wpf.UserControl
             var mirror = MirrorManager.GetCurrentMirror();
 
             _gameVersionManifest = await mirror.Version.LoadGameVersionList(Utils.HttpClientFactory.CreateClient());
+            _forgePromos = await mirror.Forge.GetForgeVersionList(Utils.HttpClientFactory.CreateClient());
 
             var dataTable = new DataTable();
             dataTable.Columns.Add("版本");
             dataTable.Columns.Add("发布时间");
             dataTable.Columns.Add("类型");
+            dataTable.Columns.Add("Forge");
             dataTable.Columns.Add("url");
             foreach (var gameVersionInfo in _gameVersionManifest.Versions)
             {
+                //查找支持该版本的forge
+                var supportedForgeList = _forgePromos.Where(f => f.Build != null && f.Build.McVersion == gameVersionInfo.Id).ToArray();
+
                 var remark = string.Empty;
                 if (gameVersionInfo.Id == _gameVersionManifest.Latest.Release)
                     remark = "(最新稳定版)";
@@ -50,6 +58,7 @@ namespace CMCL.Wpf.UserControl
                 dr["版本"] = gameVersionInfo.Id;
                 dr["发布时间"] = DateTime.Parse(gameVersionInfo.ReleaseTime).ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss");
                 dr["类型"] = $"{gameVersionInfo.Type}{remark}";
+                dr["Forge"] = supportedForgeList.Length > 0 ? "支持" : "-";
                 dr["url"] = gameVersionInfo.Url;
                 dataTable.Rows.Add(dr);
                 //从1.13正式版开始支持，更早版本抛弃
