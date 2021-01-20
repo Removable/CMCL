@@ -13,9 +13,7 @@
     </hc:Window.NonClientAreaContent>
     <Grid>
         <TabControl x:Name="TabMain" SelectionChanged="TabControl_OnSelectionChanged">
-            <TabItem Header="开始游戏" x:Name="MainTabItem">
-                <!--<userControl:MainTabUc></userControl:MainTabUc>-->
-            </TabItem>
+            <TabItem Header="开始游戏" x:Name="MainTabItem" />
             <TabItem Header="游戏下载" x:Name="VersionTabItem" />
             <TabItem Header="设置" x:Name="SettingsItem" />
         </TabControl>
