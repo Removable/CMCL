@@ -60,7 +60,9 @@ namespace CMCL.LauncherCore.Utilities
                     var jsonStr = await File.ReadAllTextAsync(jsonPath);
                     try
                     {
-                        VersionInfoList.Add(JsonConvert.DeserializeObject<VersionInfo>(jsonStr));
+                        var vi = JsonConvert.DeserializeObject<VersionInfo>(jsonStr);
+                        if (vi == null) continue;
+                        VersionInfoList.Add(vi);
                     }
                     catch
                     {

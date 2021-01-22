@@ -106,37 +106,31 @@ namespace CMCL.Wpf.UserControl
                     LoadingFrm.GetInstance(Application.Current.MainWindow).Close();
                     BtnRefresh.IsEnabled = true;
                     BtnRefresh.Content = "刷新列表";
-                    if (VersionListView.Items.Count > 0)
-                        BtnDownload.IsEnabled = true;
                 }));
             }
         }
 
         /// <summary>
-        ///     下载按钮
+        /// 下载指定版本
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private async void BtnDownload_OnClick(object sender, RoutedEventArgs e)
+        private async void DownloadSelectedVersion(object sender, RoutedEventArgs e)
         {
-            if (!(VersionListView.SelectedItem is DataRowView selectVer))
-            {
-                NotifyIcon.ShowBalloonTip("提示", "请选择一个版本", NotifyIconInfoType.Warning, "AppNotifyIcon");
-                return;
-            }
-
-            BtnDownload.IsEnabled = false;
-            BtnRefresh.IsEnabled = false;
-
             try
             {
+                var versionId = ((DataRowView) VersionListView.SelectedItem)["版本"].ToString();
+
+                BtnDownload.IsEnabled = false;
+                BtnRefresh.IsEnabled = false;
+
                 var mirror = MirrorManager.GetCurrentMirror();
-                var versionId = selectVer["版本"].ToString();
 
                 #region 下载json和jar
 
                 var downloadFrm = DownloadFrm.GetInstance(Application.Current.MainWindow);
-                Dispatcher.BeginInvoke(new Action(() => { downloadFrm.ShowDialog(); }));
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    if (!downloadFrm.IsVisible) downloadFrm.ShowDialog();
+                }));
                 try
                 {
                     //注册事件
@@ -257,23 +251,27 @@ namespace CMCL.Wpf.UserControl
         {
             if (!(VersionListView.SelectedItem is DataRowView selectVer))
             {
-                NotifyIcon.ShowBalloonTip("错误", "发生错误", NotifyIconInfoType.Error, "AppNotifyIcon");
                 return;
             }
+
+            var versionId = selectVer["版本"].ToString();
+
             SpDownloadTypes.Children.Clear();
-            var originMenuItem = new MenuItem {Header = "下载原版"};
-            originMenuItem.Click += BtnDownload_OnClick;
+            var originMenuItem = new MenuItem {Header = $"下载原版{versionId}"};
+            originMenuItem.Click += DownloadSelectedVersion;
             SpDownloadTypes.Children.Add(originMenuItem);
 
-            var version = selectVer["版本"].ToString();
-            var forgeVersions = _forgePromos.Where(f => f.Build != null && f.Build.McVersion == version).ToArray();
+            var forgeVersions = _forgePromos.Where(f => f.Build != null && f.Build.McVersion == versionId).ToArray();
             foreach (var fv in forgeVersions)
             {
-                var forgeMenuItem = new MenuItem {Header = $"下载并安装Forge({fv.Name.Replace("recommended","推荐版").Replace("latest","最新版")})"};
-                originMenuItem.Click += BtnDownload_OnClick;
-                
+                var forgeMenuItem = new MenuItem
+                    {Header = $"下载并安装Forge({fv.Name.Replace("recommended", "推荐版").Replace("latest", "最新版")})"};
+                forgeMenuItem.Click += DownloadSelectedVersion;
+
                 SpDownloadTypes.Children.Add(forgeMenuItem);
             }
+
+            BtnDownload.IsEnabled = true;
         }
     }
 }
