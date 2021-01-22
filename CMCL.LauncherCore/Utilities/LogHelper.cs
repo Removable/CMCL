@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using ComponentUtil.Common.Data;
 
@@ -29,17 +30,41 @@ namespace CMCL.LauncherCore.Utilities
             return logContent;
         }
 
+        private static async Task AppendText(string filePath, string fileContent, Encoding encoding)
+        {
+            var sem = new SemaphoreSlim(1);
+            await sem.WaitAsync();
+            try
+            {
+                await InnerFunction(1);
+            }
+            finally
+            {
+                sem.Release();
+            }
+
+            async Task InnerFunction(int tryIndex)
+            {
+                try
+                {
+                    await sem.WaitAsync();
+                    await File.AppendAllTextAsync(filePath, fileContent, encoding).ConfigureAwait(false);
+                    sem.Release();
+                }
+                catch (IOException e)
+                {
+                    if (tryIndex <= 2)
+                        await InnerFunction(tryIndex + 1);
+                    else throw;
+                }
+            }
+        }
+
         public static async Task LogExceptionAsync(Exception exception, LogLevel logLevel = LogLevel.Error)
         {
             var logContent = GetLogContent(exception, logLevel);
-            await File.AppendAllTextAsync(Path.Combine(LogDirectory, DateTime.Now.ToString("yyyyMMdd") + ".txt"),
-                logContent, Encoding.UTF8).ConfigureAwait(false);
-        }
 
-        public static void LogException(Exception exception, LogLevel logLevel = LogLevel.Error)
-        {
-            var logContent = GetLogContent(exception, logLevel);
-            File.AppendAllText(Path.Combine(LogDirectory, DateTime.Now.ToString("yyyyMMdd") + ".txt"), logContent,
+            await AppendText(Path.Combine(LogDirectory, DateTime.Now.ToString("yyyyMMdd") + ".txt"), logContent,
                 Encoding.UTF8);
         }
 
@@ -47,8 +72,9 @@ namespace CMCL.LauncherCore.Utilities
         {
             var logContent =
                 $"\r\n------------------\r\n【时间】{DateTime.Now.GetTimeString()}\r\n【级别】{logLevel.GetDescription()}\r\n【描述】{shortMsg}\r\n【详细】{fullMsg}";
-            await File.AppendAllTextAsync(Path.Combine(LogDirectory, DateTime.Now.ToString("yyyyMMdd") + ".txt"),
-                logContent, Encoding.UTF8).ConfigureAwait(false);
+
+            await AppendText(Path.Combine(LogDirectory, DateTime.Now.ToString("yyyyMMdd") + ".txt"), logContent,
+                Encoding.UTF8);
         }
     }
 }
