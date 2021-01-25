@@ -8,6 +8,6 @@ namespace CMCL.LauncherCore.Download.Mirrors.BMCLApi
 {
     public class Forge : Interface.Forge
     {
-        public override string GetPromosUrl { get; } = "https://bmclapi2.bangbang93.com/forge/promos";
+        protected override string MirrorUrl { get; } = "https://bmclapi2.bangbang93.com";
     }
 }

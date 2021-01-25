@@ -8,6 +8,6 @@ namespace CMCL.LauncherCore.Download.Mirrors.MCBBS
 {
     public class Forge : Interface.Forge
     {
-        public override string GetPromosUrl { get; } = "https://download.mcbbs.net/forge/promos";
+        protected override string MirrorUrl { get; } = "https://download.mcbbs.net";
     }
 }

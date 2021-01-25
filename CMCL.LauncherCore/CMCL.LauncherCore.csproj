@@ -34,4 +34,9 @@
       </Compile>
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="Resources\forge-installer.jar" />
+      <Content Include="Resources\forge-installer.jar" />
+    </ItemGroup>
+
 </Project>

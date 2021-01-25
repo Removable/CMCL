@@ -26,6 +26,7 @@ namespace CMCL.LauncherCore.GameEntities.JsonClasses
             {
                 [JsonProperty("category")] public string Category { get; set; }
                 [JsonProperty("format")] public string Format { get; set; }
+                [JsonProperty("hash")] public string Hash { get; set; }
             }
         }
     }

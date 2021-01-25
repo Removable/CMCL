@@ -61,6 +61,16 @@ namespace CMCL.LauncherCore.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] forge_installer {
+            get {
+                object obj = ResourceManager.GetObject("forge_installer", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 
         ///            {
         ///    &quot;selectedProfile&quot;: &quot;(Default)&quot;,

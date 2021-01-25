@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Data;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -13,6 +15,7 @@ using CMCL.Wpf.Window;
 using ComponentUtil.Common.Data;
 using HandyControl.Controls;
 using HandyControl.Data;
+using Newtonsoft.Json;
 
 namespace CMCL.Wpf.UserControl
 {
@@ -113,16 +116,18 @@ namespace CMCL.Wpf.UserControl
         /// <summary>
         /// 下载指定版本
         /// </summary>
-        private async void DownloadSelectedVersion(object sender, RoutedEventArgs e)
+        /// <param name="versionId">mc版本</param>
+        /// <param name="forgeVersion">forge版本，不安装则留空</param>
+        private async void DownloadSelectedVersion(string versionId, string forgeVersion = "")
         {
             try
             {
-                var versionId = ((DataRowView) VersionListView.SelectedItem)["版本"].ToString();
-
                 BtnDownload.IsEnabled = false;
                 BtnRefresh.IsEnabled = false;
 
                 var mirror = MirrorManager.GetCurrentMirror();
+
+                #region 原版游戏下载
 
                 #region 下载json和jar
 
@@ -227,12 +232,59 @@ namespace CMCL.Wpf.UserControl
 
                 #endregion
 
+                #endregion
+
+                #region Forge下载和安装
+
+                if (!string.IsNullOrWhiteSpace(forgeVersion))
+                {
+                    var selectedForge =
+                        _forgePromos.FirstOrDefault(f => f.Build != null && f.Build.Version == forgeVersion);
+
+                    #region forge安装器下载
+
+                    //注册事件
+                    mirror.Forge.BeforeDownloadStart += (taskName, _, _) =>
+                    {
+                        Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            downloadFrm = DownloadFrm.GetInstance(Application.Current.MainWindow);
+                            if (!downloadFrm.IsVisible) downloadFrm.ShowDialog();
+                            downloadFrm.DownloadProgressBar.Value = 0;
+                            downloadFrm.TbCurrentTaskName.Text = "正在下载";
+                            downloadFrm.TbCurrentTaskDetail.Text = taskName;
+                        }));
+                    };
+                    mirror.Forge.OnDownloadProgressChanged += (_, progress) =>
+                    {
+                        Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            downloadFrm.DownloadProgressBar.Value = progress;
+                        }));
+                    };
+                    mirror.Forge.OnDownloadFinish += (_, _, _) =>
+                    {
+                        Dispatcher.BeginInvoke(new Action(() => { downloadFrm.Hide(); }));
+                    };
+                    var installerPath = await mirror.Forge.DownloadForgeInstaller(selectedForge);
+
+                    #endregion
+
+                    #region forge安装
+
+                    await mirror.Forge.InstallForge(selectedForge, installerPath);
+
+                    #endregion
+                }
+
+                #endregion
+
                 NotifyIcon.ShowBalloonTip("提示", "下载完成", NotifyIconInfoType.Info, "AppNotifyIcon");
             }
             catch (Exception exception)
             {
                 await LogHelper.LogExceptionAsync(exception);
-                NotifyIcon.ShowBalloonTip("错误", "下载失败", NotifyIconInfoType.Error, "AppNotifyIcon");
+                NotifyIcon.ShowBalloonTip("错误", $"下载失败:{exception.Message}", NotifyIconInfoType.Error, "AppNotifyIcon");
             }
             finally
             {
@@ -258,7 +310,7 @@ namespace CMCL.Wpf.UserControl
 
             SpDownloadTypes.Children.Clear();
             var originMenuItem = new MenuItem {Header = $"下载原版{versionId}"};
-            originMenuItem.Click += DownloadSelectedVersion;
+            originMenuItem.Click += (_, _) => { DownloadSelectedVersion(versionId); };
             SpDownloadTypes.Children.Add(originMenuItem);
 
             var forgeVersions = _forgePromos.Where(f => f.Build != null && f.Build.McVersion == versionId).ToArray();
@@ -266,7 +318,7 @@ namespace CMCL.Wpf.UserControl
             {
                 var forgeMenuItem = new MenuItem
                     {Header = $"下载并安装Forge({fv.Name.Replace("recommended", "推荐版").Replace("latest", "最新版")})"};
-                forgeMenuItem.Click += DownloadSelectedVersion;
+                forgeMenuItem.Click += (_, _) => { DownloadSelectedVersion(versionId, fv.Build.Version); };
 
                 SpDownloadTypes.Children.Add(forgeMenuItem);
             }
