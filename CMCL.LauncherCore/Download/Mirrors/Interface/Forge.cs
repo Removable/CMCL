@@ -110,17 +110,17 @@ namespace CMCL.LauncherCore.Download.Mirrors.Interface
 
             var dic = new ConcurrentDictionary<string, int>();
             var sem = new SemaphoreSlim(AppConfig.GetAppConfig().MaxThreadCount);
-            var finishedCount = 0;
+            var finishedCount = 1;
             var taskArray = forgeVersionInfo.Libraries.Select(libraryInfo => Task.Run(async () =>
             {
                 try
                 {
+                    if (libraryInfo.Name.StartsWith("net.minecraftforge:forge:")) return;
                     if (!dic.TryAdd(libraryInfo.Downloads.Artifact.Url, 0)) return;
 
                     _beforeDownloadStart?.Invoke("下载Forge库", totalCount, finishedCount);
                     var sp = Utils.CombineAndCheckDirectory(true, basePath, libraryInfo.Downloads.Artifact.Path);
                     //转换地址
-                    //TODO 这里forge-1.16.5-36.0.0.jar的下载地址为空
                     var url = TransUrl(libraryInfo.Downloads.Artifact.Url);
                     if (File.Exists(sp) && string.Equals(await Utils.GetSha1HashFromFileAsync(sp).ConfigureAwait(false),
                         libraryInfo.Downloads.Artifact.Sha1, StringComparison.OrdinalIgnoreCase))

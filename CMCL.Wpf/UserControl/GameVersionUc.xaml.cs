@@ -249,10 +249,10 @@ namespace CMCL.Wpf.UserControl
                         Dispatcher.BeginInvoke(new Action(() =>
                         {
                             downloadFrm = DownloadFrm.GetInstance(Application.Current.MainWindow);
-                            if (!downloadFrm.IsVisible) downloadFrm.ShowDialog();
                             downloadFrm.DownloadProgressBar.Value = 0;
                             downloadFrm.TbCurrentTaskName.Text = "正在下载";
                             downloadFrm.TbCurrentTaskDetail.Text = taskName;
+                            if (!downloadFrm.IsVisible) downloadFrm.ShowDialog();
                         }));
                     };
                     mirror.Forge.OnDownloadProgressChanged += (_, progress) =>
@@ -272,6 +272,22 @@ namespace CMCL.Wpf.UserControl
 
                     #region forge安装
 
+                    Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        loadingFrm = LoadingFrm.GetInstance(Application.Current.MainWindow);
+                        loadingFrm.TbLodingTip.Text = $"下载Forge库";
+                        loadingFrm.ShowDialog();
+                    }));
+                    var a = 0;
+                    mirror.Forge.OnDownloadFinish += (msg, tCount, fCount) =>
+                    {
+                        if (fCount > a) a = fCount;
+                        Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            loadingFrm.TbLodingTip.Text = $"{msg}({fCount.ToString()}/{tCount.ToString()})";
+                            if (fCount == tCount) loadingFrm.Close();
+                        }));
+                    };
                     await mirror.Forge.InstallForge(selectedForge, installerPath);
 
                     #endregion
@@ -317,7 +333,7 @@ namespace CMCL.Wpf.UserControl
             foreach (var fv in forgeVersions)
             {
                 var forgeMenuItem = new MenuItem
-                    {Header = $"下载并安装Forge({fv.Name.Replace("recommended", "推荐版").Replace("latest", "最新版")})"};
+                    {Header = $"下载并安装Forge-{fv.Build.Version}({fv.Name.Replace("recommended", "推荐版").Replace("latest", "最新版")})"};
                 forgeMenuItem.Click += (_, _) => { DownloadSelectedVersion(versionId, fv.Build.Version); };
 
                 SpDownloadTypes.Children.Add(forgeMenuItem);
