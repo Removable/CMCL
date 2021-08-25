@@ -47,8 +47,8 @@ namespace CMCL.Wpf.UserControl
 
             if (forceRefresh)
             {
-                _gameVersionManifest = await mirror.Version.LoadGameVersionList(Utils.HttpClientFactory.CreateClient());
-                _forgePromos = await mirror.Forge.GetForgeVersionList(Utils.HttpClientFactory.CreateClient());
+                _gameVersionManifest = await mirror.Version.LoadGameVersionList();
+                _forgePromos = await mirror.Forge.GetForgeVersionList();
             }
 
             var dataTable = new DataTable();

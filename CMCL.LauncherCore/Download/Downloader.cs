@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -6,12 +7,14 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using CMCL.LauncherCore.Utilities;
+using Downloader;
+using Flurl.Http;
+using DownloadProgressChangedEventArgs = Downloader.DownloadProgressChangedEventArgs;
 
 namespace CMCL.LauncherCore.Download
 {
     public static class Downloader
     {
-        public static CancellationTokenSource DownloadCancellationToken = new();
 
         /// <summary>
         ///     异步获取字符串
@@ -19,19 +22,13 @@ namespace CMCL.LauncherCore.Download
         /// <param name="httpClient"></param>
         /// <param name="url"></param>
         /// <returns></returns>
-        public static async ValueTask<string> GetStringAsync(HttpClient httpClient, string url)
+        public static async Task<string> GetStringAsync(string url)
         {
-            using var response = await GetFinalResponse(httpClient, new Uri(url), 0).ConfigureAwait(false);
-
-            if (response.StatusCode == HttpStatusCode.OK)
-            {
-                var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                return json;
-            }
-
-            throw new Exception($"获取地址出错，状态码：{response.StatusCode}");
+            var json = await url.GetStringAsync();
+            return json;
         }
 
+        /*
         /// <summary>
         ///     异步下载文件
         /// </summary>
@@ -40,7 +37,7 @@ namespace CMCL.LauncherCore.Download
         /// <param name="savePath">保存路径</param>
         /// <param name="taskName">任务名</param>
         /// <returns></returns>
-        public static async ValueTask GetFileAsync(HttpClient httpClient, string url, string savePath,
+        public static async Task GetFileAsync(HttpClient httpClient, string url, string savePath,
             IProgress<double> progress)
         {
             Utils.CombineAndCheckDirectory(true, Path.GetDirectoryName(savePath));
@@ -104,50 +101,38 @@ namespace CMCL.LauncherCore.Download
                 throw new Exception("下载失败");
             }
         }
+        */
 
         /// <summary>
-        ///     获取经过重定向后的最终响应
+        /// 获取Downloader配置
         /// </summary>
-        /// <param name="httpClient"></param>
-        /// <param name="thisUri"></param>
-        /// <param name="token"></param>
-        /// <param name="tryCount"></param>
         /// <returns></returns>
-        /// <exception cref="Exception"></exception>
-        private static async ValueTask<HttpResponseMessage> GetFinalResponse(HttpClient httpClient, Uri thisUri,
-            int tryCount)
+        public static DownloadConfiguration GetConfiguration()
         {
-            try
+            return new DownloadConfiguration
             {
-                var response = await httpClient.GetAsync(thisUri.ToString(),
-                    HttpCompletionOption.ResponseHeadersRead, DownloadCancellationToken.Token).ConfigureAwait(false);
-
-                //若返回的状态码为302
-                switch (response.StatusCode)
+                BufferBlockSize = 4096, // usually, hosts support max to 8000 bytes, default values is 8000
+                ChunkCount = 1, // file parts to download, default value is 1
+                // MaximumBytesPerSecond = 1024 * 1024, // download speed limited to 1MB/s, default values is zero or unlimited
+                MaxTryAgainOnFailover = 3, // the maximum number of times to fail
+                OnTheFlyDownload = true, // caching in-memory or not? default values is true
+                ParallelDownload = true, // download parts of file as parallel or not. Default value is false
+                TempDirectory =
+                    Path.GetTempPath(), // Set the temp path for buffering chunk files, the default path is Path.GetTempPath()
+                Timeout = 3000, // timeout (millisecond) per stream block reader, default values is 1000
+                RequestConfiguration = // config and customize request headers
                 {
-                    case HttpStatusCode.Found:
-                        if (response.Headers.Location == null)
-                            throw new Exception("未找到重定向地址");
-                        //若重定向的新地址为相对地址，则将其重新拼接
-                        if (!response.Headers.Location.IsAbsoluteUri)
-                            thisUri = new Uri($"{thisUri.Scheme}://{thisUri.Host}{response.Headers.Location}");
-                        else
-                            thisUri = response.Headers.Location;
-                        //递归
-                        return await GetFinalResponse(httpClient, thisUri, tryCount).ConfigureAwait(false);
-                    case HttpStatusCode.OK:
-                        return response;
-                    default:
-                        throw new Exception($"出错啦，状态码：{response.StatusCode}");
+                    Accept = "*/*",
+                    AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+                    CookieContainer = new CookieContainer(), // Add your cookies
+                    Headers = new WebHeaderCollection(), // Add your custom headers
+                    KeepAlive = false,
+                    ProtocolVersion = HttpVersion.Version11, // Default value is HTTP 1.1
+                    UseDefaultCredentials = false,
+                    UserAgent =
+                        "CMCL", //$"DownloaderSample/{Assembly.GetExecutingAssembly().GetName().Version.ToString(3)}"
                 }
-            }
-            catch (Exception ex)
-            {
-                await LogHelper.LogExceptionAsync(ex);
-                if (tryCount <= 3)
-                    return await GetFinalResponse(httpClient, thisUri, tryCount + 1).ConfigureAwait(false);
-                throw;
-            }
+            };
         }
     }
 }

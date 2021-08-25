@@ -14,11 +14,6 @@ namespace CMCL.LauncherCore.Utilities
     public static class Utils
     {
         /// <summary>
-        ///     HttpClientFactory
-        /// </summary>
-        public static IHttpClientFactory HttpClientFactory;
-
-        /// <summary>
         ///     格式化日期
         /// </summary>
         /// <param name="dateTime"></param>
