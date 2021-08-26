@@ -4,7 +4,6 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using CMCL.LauncherCore.GameEntities.LoginInfo;
 using CMCL.LauncherCore.Utilities;
-using Flurl.Http;
 using Newtonsoft.Json;
 
 namespace CMCL.LauncherCore.Launch
@@ -29,16 +28,15 @@ namespace CMCL.LauncherCore.Launch
             {
                 var loginRequest = new LoginRequest(username, psw);
                 //请求接口
-                // var client = new HttpClient();
-                // var content = new StringContent(JsonConvert.SerializeObject(loginRequest));
-                // content.Headers.ContentType = new MediaTypeHeaderValue("application/json") {CharSet = "utf-8"};
-                // var response = await client.PostAsync(_routeAuthenticate, content).ConfigureAwait(false);
-                var response = await _routeAuthenticate.PostJsonAsync(loginRequest);
-                
+                var client = Utils.HttpClientFactory.CreateClient();
+                var content = new StringContent(JsonConvert.SerializeObject(loginRequest));
+                content.Headers.ContentType = new MediaTypeHeaderValue("application/json") {CharSet = "utf-8"};
+                var response = await client.PostAsync(_routeAuthenticate, content).ConfigureAwait(false);
+
                 //读取返回字符
-                var responseContent = await response.ResponseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
-                
-                if (!response.ResponseMessage.IsSuccessStatusCode)
+                var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+                if (!response.IsSuccessStatusCode)
                 {
                     if (responseContent.Contains("Invalid credentials")) throw new Exception("用户名或密码错误！");
                     throw new Exception(responseContent);

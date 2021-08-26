@@ -19,10 +19,10 @@ namespace CMCL.LauncherCore.Download.Mirrors.Official
         /// </summary>
         /// <param name="httpClient"></param>
         /// <returns></returns>
-        public override async ValueTask<ForgeVersion[]> GetForgeVersionList()
+        public override async ValueTask<ForgeVersion[]> GetForgeVersionList(HttpClient httpClient)
         {
             //forge官方未提供此接口，故依旧使用bmclapi的
-            var jsonStr = await Downloader.GetStringAsync("https://bmclapi2.bangbang93.com/forge/promos")
+            var jsonStr = await Downloader.GetStringAsync(httpClient, "https://bmclapi2.bangbang93.com/forge/promos")
                 .ConfigureAwait(false);
             var promos = JsonConvert.DeserializeObject<ForgeVersion[]>(jsonStr);
             return promos ?? Array.Empty<ForgeVersion>();

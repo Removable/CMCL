@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="HandyControl" Version="3.2.0" />
+      <PackageReference Include="HandyControl" Version="3.0.0" />
       <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
       <PackageReference Include="Ookii.Dialogs.Wpf" Version="3.1.0" />
     </ItemGroup>

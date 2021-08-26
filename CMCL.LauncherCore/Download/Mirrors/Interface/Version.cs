@@ -12,14 +12,15 @@ using CMCL.LauncherCore.GameEntities.JsonClasses;
 using CMCL.LauncherCore.GameEntities.LoginInfo;
 using CMCL.LauncherCore.Utilities;
 using ComponentUtil.Common.Data;
-using Downloader;
 using Newtonsoft.Json;
 
 namespace CMCL.LauncherCore.Download.Mirrors.Interface
 {
     public abstract class Version
     {
-        public DownloadService DownloaderService = new DownloadService(Downloader.GetConfiguration());
+        private BeforeDownloadStart _beforeDownloadStart;
+        private OnDownloadFinish _onDownloadFinish;
+        private OnDownloadProgressChanged _onDownloadProgressChanged;
         public VersionManifest VersionManifest;
         public virtual string ManifestUrl { get; } = "";
 
@@ -27,9 +28,9 @@ namespace CMCL.LauncherCore.Download.Mirrors.Interface
         ///     获取版本列表
         /// </summary>
         /// <returns></returns>
-        public virtual async ValueTask<VersionManifest> LoadGameVersionList()
+        public virtual async ValueTask<VersionManifest> LoadGameVersionList(HttpClient httpClient)
         {
-            var jsonStr = await Downloader.GetStringAsync(ManifestUrl).ConfigureAwait(false);
+            var jsonStr = await Downloader.GetStringAsync(httpClient, ManifestUrl).ConfigureAwait(false);
             var gameVersionManifest = JsonConvert.DeserializeObject<VersionManifest>(jsonStr);
             VersionManifest = gameVersionManifest;
             return gameVersionManifest;
@@ -38,7 +39,6 @@ namespace CMCL.LauncherCore.Download.Mirrors.Interface
         /// <summary>
         ///     下载版本json
         /// </summary>
-        /// <param name="downloader">Downloader实例</param>
         /// <param name="versionId">游戏版本号</param>
         /// <returns></returns>
         public virtual async ValueTask DownloadJsonAsync(string versionId)
@@ -49,9 +49,12 @@ namespace CMCL.LauncherCore.Download.Mirrors.Interface
             //转换地址
             var url = TransUrl(version.Url);
 
-            var savePath = Utils.CombineAndCheckDirectory(true, AppConfig.GetAppConfig().MinecraftDir, ".minecraft",
-                "versions", versionId, $"{versionId}.json");
-            await DownloaderService.DownloadFileTaskAsync(url, savePath);
+            var progress = new Progress<double>();
+            progress.ProgressChanged += (sender, value) => { _onDownloadProgressChanged?.Invoke("", value); };
+            _beforeDownloadStart?.Invoke($"{versionId}.json", 1, 0);
+            await Downloader.GetFileAsync(Utils.HttpClientFactory.CreateClient(), url,
+                Utils.CombineAndCheckDirectory(true, AppConfig.GetAppConfig().MinecraftDir, ".minecraft", "versions",
+                    versionId, $"{versionId}.json"), progress);
 
             //重新加载版本信息列表
             await GameHelper.LoadVersionInfoList();
@@ -62,7 +65,7 @@ namespace CMCL.LauncherCore.Download.Mirrors.Interface
         /// </summary>
         /// <param name="versionId">游戏版本号</param>
         /// <returns></returns>
-        public virtual async ValueTask DownloadJarAsync(DownloadService downloader, string versionId)
+        public virtual async ValueTask DownloadJarAsync(string versionId)
         {
             var versionInfo = GameHelper.GetVersionInfo(versionId);
 
@@ -92,7 +95,7 @@ namespace CMCL.LauncherCore.Download.Mirrors.Interface
         protected virtual string TransUrl(string originUrl)
         {
             const string server = "";
-            var originServers = new[] { "https://launchermeta.mojang.com/", "https://launcher.mojang.com/" };
+            var originServers = new[] {"https://launchermeta.mojang.com/", "https://launcher.mojang.com/"};
 
             return originServers.Aggregate(originUrl, (current, originServer) => current.Replace(originServer, server));
         }
@@ -232,6 +235,24 @@ namespace CMCL.LauncherCore.Download.Mirrors.Interface
                         return argStr;
                 }
             }
+        }
+
+        public event OnDownloadFinish OnDownloadFinish
+        {
+            add => _onDownloadFinish += value;
+            remove => _onDownloadFinish -= value;
+        }
+
+        public event OnDownloadProgressChanged OnDownloadProgressChanged
+        {
+            add => _onDownloadProgressChanged += value;
+            remove => _onDownloadProgressChanged -= value;
+        }
+
+        public event BeforeDownloadStart BeforeDownloadStart
+        {
+            add => _beforeDownloadStart += value;
+            remove => _beforeDownloadStart -= value;
         }
     }
 }

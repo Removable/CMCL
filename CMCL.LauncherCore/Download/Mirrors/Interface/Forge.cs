@@ -27,9 +27,9 @@ namespace CMCL.LauncherCore.Download.Mirrors.Interface
         /// </summary>
         /// <param name="httpClient"></param>
         /// <returns></returns>
-        public virtual async ValueTask<ForgeVersion[]> GetForgeVersionList()
+        public virtual async ValueTask<ForgeVersion[]> GetForgeVersionList(HttpClient httpClient)
         {
-            var jsonStr = await Downloader.GetStringAsync($"{MirrorUrl}/forge/promos")
+            var jsonStr = await Downloader.GetStringAsync(httpClient, $"{MirrorUrl}/forge/promos")
                 .ConfigureAwait(false);
             var promos = JsonConvert.DeserializeObject<ForgeVersion[]>(jsonStr);
             return promos ?? Array.Empty<ForgeVersion>();

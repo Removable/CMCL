@@ -179,6 +179,7 @@ namespace CMCL.LauncherCore.Utilities
             await LoadVersionInfoList();
 
             var serviceProvider = new ServiceCollection().AddHttpClient().BuildServiceProvider();
+            Utils.HttpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
         }
 
         #endregion

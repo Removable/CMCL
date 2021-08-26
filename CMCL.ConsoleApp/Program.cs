@@ -65,7 +65,7 @@ namespace CMCL.ConsoleApp
         private static async Task PrintVersionList(int pageNo)
         {
             var mirror = MirrorManager.GetCurrentMirror();
-            var versionList = await mirror.Version.LoadGameVersionList();
+            var versionList = await mirror.Version.LoadGameVersionList(Utils.HttpClientFactory.CreateClient());
             var table = new ConsoleTable(
                 $"版本({pageNo.ToString()}/{Math.Round(versionList.Versions.Length / 10d).ToString(CultureInfo.InvariantCulture)})",
                 "发布时间", "类型");
